@@ -1,0 +1,22 @@
+{# Pages d'invitation (activation d'un compte, lien expiré), d'après le canevas Console « Invitation » :
+   en-tête léger avec le logo de l'association, contenu centré. Variables : invitation. #}
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/invitation.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/legal.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="invitation">
+        <header class="invitation__entete">
+            {{ include('composants/logo.html.twig', {taille: 36, village: invitation.association.nomVillage}) }}
+            <span class="invitation__connexion">{{ 'invitation.deja_un_compte'|trans }} <a href="{{ path('connexion') }}">{{ 'connexion.titre'|trans }}</a></span>
+        </header>
+        <main class="invitation__corps" id="contenu">
+            {% block contenu %}{% endblock %}
+        </main>
+        <p class="invitation__pied">{{ invitation.association.nom }} · {{ 'app.nom'|trans }}</p>
+        {{ include('composants/pied_legal.html.twig') }}
+    </div>
+{% endblock %}

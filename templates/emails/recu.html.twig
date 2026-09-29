@@ -1,0 +1,11 @@
+{% set membre = paiement.membre %}
+<p>Bonjour {{ prenom }},</p>
+<p>{{ membre.association.nom }} a bien reçu votre paiement de <strong>{{ (paiement.montant / 100)|format_currency('EUR') }}</strong> le {{ paiement.recuLe|format_date('long') }} ({{ ('paiements_association.moyen.' ~ paiement.moyen.value)|trans|lower }}{% if paiement.reference %}, référence {{ paiement.reference }}{% endif %}), pour la caisse de {{ paiement.ville.nom }}.</p>
+<p>Ce paiement règle :</p>
+<ul>
+{% for e in paiement.echeances %}
+    <li>{% if e.appel %}{{ e.appel.objet }}{% else %}Cotisation {{ ('membres_association.mois.' ~ e.mois)|trans }} {{ e.annee }}{% endif %} · {{ (e.montant / 100)|format_currency('EUR') }}</li>
+{% endfor %}
+</ul>
+<p>Reçu n° {{ paiement.id }}. Conservez ce message : il vaut reçu.</p>
+<p><a href="{{ lien }}" style="display:inline-block;padding:10px 16px;border-radius:8px;background:#21705b;color:#ffffff;font-weight:600;text-decoration:none">Voir mon historique</a></p>

@@ -1,0 +1,129 @@
+{# Réglages d'un import de membres (F-31) : la feuille du classeur, la ligne d'en-têtes (pas forcément la première),
+   le champ de chaque colonne utile. Variables : association, ville, etape, etapes, form, fichier, feuilles, feuille,
+   enTetes (la ligne d'en-têtes, ou vide), exemples (les 3 lignes suivantes), indices (colonnes proposées), lettres
+   (indice => lettre), colonnesMasquees. #}
+{% extends 'ville/assistant/_layout.html.twig' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/console.css') }}">
+{% endblock %}
+
+{% block title %}{{ 'assistant_ville.membres.reglages.titre'|trans }} · {{ ville.nom }}{% endblock %}
+
+{% block contenu %}
+    {% set params = {slug: association.slug, id: ville.id} %}
+
+    <div class="etape__entete">
+        <h1 class="etape__titre">{{ 'assistant_ville.membres.reglages.titre'|trans }}</h1>
+        <p class="etape__intro">{{ 'assistant_ville.membres.reglages.intro'|trans({fichier: fichier}) }}</p>
+    </div>
+
+    {% if feuilles|length > 1 %}
+        <section class="reglages__bloc" aria-labelledby="reglages-feuilles">
+            <h2 class="etape__sous-titre" id="reglages-feuilles">{{ 'assistant_ville.membres.reglages.feuilles'|trans }}</h2>
+            <p class="etape__aide">{{ 'assistant_ville.membres.reglages.feuilles_aide'|trans }}</p>
+            <div class="filtres">
+                {% for f in feuilles %}
+                    <a class="filtre" href="{{ path('ville_assistant_membres_import_reglages', params|merge({feuille: loop.index0})) }}"{% if loop.index0 == feuille %} aria-current="true"{% endif %}>{{ f.nom }} · {{ 'assistant_ville.membres.reglages.feuille_lignes'|trans({nombre: f.lignes}) }}</a>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    {{ form_start(form, {attr: {id: form.vars.id, class: 'formulaire', novalidate: 'novalidate'}}) }}
+        {% if form.vars.submitted and not form.vars.valid %}
+            <div class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</div>
+        {% endif %}
+        {{ form_errors(form) }}
+        {{ form_widget(form.feuille) }}
+
+        <section class="reglages__bloc" aria-labelledby="reglages-colonnes">
+            <h2 class="etape__sous-titre" id="reglages-colonnes">{{ 'assistant_ville.membres.reglages.colonnes'|trans }}</h2>
+            <p class="etape__aide">{{ 'assistant_ville.membres.reglages.colonnes_aide'|trans }}</p>
+            {% set enErreurLigne = form.ligneEnTete.vars.errors|length > 0 %}
+            <div class="reglages__en-tete{{ enErreurLigne ? ' champ--erreur' }}">
+                <label class="champ__label" for="{{ form.ligneEnTete.vars.id }}">{{ 'assistant_ville.membres.reglages.ligne_en_tete'|trans }}</label>
+                <div class="reglages__en-tete-saisie">
+                    {{ form_widget(form.ligneEnTete, {attr: {class: 'champ__saisie reglages__numero', 'aria-describedby': form.ligneEnTete.vars.id ~ '_aide'}}) }}
+                    {{ form_widget(form.appliquer, {attr: {class: 'bouton bouton--secondaire'}}) }}
+                </div>
+                <p class="champ__aide" id="{{ form.ligneEnTete.vars.id }}_aide">{{ 'assistant_ville.membres.reglages.ligne_en_tete_aide'|trans }}</p>
+                {% if enErreurLigne %}<p class="champ__erreur">{% for erreur in form.ligneEnTete.vars.errors %}{{ erreur.message }}{% endfor %}</p>{% endif %}
+            </div>
+            <fieldset class="reglages__ordre">
+                <legend class="champ__label">{{ 'assistant_ville.membres.reglages.ordre'|trans }}</legend>
+                <div class="reglages__ordre-choix">
+                    {% for choix in form.ordreNomComplet %}
+                        <label class="case">{{ form_widget(choix) }}<span>{{ choix.vars.label|trans }}</span></label>
+                    {% endfor %}
+                </div>
+                <p class="champ__aide">{{ 'assistant_ville.membres.reglages.ordre_aide'|trans }}</p>
+            </fieldset>
+            {% if form.colonnes.vars.errors|length > 0 %}
+                <p class="champ__erreur" role="alert">
+                    {%- for erreur in form.colonnes.vars.errors %}{{ erreur.message }}{% if not loop.last %} {% endif %}{% endfor -%}
+                </p>
+            {% endif %}
+
+            <div class="tableau tableau--membres tableau--reglages">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ 'assistant_ville.membres.reglages.colonne'|trans }}</th>
+                            <th scope="col" class="tableau__tertiaire">{{ 'assistant_ville.membres.reglages.contenu'|trans }}</th>
+                            <th scope="col">{{ 'assistant_ville.membres.reglages.champ'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for indice in indices %}
+                            {% set enfant = form.colonnes['c' ~ indice] %}
+                            {% set enErreur = enfant.vars.errors|length > 0 %}
+                            {% set enTeteColonne = (enTetes[indice] ?? '')|trim %}
+                            <tr{{ enErreur ? ' class="import__ligne--erreur"' }}>
+                                <td>
+                                    <div class="entite">
+                                        <span class="reglages__lettre" aria-hidden="true">{{ lettres[indice] }}</span>
+                                        <div class="entite__texte">
+                                            <span class="entite__nom">{{ enTeteColonne != '' ? enTeteColonne : 'assistant_ville.membres.reglages.colonne'|trans ~ ' ' ~ lettres[indice] }}</span>
+                                            <span class="entite__detail reglages__apercu-mobile">{{ (exemples[0][indice] ?? '') ?: 'assistant_ville.membres.reglages.vide'|trans }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="tableau__tertiaire">
+                                    <ul class="reglages__apercu">
+                                        {% for ligne in exemples %}
+                                            <li>{{ (ligne[indice] ?? '') ?: 'assistant_ville.membres.reglages.vide'|trans }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                                <td>
+                                    <label class="visuellement-cache" for="{{ enfant.vars.id }}">{{ 'assistant_ville.membres.reglages.champ_de'|trans({colonne: lettres[indice]}) }}</label>
+                                    {{ form_widget(enfant, {attr: {class: 'champ__saisie reglages__champ', 'aria-invalid': enErreur ? 'true' : false}}) }}
+                                    {% if enErreur %}
+                                        <p class="champ__erreur">{% for erreur in enfant.vars.errors %}{{ erreur.message }}{% if not loop.last %} {% endif %}{% endfor %}</p>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="3" class="tableau__vide">{{ 'assistant_ville.membres.reglages.aucune_colonne'|trans }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if colonnesMasquees > 0 %}
+                <p class="etape__aide">{{ 'assistant_ville.membres.reglages.colonnes_masquees'|trans({nombre: colonnesMasquees}) }}</p>
+            {% endif %}
+        </section>
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block actions %}
+    {% set params = {slug: association.slug, id: ville.id} %}
+    <form method="post" action="{{ path('ville_assistant_membres_import_annuler', params) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('import-membres-' ~ ville.id) }}">
+        <button type="submit" class="bouton bouton--secondaire">{{ 'assistant_ville.membres.apercu.annuler'|trans }}</button>
+    </form>
+    <button type="submit" form="{{ form.vars.id }}" class="bouton bouton--primaire">{{ 'assistant_ville.membres.reglages.continuer'|trans }}</button>
+{% endblock %}

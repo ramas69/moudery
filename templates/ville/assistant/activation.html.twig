@@ -1,0 +1,96 @@
+{# Étape 3 de l'assistant : récapitulatif et activation (F-46). Pour une ville déjà active, le même récapitulatif,
+   sans le bouton : ce qui reste à faire se règle depuis l'espace de la ville.
+   Pour une ville active, les responsables affichés sont les comptes qui tiennent le rôle aujourd'hui, et « Et maintenant »
+   mène aux modules de la ville. Variables : association, ville, etape, etapes, peutActiver, comptes (rôle => comptes). #}
+{% extends 'ville/assistant/_layout.html.twig' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% set brouillon = ville.estBrouillon %}
+{% set params = {slug: association.slug, id: ville.id} %}
+
+{% block title %}{{ (brouillon ? 'assistant_ville.activation.titre' : 'assistant_ville.activation.titre_active')|trans({nom: ville.nom}) }} · {{ association.nom }}{% endblock %}
+
+{% macro responsable(ville, role, params, comptes) %}
+    {% set invitation = ville.invitationPour(role) %}
+    {% set titulaires = comptes[role.value] ?? [] %}
+    <dt>{{ ('assistant_ville.activation.roles.' ~ role.value)|trans }}</dt>
+    <dd>
+        {% if titulaires is not empty %}
+            {% for compte in titulaires %}
+                <span class="recapitulatif__valeur">{{ compte.nomComplet }} <span class="recapitulatif__detail">{{ compte.email }}</span></span>
+                <span class="pastille pastille--succes">{{ 'assistant_ville.activation.compte_actif'|trans }}</span>
+            {% endfor %}
+        {% elseif invitation %}
+            <span class="recapitulatif__valeur">{{ invitation.email }}</span>
+            {% set etat = invitation.accepteeLe is not null ? 'acceptee' : (invitation.estEnvoyee() ? 'envoyee' : 'a_envoyer') %}
+            <span class="pastille {{ etat == 'acceptee' ? 'pastille--succes' : 'pastille--attente' }}">{{ ('assistant_ville.identite.invitation.' ~ etat)|trans }}</span>
+        {% else %}
+            <span class="recapitulatif__vide">{{ 'assistant_ville.activation.non_renseigne'|trans }}</span>
+        {% endif %}
+        {% if ville.estBrouillon %}<a class="recapitulatif__lien" href="{{ path('ville_assistant_identite', params) }}">{{ 'assistant_ville.activation.modifier'|trans }}</a>{% endif %}
+    </dd>
+{% endmacro %}
+
+{% block contenu %}
+    <div class="etape__entete">
+        <h1 class="etape__titre">{{ (brouillon ? 'assistant_ville.activation.titre' : 'assistant_ville.activation.titre_active')|trans({nom: ville.nom}) }}</h1>
+        <p class="etape__intro">{{ (brouillon ? 'assistant_ville.activation.intro' : 'assistant_ville.activation.intro_active')|trans }}</p>
+    </div>
+
+    <section class="bloc recapitulatif" aria-labelledby="recapitulatif-titre">
+        <h2 id="recapitulatif-titre">{{ 'assistant_ville.activation.recapitulatif'|trans }}</h2>
+        <dl class="recapitulatif__liste">
+            <dt>{{ 'assistant_ville.activation.nom'|trans }}</dt>
+            <dd>
+                <span class="recapitulatif__valeur">{{ ville.nom }}</span>
+                {% if brouillon %}<a class="recapitulatif__lien" href="{{ path('ville_assistant_identite', params) }}">{{ 'assistant_ville.activation.modifier'|trans }}</a>{% endif %}
+            </dd>
+            {{ _self.responsable(ville, constant('App\\Entity\\RoleVille::Tresorier'), params, comptes) }}
+            {{ _self.responsable(ville, constant('App\\Entity\\RoleVille::President'), params, comptes) }}
+            {{ _self.responsable(ville, constant('App\\Entity\\RoleVille::Secretaire'), params, comptes) }}
+            <dt>{{ 'assistant_ville.activation.membres'|trans }}</dt>
+            <dd>
+                <span class="recapitulatif__valeur">{{ 'assistant_ville.activation.membres_nombre'|trans({nombre: ville.membres|length}) }}</span>
+                <a class="recapitulatif__lien" href="{{ path('ville_assistant_membres', params) }}">{{ (ville.membres|length > 0 ? 'assistant_ville.activation.completer' : 'assistant_ville.activation.ajouter_membres')|trans }}</a>
+            </dd>
+        </dl>
+    </section>
+
+    {% if brouillon %}
+        <section class="bloc" aria-labelledby="activation-suite-titre">
+            <h2 id="activation-suite-titre">{{ 'assistant_ville.activation.suite_titre'|trans }}</h2>
+            <ul class="liste-simple">
+                <li>{{ 'assistant_ville.activation.suite_invitations'|trans }}</li>
+                <li>{{ 'assistant_ville.activation.suite_visible'|trans }}</li>
+                <li>{{ 'assistant_ville.activation.suite_apres'|trans }}</li>
+            </ul>
+            {% if not peutActiver %}
+                <p class="alerte alerte--attention" role="status">{{ 'assistant_ville.activation.tresorier_obligatoire'|trans }} <a href="{{ path('ville_assistant_identite', params) }}">{{ 'assistant_ville.activation.renseigner_tresorier'|trans }}</a></p>
+            {% endif %}
+        </section>
+    {% else %}
+        <section class="bloc" aria-labelledby="apres-titre">
+            <h2 id="apres-titre">{{ 'assistant_ville.activation.apres_titre'|trans }}</h2>
+            <ul class="liste-simple">
+                <li><a href="{{ path('ville_assistant_membres', params) }}">{{ 'assistant_ville.activation.apres_membres'|trans }}</a></li>
+                <li><a href="{{ path('association_cotisations', {slug: association.slug, ville: ville.id}) }}">{{ 'assistant_ville.activation.apres_cotisations'|trans }}</a></li>
+                <li><a href="{{ path('association_appels', {slug: association.slug, ville: ville.id}) }}">{{ 'assistant_ville.activation.apres_projets'|trans }}</a></li>
+                <li><a href="{{ path('association_paiements', {slug: association.slug, ville: ville.id}) }}">{{ 'assistant_ville.activation.apres_paiements'|trans }}</a></li>
+                <li><a href="{{ path('association_depenses', {slug: association.slug, ville: ville.id}) }}">{{ 'assistant_ville.activation.apres_depenses'|trans }}</a></li>
+                <li>{{ 'assistant_ville.activation.apres_compte_bancaire'|trans }} <span class="chip chip--absente">{{ 'assistant_ville.activation.bientot'|trans }}</span></li>
+            </ul>
+        </section>
+    {% endif %}
+{% endblock %}
+
+{% block actions %}
+    {% if brouillon %}
+        <a class="bouton bouton--secondaire" href="{{ path('association_tableau_de_bord', {slug: association.slug}) }}">{{ 'assistant_ville.activation.plus_tard'|trans }}</a>
+        <form method="post" action="{{ path('ville_assistant_activer', params) }}" class="activation">
+            <input type="hidden" name="_token" value="{{ csrf_token('activer-ville-' ~ ville.id) }}">
+            <button type="submit" class="bouton bouton--primaire"{% if not peutActiver %} disabled title="{{ 'assistant_ville.activation.tresorier_obligatoire'|trans }}"{% endif %}>{{ icones.icone('coche', 15) }}{{ 'assistant_ville.activation.bouton'|trans }}</button>
+        </form>
+    {% else %}
+        <a class="bouton bouton--primaire" href="{{ path('association_tableau_de_bord', {slug: association.slug, ville: ville.id}) }}">{{ 'assistant_ville.activation.tableau_de_bord'|trans }}</a>
+    {% endif %}
+{% endblock %}

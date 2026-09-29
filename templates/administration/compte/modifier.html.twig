@@ -1,0 +1,34 @@
+{# Modification de l'identité d'un compte : prénom, nom, adresse e-mail. Garde le contexte d'origine (depuis). Variables : compte, form, depuis. #}
+{% extends 'administration/_layout.html.twig' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% set depuisEquipe = depuis == 'equipe' %}
+{% set page = depuisEquipe ? 'equipe' : 'comptes' %}
+{% set parametresFiche = depuisEquipe ? {id: compte.id, depuis: 'equipe'} : {id: compte.id} %}
+
+{% block title %}{{ 'administration.compte.modifier_titre'|trans }} · {{ compte.nomComplet }}{% endblock %}
+
+{% block fil_ariane %}
+    <a class="fil-ariane" href="{{ path('administration_compte_fiche', parametresFiche) }}">{{ icones.icone('chevron-gauche', 14) }}{{ compte.nomComplet }}</a>
+{% endblock %}
+
+{% block titre_page %}{{ 'administration.compte.modifier_titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ compte.nomComplet }} · {{ compte.email }}</p>{% endblock %}
+
+{% block contenu %}
+    {{ form_start(form, {attr: {class: 'formulaire formulaire--etroit', novalidate: 'novalidate'}}) }}
+        {% if depuisEquipe %}<input type="hidden" name="depuis" value="equipe">{% endif %}
+        {% if form.vars.submitted and not form.vars.valid %}
+            <div class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</div>
+        {% endif %}
+        {{ form_errors(form) }}
+        {{ formulaire.champ(form.prenom, null) }}
+        {{ formulaire.champ(form.nom, null) }}
+        {{ formulaire.champ(form.email, 'administration.compte.email.aide_modification'|trans) }}
+        <div class="formulaire__actions">
+            <a class="bouton bouton--secondaire" href="{{ path('administration_compte_fiche', parametresFiche) }}">{{ 'administration.compte.annuler'|trans }}</a>
+            <button type="submit" class="bouton bouton--primaire">{{ 'administration.compte.enregistrer'|trans }}</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

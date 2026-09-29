@@ -1,0 +1,114 @@
+{# Équipe de la plateforme : les super-admins (avec ou sans association), leur accès, le renvoi du lien de mot de passe,
+   et la promotion d'un compte existant. Variables : membres, formPromotion, aucunCandidat. #}
+{% extends 'administration/_layout.html.twig' %}
+{% set page = 'equipe' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'administration/_macros.html.twig' as macros %}
+
+{% block title %}{{ 'administration.equipe.titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block titre_page %}{{ 'administration.equipe.titre'|trans }} <span class="compteur">{{ membres|length }}</span>{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'administration.equipe.sous_titre'|trans({nombre: membres|length}) }}</p>{% endblock %}
+
+{% block actions %}
+    <a class="bouton bouton--primaire" href="{{ path('administration_equipe_ajouter') }}">{{ icones.icone('personne-plus', 15) }}{{ 'administration.equipe.ajouter'|trans }}</a>
+{% endblock %}
+
+{% block contenu %}
+    <form method="get" action="{{ path('administration_equipe') }}" class="barre-outils" role="search">
+        <label class="recherche">
+            <span class="visuellement-cache">{{ 'administration.equipe.rechercher'|trans }}</span>
+            {{ icones.icone('recherche', 15) }}
+            <input class="recherche__saisie" type="search" name="q" value="{{ recherche }}" placeholder="{{ 'administration.equipe.recherche_placeholder'|trans }}" autocomplete="off">
+        </label>
+        <button type="submit" class="bouton bouton--secondaire">{{ 'administration.equipe.rechercher'|trans }}</button>
+        {% if recherche != '' %}
+            <a class="bouton bouton--discret" href="{{ path('administration_equipe') }}">{{ 'administration.comptes.effacer_recherche'|trans }}</a>
+        {% endif %}
+    </form>
+
+    <section class="section" aria-label="{{ 'administration.equipe.titre'|trans }}">
+        <div class="tableau tableau--menus">
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">{{ 'administration.equipe.colonne.personne'|trans }}</th>
+                        <th scope="col" class="tableau__tertiaire">{{ 'administration.equipe.colonne.association'|trans }}</th>
+                        <th scope="col">{{ 'administration.equipe.colonne.statut'|trans }}</th>
+                        <th scope="col" class="tableau__secondaire">{{ 'administration.equipe.colonne.acces'|trans }}</th>
+                        <th scope="col"><span class="visuellement-cache">{{ 'administration.villes.colonne.actions'|trans }}</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for membre in membres %}
+                        {% set moi = app.user and app.user.id == membre.id %}
+                        <tr>
+                            <td>
+                                <span class="entite">
+                                    <span class="entite__initiales entite__initiales--rond" aria-hidden="true">{{ macros.initiales(membre.prenom, membre.nom) }}</span>
+                                    <span class="entite__texte">
+                                        <span class="entite__nom"><a href="{{ path('administration_compte_fiche', {id: membre.id, depuis: 'equipe'}) }}">{{ membre.nomComplet }}</a>{% if moi %} <span class="chip">{{ 'administration.equipe.vous'|trans }}</span>{% endif %}</span>
+                                        <span class="entite__detail">{{ membre.email }}</span>
+                                    </span>
+                                </span>
+                            </td>
+                            <td class="tableau__tertiaire">
+                                {% if membre.association %}
+                                    <a href="{{ path('administration_association_fiche', {id: membre.association.id}) }}">{{ membre.association.nom }}</a>
+                                {% else %}
+                                    <span class="tableau__precision tableau__precision--neutre">{{ 'administration.comptes.plateforme'|trans }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ macros.statut_compte(membre) }}</td>
+                            <td class="tableau__secondaire">
+                                {% if membre.derniereConnexionLe %}
+                                    {{ 'administration.equipe.derniere_connexion'|trans({date: membre.derniereConnexionLe|format_datetime('medium', 'short')}) }}
+                                {% else %}
+                                    <span class="pastille pastille--attente">{{ 'administration.equipe.mot_de_passe_a_choisir'|trans }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="tableau__menu">
+                                <details class="menu" data-controller="menu" data-action="toggle->menu#ouvrir">
+                                    <summary class="bouton bouton--icone" aria-label="{{ 'administration.equipe.actions_pour'|trans({nom: membre.nomComplet}) }}" title="{{ 'administration.equipe.actions_pour'|trans({nom: membre.nomComplet}) }}">{{ icones.icone('menu') }}</summary>
+                                    <div class="menu__liste">
+                                        <a class="menu__item" href="{{ path('administration_compte_fiche', {id: membre.id, depuis: 'equipe'}) }}">{{ icones.icone('externe', 15) }}{{ 'administration.equipe.ouvrir'|trans }}</a>
+                                        {% if not membre.derniereConnexionLe and not moi %}
+                                            <form method="post" action="{{ path('administration_equipe_renvoyer', {id: membre.id}) }}" class="menu__form renvoi-lien">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('equipe-lien-' ~ membre.id) }}">
+                                                <button type="submit" class="menu__item">{{ icones.icone('renvoyer', 15) }}{{ 'administration.equipe.renvoyer_lien'|trans }}</button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </details>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="5" class="tableau__vide">{{ 'administration.equipe.aucun_resultat'|trans }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p class="section__aide">{{ 'administration.equipe.retirer_aide'|trans }}</p>
+    </section>
+
+    <section class="section" aria-labelledby="promotion-titre">
+        <div class="section__entete">
+            <h2 id="promotion-titre">{{ 'administration.equipe.promouvoir.titre'|trans }}</h2>
+        </div>
+        <p class="section__aide">{{ 'administration.equipe.promouvoir.intro'|trans }}</p>
+        {% if aucunCandidat %}
+            <p class="section__vide">{{ 'administration.equipe.promouvoir.aucun_candidat'|trans }}</p>
+        {% else %}
+            {{ form_start(formPromotion, {attr: {class: 'section__formulaire', novalidate: 'novalidate'}}) }}
+                {{ form_errors(formPromotion) }}
+                <div class="section__formulaire-champs">
+                    {{ formulaire.champ(formPromotion.compte, null) }}
+                </div>
+                <div class="section__formulaire-actions">
+                    <button type="submit" class="bouton bouton--primaire">{{ icones.icone('cle', 15) }}{{ 'administration.equipe.promouvoir.bouton'|trans }}</button>
+                </div>
+            {{ form_end(formPromotion) }}
+        {% endif %}
+    </section>
+{% endblock %}

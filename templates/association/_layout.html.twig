@@ -1,0 +1,147 @@
+{# Coquille « Console » de l'espace d'une association (bureau central), même canevas que l'administration :
+   barre latérale avec le logo au village de l'association, le sélecteur de périmètre (toute l'association ou une
+   ville : toute l'application suit ce choix), la navigation (les modules à venir tiennent sur une ligne en bas),
+   le compte connecté ; en-tête de page ; contenu. Variables : association ; page (facultatif). #}
+{% extends 'base.html.twig' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/console.css') }}">
+{% endblock %}
+
+{% block body %}
+    {% set page = page|default('tableau-de-bord') %}
+    {% set perimetre = perimetre(association) %}
+    {% set villePerimetre = perimetre.ville %}
+    {% set retour = app.request.requestUri %}
+    <div class="console">
+        <aside class="console__barre">
+            <div class="console__marque">
+                {{ include('composants/logo.html.twig', {taille: 32, permanent: true, village: association.nomVillage, lien: path('accueil')}) }}
+            </div>
+
+            {# Le périmètre : l'association entière ou une ville ; le tableau de bord, les membres et les cotisations suivent. #}
+            {# Un responsable de ville n'a que ses villes ; avec une seule, plus rien à choisir. #}
+            {% set pilote = perimetre.toute %}
+            {% if pilote or perimetre.villes|length > 1 %}
+            <details class="menu perimetre" data-controller="menu" data-action="toggle->menu#ouvrir">
+                <summary class="console__perimetre" title="{{ (villePerimetre ? (pilote ? 'espace.perimetre_ville_aide' : 'espace.perimetre_mes_villes_aide') : 'espace.perimetre_aide')|trans }}">
+                    <span class="console__perimetre-initiales" aria-hidden="true">{{ (villePerimetre ? villePerimetre.nom : association.nom|split(' ')|last)|slice(0, 2)|upper }}</span>
+                    <span class="console__perimetre-nom">{{ villePerimetre ? villePerimetre.nom : 'espace.perimetre_toute'|trans }}</span>
+                    <span class="console__perimetre-chevron" aria-hidden="true">{{ icones.icone('chevron', 14) }}</span>
+                </summary>
+                <div class="menu__liste">
+                    {% if pilote %}<a class="menu__item{{ villePerimetre ? '' : ' menu__item--actif' }}" href="{{ path('association_perimetre', {slug: association.slug, ville: 'association', retour: retour}) }}">{{ icones.icone('associations', 15) }}{{ 'espace.perimetre_toute'|trans }}</a>{% endif %}
+                    {% for v in perimetre.villes %}
+                        <a class="menu__item{{ villePerimetre and villePerimetre.id == v.id ? ' menu__item--actif' }}" href="{{ path('association_perimetre', {slug: association.slug, ville: v.id, retour: retour}) }}">{{ icones.icone('villes', 15) }}{{ v.nom }}</a>
+                    {% endfor %}
+                </div>
+            </details>
+            {% else %}
+            <div class="console__perimetre console__perimetre--fixe" title="{{ 'espace.perimetre_ma_ville_aide'|trans }}">
+                <span class="console__perimetre-initiales" aria-hidden="true">{{ (villePerimetre ? villePerimetre.nom : association.nom|split(' ')|last)|slice(0, 2)|upper }}</span>
+                <span class="console__perimetre-nom">{{ villePerimetre ? villePerimetre.nom : association.nom }}</span>
+            </div>
+            {% endif %}
+
+            <nav class="console__nav" aria-label="{{ 'espace.navigation'|trans }}">
+                <a class="console__lien" href="{{ path('association_tableau_de_bord', {slug: association.slug}) }}"{% if page == 'tableau-de-bord' %} aria-current="page"{% endif %}>
+                    {{ icones.icone('tableau-de-bord') }}<span>{{ 'espace.nav.tableau_de_bord'|trans }}</span>
+                </a>
+                {% if not villePerimetre %}
+                    <a class="console__lien" href="{{ path('association_villes', {slug: association.slug}) }}"{% if page == 'villes' %} aria-current="page"{% endif %}>
+                        {{ icones.icone('villes') }}<span>{{ 'espace.nav.villes'|trans }}</span>
+                    </a>
+                {% endif %}
+                {% set navMembresEnAttente = villePerimetre ? membres_en_attente(villePerimetre) : 0 %}
+                <a class="console__lien" href="{{ path('association_membres', {slug: association.slug}) }}"{% if page == 'membres' %} aria-current="page"{% endif %}>
+                    {{ icones.icone('comptes') }}<span>{{ 'espace.nav.membres'|trans }}</span>{% if navMembresEnAttente > 0 %}<span class="console__badge" title="{{ 'espace.nav.membres_en_attente'|trans({nombre: navMembresEnAttente}) }}"><span class="visuellement-cache">{{ 'espace.nav.membres_en_attente'|trans({nombre: navMembresEnAttente}) }}</span><span aria-hidden="true">{{ navMembresEnAttente }}</span></span>{% endif %}
+                </a>
+                <a class="console__lien" href="{{ path('association_cotisations', {slug: association.slug}) }}"{% if page == 'cotisations' %} aria-current="page"{% endif %}>
+                    {{ icones.icone('euro') }}<span>{{ 'espace.nav.cotisations'|trans }}</span>
+                </a>
+                <a class="console__lien" href="{{ path('association_paiements', {slug: association.slug}) }}"{% if page == 'paiements' %} aria-current="page"{% endif %}>
+                    {{ icones.icone('paiement') }}<span>{{ 'espace.nav.paiements'|trans }}</span>
+                </a>
+                {% set navMembresEnRetard = membres_en_retard(association, villePerimetre) %}
+                <a class="console__lien" href="{{ path('association_impayes', {slug: association.slug}) }}"{% if page == 'impayes' %} aria-current="page"{% endif %}>
+                    {{ icones.icone('relance') }}<span>{{ 'espace.nav.impayes'|trans }}</span>{% if navMembresEnRetard > 0 %}<span class="console__badge" title="{{ 'espace.nav.impayes_en_retard'|trans({nombre: navMembresEnRetard}) }}"><span class="visuellement-cache">{{ 'espace.nav.impayes_en_retard'|trans({nombre: navMembresEnRetard}) }}</span><span aria-hidden="true">{{ navMembresEnRetard }}</span></span>{% endif %}
+                </a>
+                <a class="console__lien" href="{{ path('association_appels', {slug: association.slug}) }}"{% if page == 'appels' %} aria-current="page"{% endif %}>
+                    {{ icones.icone('envoyer') }}<span>{{ 'espace.nav.appels'|trans }}</span>
+                </a>
+                {% set navDepensesAValider = depenses_a_valider(association, pilote ? null : villePerimetre) %}
+                <a class="console__lien" href="{{ path('association_depenses', {slug: association.slug}) }}"{% if page == 'depenses' %} aria-current="page"{% endif %}>
+                    {{ icones.icone('recu') }}<span>{{ 'espace.nav.depenses'|trans }}</span>{% if navDepensesAValider > 0 %}<span class="console__badge" title="{{ 'espace.nav.depenses_a_valider'|trans({nombre: navDepensesAValider}) }}"><span class="visuellement-cache">{{ 'espace.nav.depenses_a_valider'|trans({nombre: navDepensesAValider}) }}</span><span aria-hidden="true">{{ navDepensesAValider }}</span></span>{% endif %}
+                </a>
+                {# Variable préfixée : les variables posées ici sont visibles des pages, qui ont les leurs. #}
+                {% set navReversementsAConfirmer = reversements_a_confirmer(association, pilote ? null : villePerimetre) %}
+                <a class="console__lien" href="{{ path('association_reversements', {slug: association.slug}) }}"{% if page == 'reversements' %} aria-current="page"{% endif %}>
+                    {{ icones.icone('reversement') }}<span>{{ 'espace.nav.reversements'|trans }}</span>{% if navReversementsAConfirmer > 0 %}<span class="console__badge" title="{{ 'espace.nav.reversements_a_confirmer'|trans({nombre: navReversementsAConfirmer}) }}"><span class="visuellement-cache">{{ 'espace.nav.reversements_a_confirmer'|trans({nombre: navReversementsAConfirmer}) }}</span><span aria-hidden="true">{{ navReversementsAConfirmer }}</span></span>{% endif %}
+                </a>
+                {% if pilote or villePerimetre %}
+                <a class="console__lien" href="{{ path('association_rapport', {slug: association.slug}) }}"{% if page == 'rapport' %} aria-current="page"{% endif %}>
+                    {{ icones.icone('export') }}<span>{{ 'espace.nav.rapports'|trans }}</span>
+                </a>
+                {% endif %}
+                {# Les modules qui n'existent pas encore ne sont plus des entrées mortes : une seule ligne les annonce
+                   (décision de Rama du 28 septembre 2026), et disparaît quand il n'y en a plus. #}
+                {% set navModulesAVenir = (villePerimetre ? 'espace.nav.a_venir_ville' : 'espace.nav.a_venir_association')|trans %}
+                {% if navModulesAVenir is not empty %}<p class="console__a-venir">{{ 'espace.nav.a_venir'|trans({modules: navModulesAVenir}) }}</p>{% endif %}
+            </nav>
+            {# Sur mobile, un responsable de ville a une barre d'onglets en bas (artboard « Accueil trésorière mobile »). #}
+            {% if not pilote and villePerimetre %}
+                <nav class="console__onglets" aria-label="{{ 'espace.navigation'|trans }}">
+                    <a class="console__onglet" href="{{ path('association_tableau_de_bord', {slug: association.slug}) }}"{% if page == 'tableau-de-bord' %} aria-current="page"{% endif %}>{{ icones.icone('tableau-de-bord', 22) }}<span>{{ 'espace.onglets.accueil'|trans }}</span></a>
+                    <a class="console__onglet" href="{{ path('association_membres', {slug: association.slug}) }}"{% if page == 'membres' %} aria-current="page"{% endif %}>{{ icones.icone('comptes', 22) }}<span>{{ 'espace.nav.membres'|trans }}</span></a>
+                    <a class="console__onglet" href="{{ path('association_impayes', {slug: association.slug}) }}"{% if page == 'impayes' %} aria-current="page"{% endif %}>{{ icones.icone('relance', 22) }}<span>{{ 'espace.onglets.impayes'|trans }}</span>{% if navMembresEnRetard > 0 %}<span class="console__onglet-badge" aria-hidden="true">{{ navMembresEnRetard }}</span>{% endif %}</a>
+                    <a class="console__onglet" href="{{ path('association_depenses', {slug: association.slug}) }}"{% if page == 'depenses' %} aria-current="page"{% endif %}>{{ icones.icone('recu', 22) }}<span>{{ 'espace.nav.depenses'|trans }}</span>{% if navDepensesAValider > 0 %}<span class="console__onglet-badge" aria-hidden="true">{{ navDepensesAValider }}</span>{% endif %}</a>
+                    <details class="menu console__onglet-plus" data-controller="menu" data-action="toggle->menu#ouvrir">
+                        <summary class="console__onglet">{{ icones.icone('menu', 22) }}<span>{{ 'espace.onglets.plus'|trans }}</span></summary>
+                        <div class="menu__liste">
+                            <a class="menu__item" href="{{ path('association_cotisations', {slug: association.slug}) }}">{{ icones.icone('euro', 15) }}{{ 'espace.nav.cotisations'|trans }}</a>
+                            <a class="menu__item" href="{{ path('association_paiements', {slug: association.slug}) }}">{{ icones.icone('paiement', 15) }}{{ 'espace.nav.paiements'|trans }}</a>
+                            <a class="menu__item" href="{{ path('association_appels', {slug: association.slug}) }}">{{ icones.icone('envoyer', 15) }}{{ 'espace.nav.appels'|trans }}</a>
+                            <a class="menu__item" href="{{ path('association_reversements', {slug: association.slug}) }}">{{ icones.icone('reversement', 15) }}{{ 'espace.nav.reversements'|trans }}</a>
+                            <a class="menu__item" href="{{ path('association_rapport', {slug: association.slug}) }}">{{ icones.icone('export', 15) }}{{ 'espace.nav.rapports'|trans }}</a>
+                            <a class="menu__item" href="{{ path('parametres') }}">{{ icones.icone('reglages', 15) }}{{ 'menu_compte.parametres'|trans }}</a>
+                        </div>
+                    </details>
+                </nav>
+            {% endif %}
+            <div class="console__bas">
+                {% if not is_granted('IS_IMPERSONATOR') %}
+                    <nav class="console__bas-nav" aria-label="{{ 'menu_compte.parametres'|trans }}">
+                        {% if not pilote and villePerimetre and is_granted(constant('App\\Security\\Permission::VILLE_MODIFIER'), villePerimetre) %}
+                            <a class="console__lien" href="{{ path('ville_assistant_identite', {slug: association.slug, id: villePerimetre.id}) }}">{{ icones.icone('villes') }}<span>{{ 'espace.nav.parametres_ville'|trans }}</span></a>
+                        {% endif %}
+                        <a class="console__lien" href="{{ path('parametres') }}"{% if page == 'parametres' %} aria-current="page"{% endif %}>{{ icones.icone('reglages') }}<span>{{ 'menu_compte.parametres'|trans }}</span></a>
+                    </nav>
+                {% endif %}
+                {# Sous le nom : bureau central, ou le rôle tenu sur la ville du périmètre (trésorière, président, secrétaire). #}
+                {% set roleVille = (not pilote and villePerimetre and app.user) ? app.user.roleSur(villePerimetre) : null %}
+                {{ include('composants/menu_compte.html.twig', {role: roleVille ? ('role.' ~ roleVille.value)|trans : 'espace.role_bureau_central'|trans}) }}
+            </div>
+        </aside>
+
+        <div class="console__principal">
+            <header class="console__entete">
+                <div class="console__entete-titre">
+                    <h1 class="console__titre">{% block titre_page %}{% endblock %}</h1>
+                    {% block sous_titre %}{% endblock %}
+                </div>
+                <div class="console__actions">{% block actions %}{% endblock %}</div>
+            </header>
+            <main class="console__contenu" id="contenu">
+                {% for message in app.flashes('succes') %}
+                    <p class="alerte alerte--succes" role="status">{{ message }}</p>
+                {% endfor %}
+                {% for message in app.flashes('erreur') %}
+                    <p class="alerte alerte--erreur" role="alert">{{ message }}</p>
+                {% endfor %}
+                {% block contenu %}{% endblock %}
+            </main>
+        </div>
+    </div>
+{% endblock %}

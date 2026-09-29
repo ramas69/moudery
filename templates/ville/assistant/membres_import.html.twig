@@ -1,0 +1,133 @@
+{# Aperçu d'un import de membres (F-31) : chaque ligne du fichier, prête, en erreur ou ignorée (déjà présente), avant
+   d'enregistrer les lignes prêtes. Variables : association, ville, etape, etapes, fichier, analyse (colonnes, lignes,
+   valides, invalides, ignorees), lignes (celles affichées), masquees (lignes prêtes non affichées d'un gros fichier). #}
+{% extends 'ville/assistant/_layout.html.twig' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/console.css') }}">
+{% endblock %}
+
+{% block title %}{{ 'assistant_ville.membres.apercu.titre'|trans }} · {{ ville.nom }}{% endblock %}
+
+{% block contenu %}
+    {% set params = {slug: association.slug, id: ville.id} %}
+
+    <div class="etape__entete">
+        <h1 class="etape__titre">{{ 'assistant_ville.membres.apercu.titre'|trans }}</h1>
+        <p class="etape__intro">{{ 'assistant_ville.membres.apercu.intro'|trans({fichier: fichier, nombre: analyse.lignes|length}) }}</p>
+    </div>
+
+    <ul class="membres__stats" aria-label="{{ 'assistant_ville.membres.apercu.bilan'|trans }}">
+        <li class="membres__stat membres__stat--succes">
+            <span class="membres__stat-libelle">{{ 'assistant_ville.membres.apercu.valides'|trans }}</span>
+            <span class="membres__stat-valeur">{{ analyse.valides }}</span>
+        </li>
+        <li class="membres__stat{{ analyse.invalides > 0 ? ' membres__stat--erreur' }}">
+            <span class="membres__stat-libelle">{{ 'assistant_ville.membres.apercu.invalides'|trans }}</span>
+            <span class="membres__stat-valeur">{{ analyse.invalides }}</span>
+        </li>
+        <li class="membres__stat{{ (analyse.adhesions|default(0)) > 0 ? ' membres__stat--succes' }}">
+            <span class="membres__stat-libelle">{{ 'assistant_ville.membres.apercu.adhesions'|trans }}</span>
+            <span class="membres__stat-valeur">{{ analyse.adhesions|default(0) }}</span>
+        </li>
+        <li class="membres__stat">
+            <span class="membres__stat-libelle">{{ 'assistant_ville.membres.apercu.ignorees'|trans }}</span>
+            <span class="membres__stat-valeur">{{ analyse.ignorees }}</span>
+        </li>
+    </ul>
+
+    {% if analyse.invalides > 0 %}
+        <p class="alerte alerte--attention" role="status">{{ 'assistant_ville.membres.apercu.avertissement'|trans({nombre: analyse.invalides}) }}</p>
+    {% endif %}
+
+    <p class="reglages__retour">
+        <a class="bouton bouton--discret bouton--petit" href="{{ path('ville_assistant_membres_import_reglages', params) }}">{{ icones.icone('reglages', 14) }}{{ 'assistant_ville.membres.apercu.reglages'|trans }}</a>
+    </p>
+
+    <p class="etape__aide">
+        {{ 'assistant_ville.membres.apercu.colonnes'|trans }}
+        {% for champ in ['prenom', 'nom', 'nom_complet', 'email', 'telephone', 'foyer', 'localite', 'annee', 'age', 'rapatriement', 'projet'] %}
+            <span class="chip{{ analyse.colonnes[champ] is defined ? '' : ' chip--absente' }}">{{ ('assistant_ville.membres.apercu.champ.' ~ champ)|trans }}{% if analyse.colonnes[champ] is not defined %} · {{ 'assistant_ville.membres.apercu.absente'|trans }}{% endif %}</span>
+        {% endfor %}
+        {% set moisReconnus = analyse.colonnes|keys|filter(c => c starts with 'mois_')|length %}
+        <span class="chip{{ moisReconnus == 0 ? ' chip--absente' }}">{{ 'assistant_ville.membres.apercu.champ.mois'|trans }} · {{ moisReconnus }}/12</span>
+    </p>
+
+    <div class="tableau tableau--membres">
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col" class="numerique">{{ 'assistant_ville.membres.apercu.ligne'|trans }}</th>
+                    <th scope="col">{{ 'assistant_ville.membres.tableau.membre'|trans }}</th>
+                    <th scope="col" class="tableau__tertiaire">{{ 'assistant_ville.membres.tableau.contact'|trans }}</th>
+                    <th scope="col" class="tableau__secondaire">{{ 'assistant_ville.membres.tableau.foyer'|trans }}</th>
+                    <th scope="col">{{ 'assistant_ville.membres.apercu.etat'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ligne in lignes %}
+                    {% set enErreur = ligne.etat == 'erreur' %}
+                    <tr{% if enErreur %} class="import__ligne--erreur"{% elseif ligne.etat == 'ignoree' %} class="import__ligne--ignoree"{% elseif ligne.etat == 'adhesion' %} class="import__ligne--adhesion"{% endif %}>
+                        <td class="numerique">{{ ligne.numero }}</td>
+                        <td>
+                            {% if ligne.prenom != '' or ligne.nom != '' %}
+                                {{ ligne.prenom }} {{ ligne.nom }}
+                            {% else %}
+                                <span class="tableau__precision">{{ 'assistant_ville.membres.apercu.sans_nom'|trans }}</span>
+                            {% endif %}
+                            {% set complements = [ligne.localite|default(null), ligne.annee|default(null)]|filter(v => v) %}
+                            {% if complements is not empty %}<span class="tableau__precision tableau__precision--neutre">{{ complements|join(' · ') }}</span>{% endif %}
+                            {% if ligne.historique|default(null) %}<span class="tableau__precision tableau__precision--neutre">{{ 'assistant_ville.membres.apercu.historique'|trans({mois: ligne.historique.mois|filter(v => v is not null)|length}) }}</span>{% endif %}
+                        </td>
+                        <td class="tableau__tertiaire">
+                            {{ ligne.email ?? '' }}
+                            {% if ligne.telephone %}<span class="tableau__precision tableau__precision--neutre">{{ ligne.telephone }}</span>{% endif %}
+                        </td>
+                        <td class="tableau__secondaire">{{ ligne.foyer ?? '' }}</td>
+                        <td>
+                            {% if enErreur %}
+                                <ul class="import__erreurs">
+                                    {% for erreur in ligne.erreurs %}<li>{{ ('assistant_ville.membres.apercu.erreurs.' ~ erreur)|trans({ligne: ligne.reference ?? 0}) }}</li>{% endfor %}
+                                </ul>
+                            {% elseif ligne.etat == 'ignoree' %}
+                                <span class="pastille pastille--archivee">{{ 'assistant_ville.membres.apercu.ignoree'|trans }}</span>
+                                <span class="tableau__precision tableau__precision--neutre">{{ ('assistant_ville.membres.apercu.motifs.' ~ ligne.motif)|trans({ligne: ligne.reference ?? 0}) }}</span>
+                            {% elseif ligne.etat == 'adhesion' %}
+                                <span class="pastille pastille--info">{{ 'assistant_ville.membres.apercu.adhesion'|trans({annee: ligne.annee}) }}</span>
+                                <span class="tableau__precision tableau__precision--neutre">{{ ('assistant_ville.membres.apercu.motifs.' ~ ligne.motif)|trans({ligne: ligne.reference ?? 0, annee: ligne.annee}) }}</span>
+                            {% else %}
+                                <span class="pastille pastille--succes">{{ 'assistant_ville.membres.apercu.prete'|trans }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if masquees > 0 %}
+        <p class="etape__aide">{{ 'assistant_ville.membres.apercu.lignes_masquees'|trans({nombre: masquees}) }}</p>
+    {% endif %}
+{% endblock %}
+
+{% block actions %}
+    {% set params = {slug: association.slug, id: ville.id} %}
+    <form method="post" action="{{ path('ville_assistant_membres_import_annuler', params) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('import-membres-' ~ ville.id) }}">
+        <button type="submit" class="bouton bouton--secondaire">{{ 'assistant_ville.membres.apercu.annuler'|trans }}</button>
+    </form>
+    <form method="post" action="{{ path('ville_assistant_membres_import_confirmer', params) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('import-membres-' ~ ville.id) }}">
+        {% set adhesions = analyse.adhesions|default(0) %}
+        <button type="submit" class="bouton bouton--primaire"{{ analyse.valides == 0 and adhesions == 0 ? ' disabled' }}>
+            {%- if analyse.valides > 0 -%}
+                {{ 'assistant_ville.membres.apercu.confirmer'|trans({nombre: analyse.valides}) }}{% if adhesions > 0 %} {{ 'assistant_ville.membres.apercu.et_adhesions'|trans({nombre: adhesions}) }}{% endif %}
+            {%- elseif adhesions > 0 -%}
+                {{ 'assistant_ville.membres.apercu.confirmer_adhesions'|trans({nombre: adhesions}) }}
+            {%- else -%}
+                {{ 'assistant_ville.membres.apercu.confirmer'|trans({nombre: 0}) }}
+            {%- endif -%}
+        </button>
+    </form>
+{% endblock %}

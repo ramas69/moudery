@@ -1,0 +1,14 @@
+{# E-mail au bureau central d'une association qui n'a pas encore souscrit : les offres, puis le lien de souscription.
+   Variables : invitation, lien, offres, economie, joursPremierPaiement. #}
+<p>Bonjour,</p>
+<p>{% if invitation.inviteePar %}{{ invitation.inviteePar.nomComplet }} a ouvert{% else %}Nous avons ouvert{% endif %} l’espace « {{ invitation.association.nom }} » sur {{ 'app.nom'|trans }} et vous en confie l’administration, comme {{ ('role.' ~ invitation.role.value)|trans|lower }}.</p>
+<p>Pour l’activer, choisissez l’abonnement de votre association et créez votre compte :</p>
+<ul>
+    {% for offre in offres %}
+        <li><strong>{{ offre.formule }}, {{ ('periodicite.' ~ offre.periodicite.value)|trans|lower }}</strong> : {{ (offre.montant / 100)|format_currency('EUR') }} {{ ('periodicite.par.' ~ offre.periodicite.value)|trans }}{% if offre.periodicite.value == 'annuelle' and economie > 0 %}, soit {{ (economie / 100)|format_currency('EUR') }} d’économie par rapport au mensuel{% endif %}.</li>
+    {% endfor %}
+</ul>
+<p>Le premier paiement est attendu sous {{ joursPremierPaiement }} jours après la souscription, sur facture : rien n’est prélevé en ligne.</p>
+<p><a href="{{ lien }}">Souscrire et créer mon compte</a></p>
+<p>Ce lien est valable jusqu’au {{ invitation.expireLe|format_datetime('long', 'short') }} et une seule fois. Si le bouton ne s’ouvre pas, copiez cette adresse : {{ lien }}</p>
+<p>Si vous n’attendiez pas ce message, ignorez-le : aucun compte ne sera créé et rien ne sera facturé.</p>

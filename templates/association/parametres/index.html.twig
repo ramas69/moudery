@@ -1,0 +1,50 @@
+{# Onglet « Association » des Paramètres, pour qui pilote son association : contact public, exercice comptable,
+   reversement par défaut au central, calendrier des relances. Le nom, l'identifiant et l'existence juridique restent
+   au super-admin. Variables : association, form. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'parametres' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block title %}{{ 'parametres_association.titre'|trans }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}{{ 'parametres.titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'parametres_association.sous_titre'|trans({association: association.nom}) }}</p>{% endblock %}
+
+{% block actions %}
+    <a class="bouton bouton--primaire" href="{{ path('association_responsables_inviter', {slug: association.slug}) }}">{{ icones.icone('envoyer', 15) }}{{ 'responsables_association.inviter.bouton'|trans }}</a>
+{% endblock %}
+
+{% block contenu %}
+    {{ include('parametres/_onglets.html.twig', {actif: 'association'}) }}
+    {{ form_start(form, {attr: {class: 'parametres-association', novalidate: 'novalidate'}}) }}
+        {% if form.vars.submitted and not form.vars.valid %}<p class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</p>{% endif %}
+        <div class="fiche-grille">
+            <section class="section" aria-labelledby="contact-titre">
+                <div class="section__entete"><h2 id="contact-titre">{{ 'parametres_association.contact.titre'|trans }}</h2></div>
+                <div class="section__formulaire">
+                    <div class="section__formulaire-champs section__formulaire-champs--colonne">
+                        {{ formulaire.champ(form.emailContact, 'administration.association.email_contact.aide'|trans) }}
+                        {{ formulaire.champ(form.telephoneContact, null) }}
+                        {{ formulaire.champ(form.adresseSiege, null) }}
+                    </div>
+                    <p class="section__aide">{{ 'parametres_association.contact.aide'|trans }}</p>
+                </div>
+            </section>
+
+            <section class="section" aria-labelledby="gestion-titre">
+                <div class="section__entete"><h2 id="gestion-titre">{{ 'parametres_association.gestion.titre'|trans }}</h2></div>
+                <div class="section__formulaire">
+                    <div class="section__formulaire-champs section__formulaire-champs--colonne">
+                        {{ formulaire.champ(form.debutExerciceMois, 'administration.association.exercice.aide'|trans) }}
+                        {{ formulaire.champ(form.premierExercice, 'administration.association.premier_exercice.aide'|trans) }}
+                        {{ formulaire.champ(form.tauxReversementDefaut, 'parametres_association.gestion.taux_aide'|trans) }}
+                        {{ formulaire.champ(form.calendrierRelances, 'parametres_association.gestion.relances_aide'|trans) }}
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="section__formulaire-actions parametres-association__actions">
+            <button type="submit" class="bouton bouton--primaire">{{ icones.icone('coche', 15) }}{{ 'parametres_association.enregistrer'|trans }}</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

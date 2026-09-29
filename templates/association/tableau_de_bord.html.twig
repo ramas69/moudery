@@ -1,0 +1,352 @@
+{# Tableau de bord du bureau central, à l'identique de l'artboard « 01 Tableau de bord · bureau central » du canevas
+   Console : en-tête (exercice, rapport d'AG, appel, créer une ville), cinq chiffres (collecté, dépensé, solde, membres
+   à jour, reversements dus), « Encaissements par mois » sur l'exercice avec la bascule Mois / Cumul et « À traiter »,
+   puis les villes (membres à jour, collecté, reversement dû) et l'activité récente. Les chiffres viennent de
+   l'historique des adhésions ; dépenses, reversements et contributions ponctuelles valent zéro tant que leurs modules
+   n'existent pas : rien n'est inventé.
+   Variables : association, aujourdhui, exercice (libellé), anneeExercice, exerciceCourant, exercices (du plus récent au
+   premier suivi), synthese, finances, villesFinances, vue (mois|cumul), aTraiter, villes,
+   villesToutes, villeChoisie (ou null), evenements. #}
+{% extends 'association/_layout.html.twig' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'administration/_macros.html.twig' as macros %}
+
+{% macro euros(centimes) %}{{ (centimes / 100)|format_currency('EUR', {fraction_digit: 0}) }}{% endmacro %}
+
+{% block title %}{{ 'espace.tableau_de_bord.titre'|trans }} · {{ association.nom }}{% endblock %}
+
+{% block titre_page %}{{ 'espace.tableau_de_bord.titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ villeChoisie ? 'espace.tableau_de_bord.sous_titre_ville'|trans({ville: villeChoisie.nom, association: association.nom, date: aujourdhui|format_datetime('long', 'short')}) : 'espace.tableau_de_bord.sous_titre'|trans({association: association.nom, villes: synthese.villes, date: aujourdhui|format_datetime('long', 'short')}) }}</p>{% endblock %}
+
+{% set paramsExercice = exerciceCourant ? {} : {exercice: anneeExercice} %}
+{# Filtres communs (F-32, F-34) : chaque lien garde les autres réglages de la page. #}
+{% set paramsFiltres = (type != 'tout' ? {type: type} : {})|merge(comparer ? {comparer: 1} : {}) %}
+{% block actions %}
+    {# L'exercice : un sélecteur dès qu'il y a plusieurs exercices suivis (depuis 2025), sinon une simple chip. #}
+    {% if exercices|length > 1 %}
+        <details class="menu exercice-menu" data-controller="menu" data-action="toggle->menu#ouvrir">
+            <summary class="exercice exercice--choix" title="{{ 'espace.tableau_de_bord.exercice_choisir'|trans }}">{{ icones.icone('calendrier', 15) }}{{ 'espace.tableau_de_bord.exercice'|trans({exercice: exercice}) }}{{ icones.icone('chevron', 14) }}</summary>
+            <div class="menu__liste">
+                {% for e in exercices %}
+                    <a class="menu__item{{ e.annee == anneeExercice ? ' menu__item--actif' }}" href="{{ path('association_tableau_de_bord', {slug: association.slug}|merge(vue == 'cumul' ? {vue: 'cumul'} : {})|merge(type != 'tout' ? {type: type} : {})|merge(loop.first ? {} : {exercice: e.annee})) }}">{{ 'espace.tableau_de_bord.exercice'|trans({exercice: e.libelle}) }}{% if loop.last %}<span class="menu__note">{{ 'espace.tableau_de_bord.exercice_premier'|trans }}</span>{% endif %}</a>
+                {% endfor %}
+            </div>
+        </details>
+    {% else %}
+        <span class="exercice" title="{{ 'espace.tableau_de_bord.exercice_aide'|trans({mois: association.debutExerciceMois}) }}">{{ icones.icone('calendrier', 15) }}{{ 'espace.tableau_de_bord.exercice'|trans({exercice: exercice}) }}</span>
+    {% endif %}
+{% if pilote %}    <a class="bouton bouton--secondaire" href="{{ path('association_rapport', {slug: association.slug}|merge(exerciceCourant ? {} : {exercice: anneeExercice})) }}">{{ icones.icone('export', 15) }}{{ 'espace.tableau_de_bord.rapport_ag'|trans }}</a>{% endif %}
+    {% if is_granted(constant('App\\Security\\Permission::VILLE_CREER'), association) %}
+        <a class="bouton bouton--primaire" href="{{ path('ville_assistant_nouvelle', {slug: association.slug}) }}">{{ icones.icone('plus', 15) }}{{ 'espace.tableau_de_bord.creer_ville'|trans }}</a>
+    {% endif %}
+{% endblock %}
+
+{% block contenu %}
+    {% set paramsBase = {slug: association.slug}|merge(paramsExercice)|merge(vue == 'cumul' ? {vue: 'cumul'} : {}) %}
+    <nav class="filtres-page" aria-label="{{ 'graphiques.filtres.aria'|trans }}">
+        <span class="filtres-page__libelle">{{ 'graphiques.filtres.type'|trans }}</span>
+        {% for cle in ['tout', 'cotisations', 'ponctuelles'] %}
+            <a class="filtre filtre--petit" href="{{ path('association_tableau_de_bord', paramsBase|merge(cle != 'tout' ? {type: cle} : {})|merge(comparer ? {comparer: 1} : {})) }}"{% if type == cle %} aria-current="true"{% endif %}>{{ ('graphiques.filtres.' ~ cle)|trans }}</a>
+        {% endfor %}
+        {% if exercicePrecedent %}
+            <a class="filtre filtre--petit filtres-page__comparer" href="{{ path('association_tableau_de_bord', paramsBase|merge(type != 'tout' ? {type: type} : {})|merge(comparer ? {} : {comparer: 1})) }}" aria-pressed="{{ comparer ? 'true' : 'false' }}"{% if comparer %} aria-current="true"{% endif %}>{{ icones.icone(comparer ? 'coche' : 'activite', 14) }}{{ 'graphiques.filtres.comparer'|trans({exercice: exercicePrecedent}) }}</a>
+        {% endif %}
+    </nav>
+    {# Les cinq chiffres de la maquette. Dépensé et reversements valent zéro tant que leurs modules n'existent pas. #}
+    <section class="kpis kpis--cinq" aria-label="{{ 'espace.tableau_de_bord.chiffres'|trans }}">
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'espace.kpi.collecte'|trans }}</span>
+            <span class="kpi__valeur">{{ _self.euros(finances.collecte) }}</span>
+            {# G-12 : la mini-courbe du cumul encaissé mois par mois sur l'exercice. #}
+            {% set cumul = 0 %}{% set points = [] %}{% set maximumCumul = 1 %}
+            {% for m in finances.mois %}{% set cumul = cumul + m.cotisations + m.ponctuelles %}{% set points = points|merge([cumul]) %}{% endfor %}
+            {% set maximumCumul = max(1, points|last) %}
+            <svg class="kpi__sparkline" viewBox="0 0 120 28" preserveAspectRatio="none" aria-hidden="true"><polyline fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="{% for v in points %}{{ ((loop.index0 / 11) * 118 + 1)|round(1) }},{{ (27 - (v / maximumCumul) * 25)|round(1) }}{% if not loop.last %} {% endif %}{% endfor %}"/></svg>
+            <span class="kpi__detail">{% if finances.exercicePrecedent is null %}{{ 'espace.kpi.collecte_premier'|trans }}{% else %}<span class="kpi__chip{{ finances.variation > 0 ? ' kpi__chip--succes' : (finances.variation < 0 ? ' kpi__chip--erreur' : '') }}">{{ finances.variation > 0 ? '+' }}{{ finances.variation }} %</span> {{ 'espace.kpi.collecte_vs'|trans({exercice: finances.exercicePrecedent}) }}{% endif %}</span>
+            {% if precedent %}<span class="kpi__detail kpi__precedent">{{ 'graphiques.comparer.kpi'|trans({exercice: exercicePrecedent, montant: _self.euros(precedent.collecte)}) }}</span>{% endif %}
+        </div>
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'espace.kpi.depense'|trans }}</span>
+            <span class="kpi__valeur">{{ _self.euros(finances.depense) }}</span>
+            <span class="kpi__detail"><span class="kpi__chip">{{ finances.collecte > 0 ? (finances.depense / finances.collecte * 100)|round : 0 }} %</span> {{ 'espace.kpi.depense_detail'|trans }}</span>
+        </div>
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'espace.kpi.solde'|trans }}</span>
+            <span class="kpi__valeur">{{ _self.euros(finances.solde) }}</span>
+            <span class="kpi__detail">{{ 'espace.kpi.solde_detail'|trans }}</span>
+        </div>
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'espace.kpi.membres_a_jour'|trans }}</span>
+            <span class="kpi__valeur">{{ finances.pourcentageAJour }} %</span>
+            <span class="kpi__detail"><span class="kpi__chip">{{ finances.aJour }} / {{ finances.adherents }}</span> {{ 'espace.kpi.membres_a_jour_detail'|trans }}</span>
+        </div>
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'espace.kpi.reversements_dus'|trans }}</span>
+            <span class="kpi__valeur{{ finances.reversements > 0 ? ' kpi__valeur--erreur' }}">{{ _self.euros(finances.reversements) }}</span>
+            <span class="kpi__detail"><span class="kpi__chip{{ finances.villesEnRetard > 0 ? ' kpi__chip--erreur' }}">{{ 'espace.kpi.reversements_villes'|trans({nombre: finances.villesEnRetard}) }}</span> {{ 'espace.kpi.reversements_dus_detail'|trans({villes: synthese.villes}) }}</span>
+        </div>
+    </section>
+
+    <div class="colonnes colonnes--2-1">
+        {# Encaissements par mois sur l'exercice : cotisations (accent) et contributions ponctuelles (douces, zéro pour l'instant). #}
+        <section class="section graphique" aria-labelledby="encaissements-titre" data-controller="export-png" data-export-png-nom-value="encaissements-{{ anneeExercice }}">
+            <div class="section__entete section__entete--graphique">
+                <div class="section__titre-groupe">
+                    <h2 id="encaissements-titre">{{ 'espace.encaissements.titre'|trans }}</h2>
+                    <span class="section__sous-titre">{{ 'espace.encaissements.sous_titre'|trans({montant: _self.euros(finances.collecte)}) }}</span>
+                </div>
+                {{ include('composants/export_png.html.twig') }}
+                <nav class="filtres filtres--compact" aria-label="{{ 'espace.encaissements.vue'|trans }}">
+                    {% for cle in ['mois', 'cumul'] %}
+                        <a class="filtre filtre--petit" href="{{ path('association_tableau_de_bord', {slug: association.slug, vue: cle}|merge(paramsExercice)|merge(paramsFiltres)) }}"{% if vue == cle %} aria-current="true"{% endif %}>{{ ('espace.encaissements.' ~ cle)|trans }}</a>
+                    {% endfor %}
+                </nav>
+            </div>
+            {% set cumul = 0 %}
+            {% set valeurs = [] %}
+            {% for m in finances.mois %}
+                {% set cumul = cumul + m.cotisations + m.ponctuelles %}
+                {% set valeurs = valeurs|merge([vue == 'cumul' ? {cotisations: cumul, ponctuelles: 0} : {cotisations: m.cotisations, ponctuelles: m.ponctuelles}]) %}
+            {% endfor %}
+            {# F-34 : l'exercice précédent, en repère sur chaque mois (même vue : mois ou cumul). #}
+            {% set reperes = [] %}
+            {% if precedent %}
+                {% set cumulPrecedent = 0 %}
+                {% for m in precedent.mois %}
+                    {% set cumulPrecedent = cumulPrecedent + m.cotisations + m.ponctuelles %}
+                    {% set reperes = reperes|merge([vue == 'cumul' ? cumulPrecedent : m.cotisations + m.ponctuelles]) %}
+                {% endfor %}
+            {% endif %}
+            {% set maximum = 1 %}
+            {% for v in valeurs %}{% set maximum = max(maximum, v.cotisations + v.ponctuelles) %}{% endfor %}
+            {% for r in reperes %}{% set maximum = max(maximum, r) %}{% endfor %}
+            <div class="graphique__corps" data-export-png-target="zone">
+                {% if finances.collecte == 0 %}<p class="graphique__vide">{{ 'espace.encaissements.vide'|trans({exercice: exercice}) }}</p>{% endif %}
+                <div class="graphique__barres" aria-hidden="true">
+                    {% for i, m in finances.mois %}
+                        {% set v = valeurs[i] %}
+                        <div class="graphique__colonne" title="{{ ('membres_association.mois.' ~ m.mois)|trans }} {{ m.annee }} · {{ _self.euros(v.cotisations + v.ponctuelles) }}">
+                            {% if reperes is not empty %}<span class="graphique__precedent" style="bottom: {{ (reperes[i] / maximum * 100)|round(1) }}%"></span>{% endif %}
+                            <div class="graphique__pile" style="height: {{ ((v.cotisations + v.ponctuelles) / maximum * 100)|round(1) }}%">
+                                {% if v.ponctuelles > 0 %}<span class="graphique__segment graphique__segment--doux" style="flex: {{ v.ponctuelles }} 1 0"></span>{% endif %}
+                                {% if v.cotisations > 0 %}<span class="graphique__segment" style="flex: {{ v.cotisations }} 1 0"></span>{% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="graphique__mois" aria-hidden="true">
+                    {% for m in finances.mois %}<span>{{ ('membres_association.mois.' ~ m.mois)|trans|lower }}</span>{% endfor %}
+                </div>
+                <div class="graphique__legende">
+                    <span class="graphique__cle"><span class="graphique__pastille" aria-hidden="true"></span>{{ 'espace.encaissements.cotisations'|trans }}</span>
+                    <span class="graphique__cle"><span class="graphique__pastille graphique__pastille--doux" aria-hidden="true"></span>{{ 'espace.encaissements.ponctuelles'|trans }}</span>
+                    {% if precedent %}<span class="graphique__cle"><span class="graphique__pastille graphique__pastille--precedent" aria-hidden="true"></span>{{ 'graphiques.comparer.legende'|trans({exercice: exercicePrecedent}) }}</span>{% endif %}
+                    <details class="graphique__donnees">
+                        <summary>{{ 'administration.tableau_de_bord.graphiques.donnees'|trans }}</summary>
+                        <table>
+                            <thead><tr><th scope="col"></th><th scope="col" class="numerique">{{ 'espace.encaissements.cotisations'|trans }}</th><th scope="col" class="numerique">{{ 'espace.encaissements.ponctuelles'|trans }}</th>{% if precedent %}<th scope="col" class="numerique">{{ 'graphiques.comparer.legende'|trans({exercice: exercicePrecedent}) }}</th>{% endif %}</tr></thead>
+                            <tbody>
+                                {% for i, m in finances.mois %}
+                                    <tr><th scope="row">{{ ('membres_association.mois.' ~ m.mois)|trans }} {{ m.annee }}</th><td class="numerique">{{ _self.euros(valeurs[i].cotisations) }}</td><td class="numerique">{{ _self.euros(valeurs[i].ponctuelles) }}</td>{% if precedent %}<td class="numerique">{{ _self.euros(reperes[i]) }}</td>{% endif %}</tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        {% if pilote %}
+        <section class="section" aria-labelledby="a-traiter">
+            <div class="section__entete">
+                <h2 id="a-traiter">{{ 'espace.a_traiter.titre'|trans }}{% if aTraiter|length > 0 %} <span class="compteur compteur--accent">{{ aTraiter|length }}</span>{% endif %}</h2>
+            </div>
+            {% for element in aTraiter %}
+                {% set ville = element.ville %}
+                {% set d = element.details %}
+                {% if element.lien == 'reprendre' and ville %}
+                    {% set lien = path('ville_assistant_reprendre', {slug: association.slug, id: ville.id}) %}
+                {% elseif element.lien == 'identite' and ville %}
+                    {% set lien = path('ville_assistant_identite', {slug: association.slug, id: ville.id}) %}
+                {% elseif element.type in ['abonnement_en_retard', 'premier_paiement', 'echeance_proche'] %}
+                    {% set lien = path('association_abonnement', {slug: association.slug}) %}
+                {% else %}
+                    {% set lien = path('parametres') %}
+                {% endif %}
+                {% set ton = element.type in ['abonnement_en_retard', 'invitation_expiree'] ? 'erreur' : 'attente' %}
+                {% set icone = {abonnement_en_retard: 'euro', premier_paiement: 'euro', echeance_proche: 'calendrier', ville_bloquee: 'horloge', ville_sans_tresorier: 'personne-plus', invitation_expiree: 'horloge'}[element.type] %}
+                {% set variables = {nom: ville ? ville.nom : association.nom, jours: d.jours|default(0), email: d.email|default(''), role: d.role is defined ? ('role.' ~ d.role)|trans : '', montant: d.montant is defined ? (d.montant / 100)|format_currency('EUR') : '', echeance: d.echeance is defined and d.echeance ? d.echeance|format_date('medium') : '—'} %}
+                <a class="section__ligne section__ligne--lien{{ element.type in ['abonnement_en_retard', 'premier_paiement', 'echeance_proche'] ? ' a-traiter__abonnement' }}" href="{{ lien }}">
+                    <span class="section__icone section__icone--{{ ton }}" aria-hidden="true">{{ icones.icone(icone) }}</span>
+                    <span class="section__texte">
+                        <span class="section__principal">{{ ('espace.a_traiter.' ~ element.type)|trans(variables) }}</span>
+                        <span class="section__secondaire">{{ ('espace.a_traiter.' ~ element.type ~ '_aide')|trans(variables) }}</span>
+                    </span>
+                    <span class="section__chevron" aria-hidden="true">{{ icones.icone('chevron') }}</span>
+                </a>
+            {% else %}
+                <p class="section__vide">{{ (synthese.villes == 0 ? 'espace.a_traiter.aucune_ville' : 'espace.a_traiter.rien')|trans }}</p>
+            {% endfor %}
+        </section>
+        {% endif %}
+    </div>
+
+    {% if pilote %}
+    <div class="colonnes">
+        {# Les villes, comme sur la maquette : membres à jour, collecté, reversement dû ; une ville en brouillon le dit sous son nom. #}
+        <section class="section" id="villes" aria-labelledby="villes-titre">
+            <div class="section__entete">
+                <h2 id="villes-titre">{{ 'espace.villes.titre'|trans }} <span class="compteur">{{ villes|length }}</span></h2>
+                {% if is_granted(constant('App\\Security\\Permission::VILLE_CREER'), association) and villes|length > 0 %}
+                    <a class="section__lien" href="{{ path('ville_assistant_nouvelle', {slug: association.slug}) }}">{{ 'espace.tableau_de_bord.creer_ville'|trans }}</a>
+                {% endif %}
+            </div>
+            {% if villes|length > 0 %}
+                <div class="tableau tableau--serre tableau--villes">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">{{ 'espace.villes.colonne.ville'|trans }}</th>
+                                <th scope="col">{{ 'espace.villes.colonne.membres_a_jour'|trans }}</th>
+                                <th scope="col" class="numerique">{{ 'espace.villes.colonne.collecte'|trans }}</th>
+                                <th scope="col" class="numerique">{{ 'espace.villes.colonne.reversement'|trans }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ville in villes %}
+                                {% set chiffres = villesFinances[ville.id]|default({adherents: 0, avecHistorique: 0, aJour: 0, pourcentageAJour: 0, collecte: 0, reversement: 0}) %}
+                                <tr>
+                                    <td>
+                                        <span class="entite">
+                                            <span class="entite__initiales" aria-hidden="true">{{ ville.nom|slice(0, 2)|upper }}</span>
+                                            <span class="entite__texte">
+                                                <span class="entite__nom"><a href="{{ path('ville_assistant_reprendre', {slug: association.slug, id: ville.id}) }}">{{ ville.nom }}</a> <span class="entite__precision">{{ 'espace.villes.membres'|trans({nombre: ville.membres|length}) }}</span></span>
+                                                {% if not ville.estActive %}
+                                                    <span class="entite__detail">{{ macros.statut_ville(ville) }}{% if ville.estBrouillon %} <a href="{{ path('ville_assistant_reprendre', {slug: association.slug, id: ville.id}) }}">{{ 'espace.villes.reprendre'|trans }}</a>{% endif %}</span>
+                                                {% endif %}
+                                            </span>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="progression progression--ligne">
+                                            <span class="progression__piste" aria-hidden="true"><span class="progression__barre{{ chiffres.pourcentageAJour < 75 ? ' progression__barre--attention' }}" style="width: {{ chiffres.pourcentageAJour }}%"></span></span>
+                                            <span class="progression__valeur">{{ chiffres.pourcentageAJour }} %</span>
+                                        </span>
+                                    </td>
+                                    <td class="numerique">{{ _self.euros(chiffres.collecte) }}</td>
+                                    <td class="numerique montant{{ chiffres.reversement > 0 ? ' montant--du' : ' montant--ok' }}">{{ _self.euros(chiffres.reversement) }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="section__accueil">
+                    <p class="section__accueil-titre">{{ 'espace.villes.aucune_titre'|trans }}</p>
+                    <p class="section__accueil-texte">{{ 'espace.villes.aucune_texte'|trans({association: association.nom}) }}</p>
+                    {% if is_granted(constant('App\\Security\\Permission::VILLE_CREER'), association) %}
+                        <a class="bouton bouton--primaire" href="{{ path('ville_assistant_nouvelle', {slug: association.slug}) }}">{{ icones.icone('plus', 15) }}{{ 'espace.tableau_de_bord.creer_ville'|trans }}</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </section>
+
+        {# G-04 « Comparatif des villes » et G-05 « Taux de membres à jour » : barres horizontales CSS, à l'échelle de la plus grosse valeur. #}
+        {% if comparatif is not empty %}
+            <section class="section comparatif" aria-labelledby="comparatif-titre" data-controller="export-png" data-export-png-nom-value="comparatif-villes-{{ anneeExercice }}">
+                <div class="section__entete">
+                    <h2 id="comparatif-titre">{{ 'espace.comparatif.titre'|trans }}</h2>
+                    {{ include('composants/export_png.html.twig') }}
+                </div>
+                <p class="section__aide comparatif__aide">{{ 'espace.comparatif.aide'|trans }}</p>
+                {% set maximumComparatif = 1 %}
+                {% for c in comparatif %}{% set maximumComparatif = max(maximumComparatif, c.collecte, c.depense, c.reverse) %}{% endfor %}
+                <ul class="comparatif__liste" aria-hidden="true">
+                    {% for c in comparatif %}
+                        <li class="comparatif__ville">
+                            <span class="comparatif__nom">{{ c.ville.nom }}</span>
+                            <span class="comparatif__barres">
+                                <span class="comparatif__piste"><span class="comparatif__segment comparatif__segment--collecte" style="width: {{ (c.collecte / maximumComparatif * 100)|round(1) }}%"></span></span>
+                                <span class="comparatif__piste"><span class="comparatif__segment comparatif__segment--depense" style="width: {{ (c.depense / maximumComparatif * 100)|round(1) }}%"></span></span>
+                                <span class="comparatif__piste"><span class="comparatif__segment comparatif__segment--reverse" style="width: {{ (c.reverse / maximumComparatif * 100)|round(1) }}%"></span></span>
+                            </span>
+                            <span class="comparatif__a-jour" title="{{ 'espace.comparatif.a_jour'|trans }}">{% if c.avecHistorique > 0 %}<span class="progression progression--ligne"><span class="progression__piste"><span class="progression__barre{{ c.pourcentageAJour < 75 ? ' progression__barre--attention' }}" style="width: {{ c.pourcentageAJour }}%"></span></span><span class="progression__valeur">{{ c.pourcentageAJour }} %</span></span>{% else %}<span class="tableau__precision tableau__precision--neutre">—</span>{% endif %}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <div class="graphique__legende comparatif__legende">
+                    <span class="graphique__cle"><span class="graphique__pastille comparatif__pastille--collecte" aria-hidden="true"></span>{{ 'espace.comparatif.collecte'|trans }}</span>
+                    <span class="graphique__cle"><span class="graphique__pastille comparatif__pastille--depense" aria-hidden="true"></span>{{ 'espace.comparatif.depense'|trans }}</span>
+                    <span class="graphique__cle"><span class="graphique__pastille comparatif__pastille--reverse" aria-hidden="true"></span>{{ 'espace.comparatif.reverse'|trans }}</span>
+                    <span class="graphique__cle">{{ 'espace.comparatif.a_jour'|trans }}</span>
+                    <details class="graphique__donnees">
+                        <summary>{{ 'administration.tableau_de_bord.graphiques.donnees'|trans }}</summary>
+                        <table>
+                            <thead><tr><th scope="col">{{ 'espace.villes.colonne.ville'|trans }}</th><th scope="col" class="numerique">{{ 'espace.comparatif.collecte'|trans }}</th><th scope="col" class="numerique">{{ 'espace.comparatif.depense'|trans }}</th><th scope="col" class="numerique">{{ 'espace.comparatif.reverse'|trans }}</th><th scope="col" class="numerique">{{ 'espace.comparatif.a_jour'|trans }}</th></tr></thead>
+                            <tbody>
+                                {% for c in comparatif %}<tr><th scope="row">{{ c.ville.nom }}</th><td class="numerique">{{ _self.euros(c.collecte) }}</td><td class="numerique">{{ _self.euros(c.depense) }}</td><td class="numerique">{{ _self.euros(c.reverse) }}</td><td class="numerique">{{ c.avecHistorique > 0 ? c.pourcentageAJour ~ ' %' : '—' }}</td></tr>{% endfor %}
+                            </tbody>
+                        </table>
+                    </details>
+                </div>
+            </section>
+        {% endif %}
+
+        <section class="section" aria-labelledby="journal-titre">
+            <div class="section__entete">
+                <h2 id="journal-titre">{{ 'espace.journal.titre'|trans }}</h2>
+            </div>
+            {% for evenement in evenements %}
+                <div class="fil__ligne">
+                    <span class="fil__avatar fil__avatar--{{ evenement.type.categorie }}" aria-hidden="true">
+                        {%- if evenement.acteur %}{{ macros.initiales(evenement.acteur.prenom, evenement.acteur.nom) }}{% else %}{{ icones.icone('activite', 14) }}{% endif -%}
+                    </span>
+                    <span class="fil__texte">
+                        {% if evenement.acteur %}<strong>{{ evenement.acteur.nomComplet }}</strong> · {% endif %}{{ ('journal.type.' ~ evenement.type.value)|trans }}{% if evenement.cible %} · {{ evenement.cible }}{% endif %}
+                    </span>
+                    <time class="fil__quand" datetime="{{ evenement.quand|date('c') }}" title="{{ evenement.quand|format_datetime('medium', 'short') }}">{{ evenement.quand|il_y_a }}</time>
+                </div>
+            {% else %}
+                <p class="section__vide">{{ 'espace.journal.rien'|trans }}</p>
+            {% endfor %}
+        </section>
+    </div>
+
+    {# G-02 « Où va chaque euro collecté ? » et G-03 « Quelles villes pèsent le plus ? » (29 septembre 2026). #}
+    {% if flux %}
+    <div class="colonnes colonnes--2-1">
+        <section class="section graphique" aria-labelledby="flux-titre" data-controller="export-png" data-export-png-nom-value="flux-argent-{{ anneeExercice }}">
+            <div class="section__entete section__entete--graphique">
+                <div class="section__titre-groupe">
+                    <h2 id="flux-titre">{{ 'graphiques.flux.titre'|trans }}</h2>
+                    <span class="section__sous-titre">{{ 'graphiques.flux.sous_titre'|trans({exercice: exercice}) }}</span>
+                </div>
+                {{ include('composants/export_png.html.twig') }}
+            </div>
+            <div class="graphique__corps">
+                {% if flux.noeuds is not empty %}
+                    <div class="graphique__legende">
+                        {% for c in ['cotisations', 'ponctuelles', 'depense', 'du', 'reste'] %}
+                            {% if flux.sorties or c in ['cotisations', 'ponctuelles'] %}<span class="graphique__cle"><span class="graphique__pastille flux__pastille--{{ c }}" aria-hidden="true"></span>{{ ('graphiques.flux.noeud.' ~ c)|trans }}</span>{% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {{ include('composants/flux.html.twig', {flux: flux, id: 'flux'}) }}
+            </div>
+        </section>
+        {% if carte and not villeChoisie %}
+            <section class="section graphique" aria-labelledby="carte-titre" data-controller="export-png" data-export-png-nom-value="carte-villes-{{ anneeExercice }}">
+                <div class="section__entete section__entete--graphique">
+                    <div class="section__titre-groupe">
+                        <h2 id="carte-titre">{{ 'graphiques.carte.titre'|trans }}</h2>
+                        <span class="section__sous-titre">{{ ('graphiques.carte.sous_titre_' ~ carte.mesure)|trans }}</span>
+                    </div>
+                    {{ include('composants/export_png.html.twig') }}
+                </div>
+                <div class="graphique__corps">{{ include('composants/carte.html.twig', {carte: carte, id: 'carte'}) }}</div>
+            </section>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% endif %}
+{% endblock %}

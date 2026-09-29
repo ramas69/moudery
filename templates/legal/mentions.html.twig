@@ -1,0 +1,29 @@
+{% extends 'legal/_layout.html.twig' %}
+{% set page = 'mentions' %}
+{% block title %}{{ 'legal.mentions'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+{% block contenu %}
+    <h1>Mentions légales</h1>
+
+    <h2>Éditeur</h2>
+    <p>La plateforme Caisses est éditée par {{ legal.editeur }}, {{ legal.adresse }}.<br>
+    Directrice ou directeur de la publication : {{ legal.directeur }}.<br>
+    Contact : <a href="mailto:{{ legal.contact }}">{{ legal.contact }}</a>.</p>
+
+    <h2>Hébergement</h2>
+    <p>O2switch, SARL au capital de 100 000 €, 222-224 boulevard Gustave Flaubert, 63000 Clermont-Ferrand, France.
+    Téléphone : 04 44 44 60 40. Site : <a href="https://www.o2switch.fr" rel="noopener">o2switch.fr</a>.
+    Les données sont hébergées en France.</p>
+
+    <h2>Objet du service</h2>
+    <p>Caisses aide les associations de la diaspora à tenir les caisses de leurs villes : membres, cotisations, appels à
+    contribution, paiements, dépenses et reversements. Chaque association reste responsable des informations qu’elle y
+    enregistre sur ses membres.</p>
+
+    <h2>Propriété intellectuelle</h2>
+    <p>Le code, la présentation et les textes de la plateforme sont protégés. La police Manrope est distribuée sous licence
+    SIL Open Font License.</p>
+
+    <h2>Données personnelles</h2>
+    <p>Le traitement des données des membres et des responsables est décrit dans la
+    <a href="{{ path('confidentialite') }}">politique de confidentialité</a>.</p>
+{% endblock %}

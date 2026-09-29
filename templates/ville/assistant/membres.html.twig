@@ -1,0 +1,216 @@
+{# Étape 2 de l'assistant : les membres de la ville (F-42, F-31), facultative ; la liste reste ouverte une fois la ville active. Import d'un fichier CSV avec aperçu, ajout à la main,
+   liste avec recherche, filtres de statut et pagination. Canevas Console, écran « Membres ».
+   Variables : association, ville, etape, etapes, formAjout, formImport, membres, total, totalVille, compteurs, sansEmail,
+   foyers, filtres (q, statut), pagination (page, pages, parPage, de, a), importEnCours ('reglages', 'apercu' ou null). #}
+{% extends 'ville/assistant/_layout.html.twig' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/console.css') }}">
+{% endblock %}
+
+{% block title %}{{ 'assistant_ville.etapes.membres'|trans }} · {{ ville.nom }}{% endblock %}
+
+{% block contenu %}
+    {% set params = {slug: association.slug, id: ville.id} %}
+    {% set paramsFiltres = params|merge(filtres|filter(valeur => valeur != '')) %}
+    {% set filtreActif = filtres.q != '' or filtres.statut != '' %}
+    {% set importOuvert = formImport.vars.submitted or (totalVille == 0 and not formAjout.vars.submitted) %}
+    {% set ajoutOuvert = formAjout.vars.submitted %}
+
+    <div class="etape__entete">
+        <h1 class="etape__titre">{{ 'assistant_ville.membres.titre'|trans({ville: ville.nom}) }}</h1>
+        <p class="etape__intro">{{ 'assistant_ville.membres.intro'|trans }}</p>
+    </div>
+
+    {% if importEnCours %}
+        <p class="alerte alerte--attention" role="status">
+            {{ 'assistant_ville.membres.import.en_attente'|trans }}
+            <a href="{{ path(importEnCours == 'apercu' ? 'ville_assistant_membres_import_apercu' : 'ville_assistant_membres_import_reglages', params) }}">{{ 'assistant_ville.membres.import.reprendre'|trans }}</a>
+        </p>
+    {% endif %}
+
+    <ul class="membres__stats" aria-label="{{ 'assistant_ville.membres.stats.titre'|trans }}">
+        <li class="membres__stat">
+            <span class="membres__stat-libelle">{{ 'assistant_ville.membres.stats.actifs'|trans }}</span>
+            <span class="membres__stat-valeur">{{ compteurs['actif'] }}</span>
+        </li>
+        <li class="membres__stat{{ compteurs['en-attente'] > 0 ? ' membres__stat--attention' }}">
+            <span class="membres__stat-libelle">{{ 'assistant_ville.membres.stats.en_attente'|trans }}</span>
+            <span class="membres__stat-valeur">{{ compteurs['en-attente'] }}</span>
+        </li>
+        <li class="membres__stat{{ sansEmail > 0 ? ' membres__stat--attention' }}">
+            <span class="membres__stat-libelle">{{ 'assistant_ville.membres.stats.sans_email'|trans }}</span>
+            <span class="membres__stat-valeur">{{ sansEmail }}</span>
+        </li>
+        <li class="membres__stat">
+            <span class="membres__stat-libelle">{{ 'assistant_ville.membres.stats.foyers'|trans }}</span>
+            <span class="membres__stat-valeur">{{ foyers }}</span>
+        </li>
+    </ul>
+    {% if adhesionsParAnnee is not empty %}
+        <p class="membres__adhesions">
+            <span class="membres__adhesions-libelle">{{ 'assistant_ville.membres.stats.adhesions'|trans }}</span>
+            {% for annee, nombre in adhesionsParAnnee %}<span class="chip">{{ annee }} · {{ nombre }}</span>{% endfor %}
+        </p>
+    {% endif %}
+
+    <details class="volet" id="volet-import"{{ importOuvert ? ' open' }}>
+        <summary class="volet__resume">{{ icones.icone('export', 15) }}{{ 'assistant_ville.membres.import.titre'|trans }}</summary>
+        <div class="volet__contenu">
+            <p class="volet__aide">{{ 'assistant_ville.membres.import.aide'|trans }}</p>
+            <p class="volet__aide">
+                {{ 'assistant_ville.membres.import.colonnes'|trans }}
+                <a href="{{ path('ville_assistant_membres_modele', params) }}" download="membres-modele.csv">{{ 'assistant_ville.membres.import.modele'|trans }}</a>
+            </p>
+            {{ form_start(formImport, {attr: {class: 'formulaire__ligne', novalidate: 'novalidate'}}) }}
+                {{ form_errors(formImport) }}
+                {{ formulaire.champ(formImport.fichier, null) }}
+                <div class="volet__actions">
+                    <button type="submit" class="bouton bouton--secondaire">{{ 'assistant_ville.membres.import.bouton'|trans }}</button>
+                </div>
+            {{ form_end(formImport) }}
+        </div>
+    </details>
+
+    <details class="volet" id="volet-ajout"{{ ajoutOuvert ? ' open' }}>
+        <summary class="volet__resume">{{ icones.icone('personne-plus', 15) }}{{ 'assistant_ville.membres.formulaire.titre'|trans }}</summary>
+        <div class="volet__contenu">
+            {{ form_start(formAjout, {attr: {class: 'formulaire', novalidate: 'novalidate'}}) }}
+                {% if formAjout.vars.submitted and not formAjout.vars.valid %}
+                    <div class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</div>
+                {% endif %}
+                {{ form_errors(formAjout) }}
+                <div class="formulaire__grille formulaire__grille--deux">
+                    {{ formulaire.champ(formAjout.prenom, null) }}
+                    {{ formulaire.champ(formAjout.nom, null) }}
+                    {{ formulaire.champ(formAjout.email, 'assistant_ville.membres.formulaire.email_aide'|trans) }}
+                    {{ formulaire.champ(formAjout.telephone, 'assistant_ville.membres.formulaire.telephone_aide'|trans) }}
+                    {{ formulaire.champ(formAjout.localite, 'assistant_ville.membres.formulaire.localite_aide'|trans) }}
+                    {{ formulaire.champ(formAjout.anneeNaissance, 'assistant_ville.membres.formulaire.annee_naissance_aide'|trans) }}
+                    {{ formulaire.champ(formAjout.foyer, 'assistant_ville.membres.formulaire.foyer_aide'|trans) }}
+                    {{ formulaire.champ(formAjout.nouveauFoyer, 'assistant_ville.membres.formulaire.nouveau_foyer_aide'|trans) }}
+                </div>
+                <div class="volet__actions">
+                    <button type="submit" class="bouton bouton--primaire">{{ 'assistant_ville.membres.formulaire.bouton'|trans }}</button>
+                </div>
+            {{ form_end(formAjout) }}
+        </div>
+    </details>
+
+    <section class="membres__liste" aria-labelledby="membres-liste-titre">
+        <div class="membres__liste-entete">
+            <h2 class="etape__sous-titre" id="membres-liste-titre">{{ 'assistant_ville.membres.liste.titre'|trans }} <span class="compteur">{{ total }}</span></h2>
+            {% if filtreActif %}
+                <a class="bouton bouton--discret bouton--petit" href="{{ path('ville_assistant_membres', params) }}">{{ icones.icone('croix', 14) }}{{ 'assistant_ville.membres.liste.effacer'|trans }}</a>
+            {% endif %}
+        </div>
+        <form method="get" action="{{ path('ville_assistant_membres', params) }}" class="barre-outils membres__outils" role="search">
+            <label class="recherche">
+                <span class="visuellement-cache">{{ 'assistant_ville.membres.liste.rechercher'|trans }}</span>
+                {{ icones.icone('recherche', 15) }}
+                <input class="recherche__saisie" type="search" name="q" value="{{ filtres.q }}" placeholder="{{ 'assistant_ville.membres.liste.recherche_placeholder'|trans }}" autocomplete="off">
+            </label>
+            {% if filtres.statut != '' %}<input type="hidden" name="statut" value="{{ filtres.statut }}">{% endif %}
+            <div class="filtres" role="group" aria-label="{{ 'assistant_ville.membres.liste.filtre_statut'|trans }}">
+                <a class="filtre" href="{{ path('ville_assistant_membres', params|merge(filtres.q != '' ? {q: filtres.q} : {})) }}"{% if filtres.statut == '' %} aria-current="true"{% endif %}>{{ 'assistant_ville.membres.liste.tous'|trans }} · {{ totalVille }}</a>
+                {% for statut in ['actif', 'en-attente', 'sorti'] %}
+                    <a class="filtre" href="{{ path('ville_assistant_membres', params|merge(filtres.q != '' ? {q: filtres.q} : {})|merge({statut: statut})) }}"{% if filtres.statut == statut %} aria-current="true"{% endif %}>{{ ('membre.statut.' ~ statut)|trans }} · {{ compteurs[statut] }}</a>
+                {% endfor %}
+            </div>
+            <button type="submit" class="visuellement-cache">{{ 'assistant_ville.membres.liste.rechercher'|trans }}</button>
+        </form>
+
+        {% if membres is empty %}
+            <p class="membres__vide">
+                {% if filtreActif %}
+                    {{ 'assistant_ville.membres.liste.aucun_resultat'|trans }}
+                {% else %}
+                    {{ 'assistant_ville.membres.liste.vide'|trans }}
+                {% endif %}
+            </p>
+        {% else %}
+            <div class="tableau tableau--membres">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ 'assistant_ville.membres.tableau.membre'|trans }}</th>
+                            <th scope="col" class="tableau__tertiaire">{{ 'assistant_ville.membres.tableau.contact'|trans }}</th>
+                            <th scope="col" class="tableau__secondaire">{{ 'assistant_ville.membres.tableau.foyer'|trans }}</th>
+                            <th scope="col" class="tableau__secondaire">{{ 'assistant_ville.membres.tableau.adhesions'|trans }}</th>
+                            <th scope="col">{{ 'assistant_ville.membres.tableau.statut'|trans }}</th>
+                            <th scope="col"><span class="visuellement-cache">{{ 'assistant_ville.membres.tableau.actions'|trans }}</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for membre in membres %}
+                            {% set classeStatut = {actif: 'succes', 'en-attente': 'attente', sorti: 'archivee'}[membre.statut.value] %}
+                            <tr>
+                                <td>
+                                    <div class="entite">
+                                        <span class="entite__initiales entite__initiales--rond" aria-hidden="true">{{ membre.initiales }}</span>
+                                        <div class="entite__texte">
+                                            <span class="entite__nom"><a href="{{ path('association_membre', {slug: association.slug, id: membre.id}) }}">{{ membre.nomComplet }}</a></span>
+                                            {% if membre.localite %}<span class="entite__detail">{{ membre.localite }}{% if membre.age %} · {{ 'assistant_ville.membres.tableau.age'|trans({age: membre.age}) }}{% endif %}</span>{% elseif membre.age %}<span class="entite__detail">{{ 'assistant_ville.membres.tableau.age'|trans({age: membre.age}) }}</span>{% endif %}
+                                            <span class="entite__detail membres__contact-mobile">{{ membre.email ?? membre.telephoneAffiche ?? 'assistant_ville.membres.tableau.sans_contact'|trans }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="tableau__tertiaire">
+                                    {% if membre.email %}<a href="mailto:{{ membre.email }}">{{ membre.email }}</a>{% endif %}
+                                    {% if membre.telephoneAffiche %}<span class="tableau__precision tableau__precision--neutre">{{ membre.telephoneAffiche }}</span>{% endif %}
+                                    {% if membre.email is null and membre.telephoneAffiche is null %}<span class="tableau__precision">{{ 'assistant_ville.membres.tableau.sans_contact'|trans }}</span>{% endif %}
+                                </td>
+                                <td class="tableau__secondaire">
+                                    {% if membre.foyer %}
+                                        {{ membre.foyer.nom }}
+                                        {% if membre.foyer.payeur is same as(membre) %}<span class="tableau__precision tableau__precision--neutre">{{ 'assistant_ville.membres.tableau.payeur'|trans }}</span>{% endif %}
+                                    {% else %}
+                                        <span class="tableau__precision tableau__precision--neutre">{{ 'assistant_ville.membres.tableau.sans_foyer'|trans }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="tableau__secondaire">{% if membre.anneesAdhesion is not empty %}{{ membre.anneesAdhesion|join(' · ') }}{% else %}<span class="tableau__precision tableau__precision--neutre">{{ 'assistant_ville.membres.tableau.sans_adhesion'|trans }}</span>{% endif %}</td>
+                                <td><span class="pastille pastille--{{ classeStatut }}">{{ ('membre.statut.' ~ membre.statut.value)|trans }}</span></td>
+                                <td>
+                                    <form class="tableau__actions" method="post" action="{{ path('ville_assistant_membres_retirer', params|merge({membre: membre.id})) }}" data-turbo-confirm="{{ 'assistant_ville.membres.tableau.retirer_confirmation'|trans({nom: membre.nomComplet}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('retirer-membre-' ~ membre.id) }}">
+                                        {% for cle, valeur in filtres|filter(valeur => valeur != '') %}<input type="hidden" name="{{ cle }}" value="{{ valeur }}">{% endfor %}
+                                        {% if pagination.page > 1 %}<input type="hidden" name="page" value="{{ pagination.page }}">{% endif %}
+                                        <button type="submit" class="bouton bouton--discret bouton--petit" aria-label="{{ 'assistant_ville.membres.tableau.retirer_aria'|trans({nom: membre.nomComplet}) }}">{{ icones.icone('retirer', 14) }}{{ 'assistant_ville.membres.tableau.retirer'|trans }}</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if pagination.pages > 1 %}
+                <nav class="pagination" aria-label="{{ 'assistant_ville.membres.pagination.titre'|trans }}">
+                    <span class="pagination__resume">{{ 'assistant_ville.membres.pagination.resume'|trans({de: pagination.de, a: pagination.a, total: total}) }}</span>
+                    <span class="pagination__pages">
+                        {% if pagination.page > 1 %}
+                            <a class="bouton bouton--secondaire bouton--petit" href="{{ path('ville_assistant_membres', paramsFiltres|merge({page: pagination.page - 1})) }}">{{ icones.icone('chevron-gauche', 14) }}{{ 'assistant_ville.membres.pagination.precedente'|trans }}</a>
+                        {% endif %}
+                        <span class="pagination__position">{{ 'assistant_ville.membres.pagination.position'|trans({page: pagination.page, pages: pagination.pages}) }}</span>
+                        {% if pagination.page < pagination.pages %}
+                            <a class="bouton bouton--secondaire bouton--petit" href="{{ path('ville_assistant_membres', paramsFiltres|merge({page: pagination.page + 1})) }}">{{ 'assistant_ville.membres.pagination.suivante'|trans }}{{ icones.icone('chevron', 14) }}</a>
+                        {% endif %}
+                    </span>
+                </nav>
+            {% endif %}
+        {% endif %}
+    </section>
+{% endblock %}
+
+{% block actions %}
+    {% if ville.estBrouillon %}
+        <form method="post" action="{{ path('ville_assistant_membres_continuer', {slug: association.slug, id: ville.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('continuer-membres-' ~ ville.id) }}">
+            <button type="submit" class="bouton bouton--primaire">{{ 'assistant_ville.membres.continuer'|trans }}</button>
+        </form>
+    {% else %}
+        <a class="bouton bouton--secondaire" href="{{ path('ville_assistant_activation', {slug: association.slug, id: ville.id}) }}">{{ 'assistant_ville.membres.recapitulatif'|trans }}</a>
+    {% endif %}
+{% endblock %}

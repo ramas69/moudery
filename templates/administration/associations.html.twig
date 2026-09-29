@@ -1,0 +1,62 @@
+{# Liste des associations de la plateforme : recherche, filtres, tri, export.
+   Variables : lignes, filtres (q, statut, bureau, tri, sens), compteurs, totaux, total. #}
+{% extends 'administration/_layout.html.twig' %}
+{% set page = 'associations' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block title %}{{ 'administration.associations.titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block titre_page %}{{ 'administration.associations.titre'|trans }} <span class="compteur">{{ total }}</span>{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'administration.associations.sous_titre'|trans }}</p>{% endblock %}
+
+{% block actions %}
+    <a class="bouton bouton--secondaire" href="{{ path('administration_associations_export', filtres) }}">{{ icones.icone('export', 15) }}{{ 'administration.associations.exporter'|trans }}</a>
+    <a class="bouton bouton--primaire" href="{{ path('administration_association_nouvelle') }}">{{ icones.icone('plus', 15) }}{{ 'administration.association.creer'|trans }}</a>
+{% endblock %}
+
+{% block contenu %}
+    <form method="get" action="{{ path('administration_associations') }}" class="barre-outils" role="search">
+        <label class="recherche">
+            <span class="visuellement-cache">{{ 'administration.associations.rechercher'|trans }}</span>
+            {{ icones.icone('recherche', 15) }}
+            <input class="recherche__saisie" type="search" name="q" value="{{ filtres.q }}" placeholder="{{ 'administration.associations.recherche_placeholder'|trans }}" autocomplete="off">
+        </label>
+        <input type="hidden" name="statut" value="{{ filtres.statut }}">
+        <input type="hidden" name="bureau" value="{{ filtres.bureau }}">
+        <input type="hidden" name="abonnement" value="{{ filtres.abonnement }}">
+        <input type="hidden" name="tri" value="{{ filtres.tri }}">
+        <input type="hidden" name="sens" value="{{ filtres.sens }}">
+        <button type="submit" class="bouton bouton--secondaire">{{ 'administration.associations.rechercher'|trans }}</button>
+        {% if filtres.q != '' or filtres.statut != 'toutes' or filtres.bureau != 'tous' or filtres.abonnement != 'tous' %}
+            <a class="bouton bouton--discret" href="{{ path('administration_associations', {tri: filtres.tri, sens: filtres.sens}) }}">{{ icones.icone('croix', 15) }}{{ 'administration.associations.effacer_filtres'|trans }}</a>
+        {% endif %}
+    </form>
+
+    <nav class="filtres" aria-label="{{ 'administration.associations.filtre_statut'|trans }}">
+        <span class="filtres__libelle">{{ 'administration.associations.filtre_statut'|trans }}</span>
+        {% for statut in ['toutes', 'actives', 'suspendues', 'archivees'] %}
+            <a class="filtre" href="{{ path('administration_associations', filtres|merge({statut: statut})) }}"{% if filtres.statut == statut %} aria-current="true"{% endif %}>{{ ('administration.associations.filtres.' ~ statut)|trans }} · {{ compteurs.statut[statut] }}</a>
+        {% endfor %}
+    </nav>
+    <nav class="filtres" aria-label="{{ 'administration.associations.filtre_abonnement'|trans }}">
+        <span class="filtres__libelle">{{ 'administration.associations.filtre_abonnement'|trans }}</span>
+        {% for abonnement in ['tous', 'a-souscrire', 'offert', 'actif', 'echeance-proche', 'en-retard', 'resilie'] %}
+            <a class="filtre" href="{{ path('administration_associations', filtres|merge({abonnement: abonnement})) }}"{% if filtres.abonnement == abonnement %} aria-current="true"{% endif %}>{{ ('administration.associations.filtres.abonnement_' ~ abonnement)|trans }} · {{ compteurs.abonnement[abonnement] }}</a>
+        {% endfor %}
+    </nav>
+    <nav class="filtres" aria-label="{{ 'administration.associations.filtre_bureau'|trans }}">
+        <span class="filtres__libelle">{{ 'administration.associations.filtre_bureau'|trans }}</span>
+        {% for bureau in ['tous', 'avec', 'sans', 'invitation-en-attente', 'invitation-expiree'] %}
+            <a class="filtre" href="{{ path('administration_associations', filtres|merge({bureau: bureau})) }}"{% if filtres.bureau == bureau %} aria-current="true"{% endif %}>{{ ('administration.associations.filtres.' ~ bureau)|trans }} · {{ compteurs.bureau[bureau] }}</a>
+        {% endfor %}
+    </nav>
+
+    <section class="section" aria-label="{{ 'administration.associations.titre'|trans }}">
+        <div class="section__entete">
+            <h2>{{ 'administration.associations.resultats'|trans({nombre: lignes|length, total: total}) }}</h2>
+        </div>
+        {{ include('administration/_associations_tableau.html.twig', {complet: true}) }}
+    </section>
+
+    <p class="note">{{ 'administration.associations.pied'|trans }}</p>
+{% endblock %}

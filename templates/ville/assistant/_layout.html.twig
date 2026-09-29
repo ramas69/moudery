@@ -1,0 +1,91 @@
+{# Coquille de l'assistant de création d'une ville, en trois étapes : en-tête (logo, ville, statut), progression
+   (seulement tant que la ville est en brouillon), contenu de l'étape, panneau de statut, pied d'actions.
+   Variables attendues : association, ville (null tant qu'elle n'existe pas), etape, etapes. #}
+{% extends 'base.html.twig' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'ville/assistant/_liens.html.twig' as liens %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/ville_assistant.css') }}">
+{% endblock %}
+
+{% block body %}
+    {% set villeExiste = ville is not null and ville.id is not null %}
+    {% set statut = villeExiste ? ville.statut.value : 'brouillon' %}
+    {% set enBrouillon = statut == 'brouillon' %}
+    {% set libelleStatut = ('assistant_ville.statut.' ~ statut)|trans %}
+
+    <div class="assistant">
+        <header class="assistant__entete">
+            <div class="assistant__marque">
+                {{ include('composants/logo.html.twig', {taille: 36, permanent: true, village: association.nomVillage, lien: path('accueil')}) }}
+                <span class="assistant__separateur" aria-hidden="true"></span>
+                <p class="assistant__titre">
+                    <span>{{ villeExiste ? (enBrouillon ? 'assistant_ville.entete.ville' : 'assistant_ville.entete.ville_active')|trans({nom: ville.nom}) : 'assistant_ville.entete.nouvelle'|trans }}</span>
+                    <span class="pastille pastille--{{ statut }}">{{ libelleStatut }}</span>
+                </p>
+            </div>
+            <div class="assistant__compte">
+                <a class="assistant__contexte" href="{{ path('association_tableau_de_bord', {slug: association.slug}) }}">{{ association.nom }}</a>
+                {% if app.user %}
+                    <span class="assistant__utilisateur">{{ app.user.nomComplet }}</span>
+                    {{ formulaire.deconnexion() }}
+                {% endif %}
+            </div>
+        </header>
+
+        {% if enBrouillon %}
+            <div class="assistant__progression">
+                {{ include('ville/assistant/_etapes.html.twig') }}
+            </div>
+        {% endif %}
+
+        <div class="assistant__corps">
+            <main class="assistant__contenu" id="contenu">
+                {% for message in app.flashes('succes') %}
+                    <p class="alerte alerte--succes" role="status">{{ message|trans }}</p>
+                {% endfor %}
+                {% for message in app.flashes('erreur') %}
+                    <p class="alerte alerte--erreur" role="alert">{{ message }}</p>
+                {% endfor %}
+
+                {% block contenu %}{% endblock %}
+            </main>
+
+            <aside class="panneau" aria-labelledby="panneau-titre">
+                <div class="panneau__bloc">
+                    <h2 class="surtitre" id="panneau-titre">{{ 'assistant_ville.panneau.titre'|trans }}</h2>
+                    <span class="pastille pastille--{{ statut }}">{{ libelleStatut }}</span>
+                    <p>{{ (enBrouillon ? 'assistant_ville.panneau.brouillon_info' : 'assistant_ville.panneau.active_info')|trans }}</p>
+                </div>
+                <dl class="panneau__faits">
+                    <dt>{{ 'assistant_ville.panneau.responsables'|trans }}</dt>
+                    <dd>{{ 'assistant_ville.panneau.sur'|trans({nombre: villeExiste ? ville.invitations|length : 0, total: 3}) }}</dd>
+                    <dt>{{ 'assistant_ville.panneau.membres'|trans }}</dt>
+                    <dd>
+                        {% if villeExiste and etape.value != 'membres' %}
+                            <a href="{{ path('ville_assistant_membres', {slug: association.slug, id: ville.id}) }}">{{ ville.membres|length }}</a>
+                        {% else %}
+                            {{ villeExiste ? ville.membres|length : 0 }}
+                        {% endif %}
+                    </dd>
+                </dl>
+                <div class="panneau__bloc panneau__bloc--suite">
+                    <h3 class="panneau__sous-titre">{{ 'assistant_ville.panneau.apres_titre'|trans }}</h3>
+                    <p>{{ 'assistant_ville.panneau.apres_texte'|trans }}</p>
+                </div>
+            </aside>
+        </div>
+
+        <footer class="assistant__pied">
+            <div class="assistant__pied-gauche">
+                {% if villeExiste and enBrouillon and etape.numero > 1 %}
+                    <a class="bouton bouton--secondaire" href="{{ liens.etape(association, ville, etapes[etape.numero - 2]) }}">{{ 'assistant_ville.etapes.precedente'|trans }}</a>
+                {% endif %}
+            </div>
+            <div class="assistant__pied-droite">
+                {% block actions %}{% endblock %}
+            </div>
+        </footer>
+    </div>
+{% endblock %}

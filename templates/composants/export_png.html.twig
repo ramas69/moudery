@@ -1,0 +1,3 @@
+{# Bouton « Exporter en PNG » d'un graphique (F-35), dans une section qui porte le contrôleur Stimulus `export-png`. #}
+{% import "composants/icones.html.twig" as icones %}
+<button type="button" class="bouton bouton--secondaire bouton--petit export-png" data-action="export-png#exporter" data-export-png-target="bouton" title="{{ 'graphiques.png.aide'|trans }}">{{ icones.icone('export', 14) }}<span>{{ 'graphiques.png.bouton'|trans }}</span></button>

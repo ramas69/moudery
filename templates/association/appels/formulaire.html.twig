@@ -1,0 +1,197 @@
+{# « Nouvel appel à contribution » (F-13), à l'identique de l'artboard « 04 Lancer un appel » du canevas Console : fil
+   Projets et appels › Nouvel appel, état du brouillon, « Aperçu de l'e-mail », « Lancer l'appel à N membres » ; à
+   gauche le type de contribution en cartes et les détails ; à droite « Ce qui va se passer » et l'aperçu de l'e-mail,
+   recalculés en direct (contrôleur Stimulus « appel ») et, sans JavaScript, au prochain envoi du formulaire.
+   Variables : association, appel (ou null), form, types, typeChoisi, statistiques, synthese, donnees, relances, prenomExemple. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'appels' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import _self as vue %}
+
+{% macro euros(centimes) %}{{ centimes is null ? '—' : (centimes / 100)|format_currency('EUR', centimes % 100 == 0 ? {fraction_digit: 0} : {}) }}{% endmacro %}
+
+{% macro detail_type(type) %}
+    {%- import _self as vue -%}
+    {%- set parties = [] -%}
+    {%- if type.unite.value == 'foyer' -%}
+        {%- set parties = parties|merge(['appels_association.type.par_foyer'|trans]) -%}
+    {%- elseif type.mode.value == 'libre' -%}
+        {%- set parties = parties|merge(['appels_association.type.libre'|trans]) -%}
+    {%- elseif type.montantDefaut -%}
+        {%- set parties = parties|merge(['appels_association.type.par_adulte'|trans({montant: vue.euros(type.montantDefaut)|trim})]) -%}
+    {%- endif -%}
+    {#- Le taux ne s'affiche que s'il est fixé par le type : par défaut, aucun (chaque appel le précise). -#}
+    {%- if type.tauxReversement is null -%}
+    {%- elseif type.tauxReversement == 0 -%}
+        {%- set parties = parties|merge(['appels_association.type.reste_ville'|trans]) -%}
+    {%- else -%}
+        {%- set parties = parties|merge(['appels_association.type.taux'|trans({taux: type.tauxReversement})]) -%}
+    {%- endif -%}
+    {{- parties|join(' · ') -}}
+{% endmacro %}
+
+{% set typesJs = {} %}
+{% for t in types %}
+    {% set typesJs = typesJs|merge({(t.code): {nom: t.nom, unite: t.unite.value, mode: t.mode.value, montant: t.montantDefaut, taux: t.tauxReversement}}) %}
+{% endfor %}
+{% set membresLancer = synthese.membres %}
+
+{% block title %}{{ 'appels_association.nouveau.titre'|trans }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}<span class="console__fil"><a href="{{ path('association_appels', {slug: association.slug}) }}">{{ 'appels_association.titre'|trans }}</a> <span aria-hidden="true">›</span> </span>{{ 'appels_association.nouveau.titre'|trans }}{% endblock %}
+
+{% block actions %}
+    {% if appel %}
+        <span class="appel__etat" role="status">{{ icones.icone('coche', 15) }}{{ 'appels_association.nouveau.enregistre'|trans({heure: appel.modifieLe|format_datetime('none', 'short')|replace({':': ' h '})}) }}</span>
+    {% endif %}
+    <a class="bouton bouton--secondaire" href="#apercu-email">{{ 'appels_association.apercu.bouton'|trans }}</a>
+    <button type="submit" form="appel-formulaire" name="action" value="lancer" class="bouton bouton--primaire"
+            data-turbo-confirm="{{ 'appels_association.nouveau.confirmer'|trans }}"
+            data-appel-target="lancer"{% if membresLancer == 0 %} disabled{% endif %}>
+        {{ icones.icone('envoyer', 15) }}<span data-appel-target="lancerLibelle">{{ 'appels_association.nouveau.lancer'|trans({nombre: membresLancer}) }}</span>
+    </button>
+{% endblock %}
+
+{% block contenu %}
+    {{ form_start(form, {attr: {id: 'appel-formulaire', class: 'appel', novalidate: 'novalidate',
+        'data-controller': 'appel',
+        'data-appel-statistiques-value': statistiques|json_encode,
+        'data-appel-types-value': typesJs|json_encode,
+        'data-appel-calendrier-value': association.calendrierRelances|json_encode,
+        'data-appel-association-value': association.nom,
+        'data-appel-prenom-value': prenomExemple ?? '',
+        'data-appel-textes-value': {
+            lancer: 'appels_association.nouveau.lancer'|trans({nombre: '#'}),
+            echeancesFixe: 'appels_association.synthese.echeances_fixe'|trans({nombre: '#', montant: '@'}),
+            echeancesLibre: 'appels_association.synthese.echeances_libre'|trans({nombre: '#'}),
+            aucune: 'appels_association.synthese.aucune'|trans,
+            noteSansEmail: 'appels_association.synthese.note_sans_email'|trans({nombre: 999}),
+            bonjour: prenomExemple ? 'appels_association.apercu.bonjour'|trans({prenom: prenomExemple}) : 'appels_association.apercu.bonjour_anonyme'|trans,
+            corpsFixe: 'appels_association.apercu.corps_fixe'|trans({association: association.nom, montant: '@', date: '%'}),
+            corpsLibre: 'appels_association.apercu.corps_libre'|trans({association: association.nom, date: '%'}),
+            payerFixe: 'appels_association.apercu.payer_fixe'|trans({montant: '@'}),
+            payerLibre: 'appels_association.apercu.payer_libre'|trans,
+            objetVide: 'appels_association.apercu.objet_vide'|trans,
+            montant: 'appels_association.formulaire.montant'|trans,
+            montantSuggere: 'appels_association.formulaire.montant_suggere'|trans,
+            reversementFixe: 'appels_association.formulaire.reversement_fixe'|trans({taux: '#'}),
+            resteVille: 'appels_association.formulaire.reste_ville'|trans,
+        }|json_encode}}) }}
+        <div class="appel__principal">
+            {% for message in form.vars.errors %}<p class="alerte alerte--erreur" role="alert">{{ message.message }}</p>{% endfor %}
+            {% if form.vars.submitted and not form.vars.valid %}<p class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</p>{% endif %}
+            <p class="appel__intro">{{ 'appels_association.nouveau.intro'|trans }}</p>
+
+            <fieldset class="appel__bloc">
+                <legend class="appel__legende">{{ 'appels_association.formulaire.type'|trans }}</legend>
+                <div class="appel__types">
+                    {% for choix in form.type %}
+                        {% set type = null %}{% for t in types %}{% if t.code == choix.vars.value %}{% set type = t %}{% endif %}{% endfor %}
+                        <label class="appel-type">
+                            <input type="radio" id="{{ choix.vars.id }}" name="{{ choix.vars.full_name }}" value="{{ choix.vars.value }}"{% if choix.vars.checked %} checked{% endif %} data-appel-target="type" data-action="appel#changerType">
+                            <span class="appel-type__texte">
+                                <span class="appel-type__nom">{{ type.nom }}</span>
+                                <span class="appel-type__detail">{{ vue.detail_type(type) }}</span>
+                            </span>
+                        </label>
+                        {% do choix.setRendered %}
+                    {% endfor %}
+                </div>
+                {{ form_errors(form.type) }}
+            </fieldset>
+
+            <fieldset class="appel__bloc">
+                <legend class="appel__legende">{{ 'appels_association.formulaire.details'|trans }}</legend>
+                <div class="appel__champs">
+                    <div class="champ{{ form.objet.vars.errors|length ? ' champ--erreur' }}">
+                        {{ form_label(form.objet, null, {label_attr: {class: 'champ__label'}}) }}
+                        {{ form_widget(form.objet, {attr: {class: 'champ__saisie', 'aria-describedby': form.objet.vars.id ~ '_aide', 'data-appel-target': 'objet', 'data-action': 'appel#calculer', placeholder: 'appels_association.formulaire.objet_exemple'|trans}}) }}
+                        <p class="champ__aide" id="{{ form.objet.vars.id }}_aide">{{ 'appels_association.formulaire.objet_aide'|trans }}</p>
+                        {% for e in form.objet.vars.errors %}<p class="champ__erreur">{{ e.message }}</p>{% endfor %}
+                    </div>
+
+                    <div class="appel__ligne appel__ligne--3">
+                        <div class="champ{{ form.montant.vars.errors|length ? ' champ--erreur' }}">
+                            <label class="champ__label" for="{{ form.montant.vars.id }}" data-appel-target="montantLibelle">{{ (donnees.mode.value == 'libre' ? 'appels_association.formulaire.montant_suggere' : 'appels_association.formulaire.montant')|trans }}</label>
+                            <span class="appel__euro">
+                                {{ form_widget(form.montant, {attr: {class: 'champ__saisie', 'data-appel-target': 'montant', 'data-action': 'appel#calculer', placeholder: '0,00'}}) }}
+                                <span class="appel__euro-signe" aria-hidden="true">€</span>
+                            </span>
+                            {% for e in form.montant.vars.errors %}<p class="champ__erreur">{{ e.message }}</p>{% endfor %}
+                        </div>
+                        <div class="champ">
+                            {{ form_label(form.mode, null, {label_attr: {class: 'champ__label'}}) }}
+                            {{ form_widget(form.mode, {attr: {class: 'champ__saisie', 'data-appel-target': 'mode', 'data-action': 'appel#calculer'}}) }}
+                        </div>
+                        <div class="champ{{ form.dateLimite.vars.errors|length ? ' champ--erreur' }}">
+                            {{ form_label(form.dateLimite, null, {label_attr: {class: 'champ__label'}}) }}
+                            {{ form_widget(form.dateLimite, {attr: {class: 'champ__saisie', 'data-appel-target': 'dateLimite', 'data-action': 'appel#calculer', min: 'now'|date('Y-m-d')}}) }}
+                            {% for e in form.dateLimite.vars.errors %}<p class="champ__erreur">{{ e.message }}</p>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="appel__ligne appel__ligne--2">
+                        <div class="champ">
+                            {{ form_label(form.perimetre, null, {label_attr: {class: 'champ__label'}}) }}
+                            {{ form_widget(form.perimetre, {attr: {class: 'champ__saisie', 'data-appel-target': 'perimetre', 'data-action': 'appel#calculer'}}) }}
+                        </div>
+                        <div class="champ{{ form.taux.vars.errors|length ? ' champ--erreur' }}">
+                            {{ form_label(form.taux, null, {label_attr: {class: 'champ__label'}}) }}
+                            {% set tauxFixe = typeChoisi.tauxReversement %}
+                            <div class="appel__reversement" data-appel-target="reversementFixe"{% if tauxFixe is null %} hidden{% endif %}>
+                                <span data-appel-target="reversementTexte">{{ tauxFixe == 0 ? 'appels_association.formulaire.reste_ville'|trans : 'appels_association.formulaire.reversement_fixe'|trans({taux: tauxFixe ?? 0}) }}</span>
+                                <span class="appel__reversement-note">{{ 'appels_association.formulaire.fixe_par_type'|trans }}</span>
+                            </div>
+                            <span class="appel__euro" data-appel-target="reversementLibre"{% if tauxFixe is not null %} hidden{% endif %}>
+                                {{ form_widget(form.taux, {attr: {class: 'champ__saisie', 'data-appel-target': 'taux', 'data-action': 'appel#calculer', placeholder: '0'}}) }}
+                                <span class="appel__euro-signe" aria-hidden="true">%</span>
+                            </span>
+                            {% for e in form.taux.vars.errors %}<p class="champ__erreur">{{ e.message }}</p>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="champ">
+                        {{ form_label(form.message, null, {label_attr: {class: 'champ__label'}}) }}
+                        {{ form_widget(form.message, {attr: {class: 'champ__saisie appel__message', 'data-appel-target': 'message', 'data-action': 'appel#calculer', placeholder: 'appels_association.formulaire.message_exemple'|trans}}) }}
+                    </div>
+
+                    <div class="appel__pied">
+                        <label class="appel__relances">
+                            {{ form_widget(form.relancesAuto, {attr: {'data-appel-target': 'relances', 'data-action': 'appel#calculer'}}) }}
+                            <span>{{ 'appels_association.formulaire.relances_libelle'|trans({calendrier: association.calendrierRelances|map(j => j == 0 ? 'appels_association.formulaire.jour_j'|trans : (j < 0 ? 'J' ~ j : 'J+' ~ j))|join(', ', ' et ')}) }}</span>
+                        </label>
+                        <button type="submit" name="action" value="enregistrer" class="bouton bouton--discret">{{ 'appels_association.formulaire.enregistrer'|trans }}</button>
+                    </div>
+                </div>
+            </fieldset>
+            <input type="hidden" name="_jeton_lancer" value="{{ csrf_token('lancer-appel') }}">
+        </div>
+
+        <aside class="appel__cote">
+            <section class="section appel__synthese" aria-labelledby="appel-synthese-titre">
+                <div class="section__entete"><h2 id="appel-synthese-titre">{{ 'appels_association.synthese.titre'|trans }}</h2></div>
+                <dl class="appel__chiffres">
+                    <div><dt>{{ 'appels_association.synthese.membres'|trans }}</dt><dd class="appel__fort" data-appel-target="membres">{{ synthese.membres }}</dd></div>
+                    <div><dt>{{ 'appels_association.synthese.echeances'|trans }}</dt><dd data-appel-target="echeances">{{ donnees.mode.value == 'libre' ? 'appels_association.synthese.echeances_libre'|trans({nombre: synthese.membres}) : 'appels_association.synthese.echeances_fixe'|trans({nombre: synthese.membres, montant: vue.euros(synthese.montant)|trim}) }}</dd></div>
+                    <div><dt>{{ 'appels_association.synthese.objectif'|trans }}</dt><dd class="appel__fort" data-appel-target="objectif">{{ vue.euros(synthese.objectif) }}</dd></div>
+                    <div><dt>{{ 'appels_association.synthese.part_central'|trans }}</dt><dd data-appel-target="partCentral">{{ vue.euros(synthese.partCentral) }}</dd></div>
+                    <div><dt>{{ 'appels_association.synthese.emails'|trans }}</dt><dd data-appel-target="emails">{{ synthese.emails }}</dd></div>
+                    <div class="appel__alerte" data-appel-target="ligneSansEmail"{% if synthese.sansEmail == 0 %} hidden{% endif %}><dt>{{ 'appels_association.synthese.sans_email'|trans }}</dt><dd data-appel-target="sansEmail">{{ synthese.sansEmail }}</dd></div>
+                    <div><dt>{{ 'appels_association.synthese.relances'|trans }}</dt><dd data-appel-target="relancesDates">{{ relances is empty ? 'appels_association.synthese.aucune'|trans : relances|map(d => d|format_date('none', 'd MMM'))|join(' · ') }}</dd></div>
+                </dl>
+                <p class="section__aide" data-appel-target="noteSansEmail"{% if synthese.sansEmail == 0 %} hidden{% endif %}>{{ 'appels_association.synthese.note_sans_email'|trans({nombre: synthese.sansEmail}) }}</p>
+            </section>
+
+            <section class="appel__apercu" id="apercu-email" aria-labelledby="apercu-titre">
+                <h2 class="appel__apercu-titre" id="apercu-titre">{{ 'appels_association.apercu.titre'|trans }}</h2>
+                <p class="appel__apercu-objet" data-appel-target="apercuObjet">{{ donnees.objet ?: 'appels_association.apercu.objet_vide'|trans }}</p>
+                <p class="appel__apercu-texte" data-appel-target="apercuTexte">
+                    {{- prenomExemple ? 'appels_association.apercu.bonjour'|trans({prenom: prenomExemple}) : 'appels_association.apercu.bonjour_anonyme'|trans }} {{ donnees.mode.value == 'libre'
+                        ? 'appels_association.apercu.corps_libre'|trans({association: association.nom, date: donnees.dateLimite ? donnees.dateLimite|format_date('long') : '…'})
+                        : 'appels_association.apercu.corps_fixe'|trans({association: association.nom, montant: vue.euros(synthese.montant)|trim, date: donnees.dateLimite ? donnees.dateLimite|format_date('long') : '…'}) }}{% if donnees.message %} {{ donnees.message|length > 110 ? donnees.message|slice(0, 110) ~ '…' : donnees.message }}{% endif -%}
+                </p>
+                <span class="appel__apercu-bouton" data-appel-target="apercuPayer">{{ donnees.mode.value == 'libre' ? 'appels_association.apercu.payer_libre'|trans : 'appels_association.apercu.payer_fixe'|trans({montant: vue.euros(synthese.montant)|trim}) }}</span>
+            </section>
+        </aside>
+        {{ form_rest(form) }}
+    {{ form_end(form) }}
+{% endblock %}

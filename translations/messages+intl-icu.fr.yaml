@@ -1,0 +1,2810 @@
+app:
+    nom: Caisses
+    village: Moudery
+
+formulaire:
+    erreurs: 'Le formulaire contient des erreurs. Corrigez les champs signalés.'
+
+connexion:
+    surtitre: 'Espace membre et responsables'
+    surtitre_panneau: 'Caisses du village'
+    titre: 'Se connecter'
+    intro: 'Retrouvez vos villes, vos membres et vos caisses.'
+    afficher: Afficher
+    masquer: Masquer
+    sans_compte: 'Pas encore de compte ?'
+    sans_compte_aide: 'Votre association vous invite par e-mail : le lien reçu crée votre compte et vous ouvre votre espace.'
+    pied: 'Chaque association est un espace étanche'
+    panneau:
+        surtitre: 'Caisses du village'
+        texte: 'Une plateforme pour l’association de la diaspora de Moudery et les caisses de ses villes : cotisations, appels à contribution, dépenses, tout est suivi et visible.'
+        points:
+            villes:
+                titre: 'Une caisse par ville'
+                texte: 'Chaque ville tient ses membres, ses cotisations et ses dépenses ; le bureau central voit l’ensemble.'
+            depenses:
+                titre: 'Des dépenses validées à deux'
+                texte: 'Une dépense n’est jamais validée par la personne qui l’a saisie.'
+            membres:
+                titre: 'Transparence sans indiscrétion'
+                texte: 'Les membres voient les totaux de leur ville, jamais les noms des autres.'
+    email: 'Adresse e-mail'
+    mot_de_passe: 'Mot de passe'
+    mot_de_passe_oublie: 'Mot de passe oublié ?'
+    rester_connecte: 'Rester connecté sur cet appareil'
+    bouton: 'Se connecter'
+    citation: 'Chaque ville tient sa caisse. Tout le village voit où va l’argent.'
+    deconnexion: 'Se déconnecter'
+
+mot_de_passe_oublie:
+    surtitre: 'Mot de passe oublié'
+    titre: 'Recevoir un lien de réinitialisation'
+    intro: 'Indiquez l’adresse e-mail de votre compte. Si elle existe, vous recevrez un lien valable une heure.'
+    bouton: 'Envoyer le lien'
+    retour: 'Revenir à la connexion'
+    envoye_titre: 'Vérifiez votre boîte mail'
+    envoye_texte: 'Si un compte existe pour cette adresse, un e-mail avec un lien de réinitialisation vient de partir. Pensez à regarder vos courriers indésirables.'
+    trop_de_demandes: 'Trop de demandes. Réessayez dans quelques minutes.'
+    lien_invalide: 'Ce lien n’est plus valable. Demandez un nouveau lien.'
+
+reinitialisation:
+    surtitre: 'Nouveau mot de passe'
+    titre: 'Choisir un nouveau mot de passe'
+    aide: '12 caractères minimum. Mélangez lettres, chiffres et ponctuation.'
+    mot_de_passe: 'Nouveau mot de passe'
+    confirmation: 'Confirmez le mot de passe'
+    bouton: 'Enregistrer le mot de passe'
+    reussie: 'Votre mot de passe est enregistré. Vous pouvez vous connecter.'
+    email:
+        objet: 'Réinitialiser votre mot de passe'
+
+accueil:
+    titre: 'Bienvenue, {prenom}'
+    texte: 'Votre espace membre arrive bientôt. En attendant, les responsables de votre ville gèrent vos cotisations.'
+    plateforme: 'Administration de la plateforme'
+
+administration:
+    titre: 'Administration de la plateforme'
+    sous_titre: '{associations, plural, =0 {Aucune association} one {# association} other {# associations}} · vous pouvez tout consulter et tout modifier'
+    perimetre: Plateforme
+    perimetre_aide: 'Vous administrez toute la plateforme : associations, villes et comptes.'
+    navigation: 'Navigation principale'
+    role: 'Super-admin plateforme'
+    equipe:
+        titre: 'Équipe de la plateforme'
+        sous_titre: '{nombre, plural, =0 {Aucun super-admin} one {# super-admin} other {# super-admins}} · ils voient et modifient tout, avec ou sans association'
+        ajouter: 'Ajouter un super-admin'
+        ajouter_titre: 'Ajouter un super-admin'
+        ajouter_sous_titre: 'La personne reçoit un e-mail avec un lien valable 7 jours pour choisir son mot de passe.'
+        prenom: Prénom
+        nom: Nom
+        email:
+            label: 'Adresse e-mail'
+            aide: 'Elle servira à se connecter. Une adresse personnelle, pas une boîte partagée.'
+        droits_aide: 'Un super-admin a exactement les mêmes droits que vous : toutes les associations, leurs villes et leurs comptes.'
+        annuler: Annuler
+        envoyer: 'Ajouter et envoyer le lien'
+        ajoute: '{nom} est super-admin. Un lien valable 7 jours est parti à {email}.'
+        colonne:
+            personne: Personne
+            association: Association
+            statut: Statut
+            acces: Accès
+        vous: Vous
+        mot_de_passe_a_choisir: 'Mot de passe à choisir'
+        derniere_connexion: 'Dernière connexion le {date}'
+        renvoyer_lien: 'Renvoyer le lien'
+        lien_envoye: 'Un nouveau lien, valable 7 jours, est parti à {email}.'
+        lien_impossible: 'Le compte de {nom} est désactivé : réactivez-le depuis sa fiche avant de renvoyer un lien.'
+        ouvrir: Ouvrir
+        actions_pour: 'Actions pour {nom}'
+        rechercher: Rechercher
+        recherche_placeholder: 'Nom, e-mail, association…'
+        aucun_resultat: 'Aucun super-admin ne correspond à la recherche.'
+        retirer_aide: 'Pour retirer un super-admin, ouvrez sa fiche et désactivez son compte. Vous ne pouvez ni désactiver le vôtre ni retirer votre propre rôle.'
+        email_objet: 'Vous rejoignez l’équipe d’administration de Caisses'
+        association:
+            label: 'Association (facultatif)'
+            placeholder: 'Aucune : compte de la plateforme seulement'
+            aide: 'Une personne peut être super-admin et appartenir à une association : rattachée, elle pourra aussi y recevoir un rôle (bureau central, trésorier…).'
+        promouvoir:
+            titre: 'Promouvoir un compte existant'
+            intro: 'Une personne qui a déjà un compte, par exemple au bureau central d’une association, peut aussi devenir super-admin. Elle garde tous ses rôles.'
+            label: Compte
+            placeholder: 'Choisir un compte'
+            bouton: Promouvoir
+            aucun_candidat: 'Tous les comptes existants sont déjà super-admins.'
+        promu: '{nom} est maintenant super-admin, en plus de ses autres rôles.'
+    voir_comme:
+        titre: 'Voir comme'
+        sous_titre: 'Regardez l’application avec les yeux d’une personne : ses écrans, ses droits, rien de plus. Un bandeau vous ramène à votre compte quand vous voulez.'
+        choisir:
+            titre: 'Choisir une personne'
+            label: Personne
+            placeholder: 'Nom, e-mail, association, rôle…'
+            aucune: 'Aucune personne ne correspond.'
+            bouton: Voir
+            aide: 'Tapez un nom ou une adresse et choisissez dans la liste : vous basculez aussitôt. Seuls les comptes actifs d’associations actives sont proposés ; le vôtre n’y est pas.'
+        liste:
+            titre: 'Toutes les personnes'
+            colonne:
+                personne: Personne
+                association: Association
+                roles: Rôles
+            voir: Voir
+            voir_pour: 'Voir l’application comme {nom}'
+            aucune: 'Aucun autre compte actif pour le moment.'
+        introuvable: 'Aucune personne ne correspond à « {saisie} ». Choisissez-la dans la liste.'
+        journal_aide: 'Chaque emprunt est consigné dans l’activité, avec la personne vue et le moment.'
+    tableau_de_bord:
+        titre: 'Tableau de bord'
+        filtres:
+            titre: 'Filtres des graphiques'
+            periode: Période
+            periodes:
+                30j: '30 jours'
+                3m: '3 mois'
+                12m: '12 mois'
+                annee: 'Année en cours'
+            du: Du
+            au: au
+            appliquer: Appliquer
+            effacer: 'Tout effacer'
+            resume: 'Du {du} au {au}, par {pas} · {association}'
+            toutes_les_associations: 'toutes les associations'
+            pas:
+                jour: jour
+                semaine: semaine
+                mois: mois
+            role: Rôle
+            tous_les_roles: 'Tous les rôles'
+        graphiques:
+            donnees: 'Tableau de données'
+            croissance:
+                titre: 'Croissance de la plateforme'
+                sous_titre: '{associations, plural, =0 {Aucune association} one {# association} other {# associations}}, {villes, plural, =0 {aucune ville} one {# ville} other {# villes}} et {comptes, plural, =0 {aucun compte} one {# compte} other {# comptes}} créés sur la période'
+                associations: Associations
+                villes: Villes
+                comptes: Comptes
+                cumul_comptes: 'Comptes au total'
+            revenu:
+                titre: 'Revenu mensuel récurrent'
+                sous_titre: '{mensuel} par mois aujourd’hui · {payants, plural, =0 {aucun abonnement payant} one {# abonnement payant} other {# abonnements payants}}'
+                mensuel: 'Revenu mensuel (€)'
+                payants: 'Abonnements payants'
+            encaissements:
+                titre: 'Encaissements reçus et attendus'
+                sous_titre: '{recus} reçus · {attendus} attendus · {retard} en retard'
+                recus: 'Reçus (€)'
+                attendus: 'Attendus (€)'
+            abonnements:
+                titre: 'Abonnements par statut'
+                sous_titre: '{nombre, plural, =0 {Aucun abonnement} one {# abonnement} other {# abonnements}} · {mensuel} par mois'
+                nombre: Nombre
+                mensuel: 'Revenu mensuel (€)'
+            villes:
+                titre: 'Où en sont les villes'
+                sous_titre: '{nombre, plural, =0 {Aucune ville} one {# ville} other {# villes}} · {brouillons, plural, =0 {aucun brouillon} one {# brouillon} other {# brouillons}} dans l’assistant'
+                nombre: Villes
+            invitations:
+                titre: Invitations
+                sous_titre: '{taux} % acceptées sur {envoyees, plural, one {# envoyée} other {# envoyées}} · délai moyen {delai}'
+                aucune: 'Aucune invitation sur la période'
+                heures: '{nombre, plural, one {# heure} other {# heures}}'
+                jours: '{nombre} jours'
+                envoyees: Envoyées
+                acceptees: Acceptées
+                expirees: Expirées
+            comptes:
+                titre: 'Comptes des associations'
+                sous_titre: '{nombre, plural, =0 {Aucun compte} one {# compte} other {# comptes}} · {connectes, plural, =0 {aucun connecté} one {# connecté} other {# connectés}} ces 30 derniers jours'
+                nombre: Comptes
+                connectes: 'Connectés (30 j)'
+                inactifs: 'Sans connexion depuis 30 j'
+                jamais_connectes: 'Jamais connectés'
+                en_attente: 'En attente'
+                desactives: Désactivés
+            activite:
+                titre: Activité
+                sous_titre: '{connexions, plural, =0 {Aucune connexion} one {# connexion} other {# connexions}} · {actions, plural, =0 {aucune action} one {# action} other {# actions}} consignées'
+                connexions: Connexions
+                actions: Actions
+        previsions:
+            titre: 'Encaissements attendus'
+            sous_titre: '{montant} sur {mois} mois · abonnements à jour et en retard'
+            attendu: 'Échéances attendues'
+            en_retard: 'Déjà en retard : {montant}'
+            donnees: 'Tableau de données'
+            aucun: 'Aucun abonnement payant pour l’instant : rien à encaisser.'
+            colonne:
+                mois: Mois
+                attendu: Attendu
+                en_retard: 'En retard'
+        repartition:
+            titre: Abonnements
+            tous: 'Tous les abonnements'
+            aide: '{retard} en retard · {proche} à échéance sous 30 jours'
+        colonne:
+            association: Association
+            bureau_central: 'Bureau central'
+            villes: Villes
+            comptes: Comptes
+            abonnement: Abonnement
+        sous_titre: '{associations, plural, =0 {Aucune association} one {# association} other {# associations}}, {villes, plural, =0 {aucune ville} one {# ville} other {# villes}}, {comptes, plural, =0 {aucun compte} one {# compte} other {# comptes}} · données au {date}'
+    nav:
+        tableau_de_bord: 'Tableau de bord'
+        associations: Associations
+        villes: Villes
+        comptes: Comptes
+        equipe: Équipe
+        abonnements: Abonnements
+        activite: Activité
+        voir_comme: 'Voir comme…'
+    kpi:
+        titre: 'La plateforme en chiffres'
+        associations: Associations
+        associations_detail: 'chacune est un espace étanche'
+        associations_actives: '{nombre, plural, =0 {aucune active} one {# active} other {# actives}}'
+        suspendues: '{nombre, plural, one {# suspendue} other {# suspendues}}'
+        abonnements: 'Revenu mensuel'
+        abonnements_detail: '{actifs, plural, =0 {aucun payant à jour} one {# payant à jour} other {# payants à jour}} · {offerts, plural, =0 {aucun offert} one {# offert} other {# offerts}}'
+        abonnements_en_retard: '{nombre, plural, one {# en retard} other {# en retard}}'
+        a_encaisser: 'À encaisser'
+        a_encaisser_detail: '{nombre, plural, =0 {aucune échéance sous 30 jours} one {# échéance sous 30 jours} other {# échéances sous 30 jours}}'
+        villes: Villes
+        villes_detail: '{actives, plural, =0 {aucune active} one {# active} other {# actives}}'
+        brouillons: '{nombre, plural, one {# brouillon} other {# brouillons}}'
+        comptes: Comptes
+        comptes_detail: 'responsables et membres'
+        en_attente: '{nombre, plural, one {# en attente} other {# en attente}}'
+    a_traiter:
+        titre: 'À traiter'
+        rien: 'Rien à traiter : bureaux centraux en place, abonnements à jour.'
+        sans_bureau_central: '{nom} n’a pas de bureau central'
+        sans_bureau_central_aide: 'Aucune invitation en cours · inviter son bureau central'
+        abonnement_en_retard: '{nom} : abonnement en retard'
+        abonnement_en_retard_aide: 'Échéance du {echeance} · {montant} attendus'
+        echeance_proche: '{nom} : abonnement à renouveler le {date}'
+        echeance_proche_aide: '{montant} à venir'
+        premier_paiement: '{nom} : premier paiement attendu le {date}'
+        premier_paiement_aide: '{montant} · {formule} {periodicite}, souscrit le {souscrit}'
+        a_souscrire: '{nom} : abonnement à souscrire'
+        a_souscrire_aide: 'Bureau central en place, aucune offre choisie'
+        suspendue: '{nom} est suspendue'
+        suspendue_aide: 'Ses comptes ne peuvent plus se connecter'
+        invitation_en_attente: '{nom} attend son bureau central'
+        invitation_en_attente_aide: 'Invitation envoyée à {email} le {envoi}, valable jusqu’au {expiration}'
+        invitation_expiree: '{nom} : l’invitation du bureau central a expiré'
+        invitation_expiree_aide: 'Envoyée à {email}, expirée le {expiration} · à renvoyer depuis la fiche'
+    activite:
+        titre: Activité
+        sous_titre: 'Les derniers événements de la plateforme, jour par jour : connexions, comptes créés, invitations acceptées, associations créées.'
+        aujourdhui: 'Aujourd’hui'
+        hier: Hier
+        tous_les_comptes: 'Tous les comptes'
+        rien: 'Aucune activité pour l’instant.'
+        la_plateforme: 'la plateforme'
+        connexion: 's’est connecté à {association}'
+        compte_cree: 'a rejoint {association}'
+        invitation_acceptee: 'a activé son compte dans {association}'
+        association_creee: 'L’association <strong>{nom}</strong> a été créée'
+    invitation:
+        renvoyer: 'Renvoyer l’invitation'
+        renvoyee: 'Un nouveau lien, valable 7 jours, est parti à {email}.'
+        deja_acceptee: 'L’invitation de {email} a déjà été acceptée : son compte existe.'
+    associations:
+        titre: Associations
+        sous_titre: 'Chaque association est un espace étanche : ses villes, ses comptes, ses caisses.'
+        tout_voir: 'Tout voir'
+        aucune: 'Aucune association pour l’instant. Créez la première.'
+        aucun_resultat: 'Aucune association ne correspond à cette recherche.'
+        rechercher: Rechercher
+        recherche_placeholder: 'Nom, identifiant, village, e-mail…'
+        effacer_filtres: 'Effacer les filtres'
+        filtre_statut: Statut
+        filtre_bureau: 'Bureau central'
+        filtre_abonnement: Abonnement
+        filtres:
+            abonnement_tous: Tous
+            abonnement_a-souscrire: 'À souscrire'
+            abonnement_offert: Offerts
+            abonnement_actif: 'À jour'
+            abonnement_echeance-proche: 'Échéance sous 30 jours'
+            abonnement_en-retard: 'En retard'
+            abonnement_resilie: Résiliés
+            toutes: Toutes
+            actives: Actives
+            suspendues: Suspendues
+            archivees: Archivées
+            tous: Tous
+            avec: 'Avec bureau central'
+            sans: 'Sans bureau central'
+            invitation-en-attente: 'Invitation en attente'
+            invitation-expiree: 'Invitation expirée'
+        resultats: '{nombre, plural, =0 {Aucune association affichée} one {# association affichée} other {# associations affichées}} sur {total}'
+        exporter: 'Exporter en CSV'
+        actions_pour: 'Actions pour {nom}'
+        action:
+            fiche: 'Ouvrir la fiche'
+            modifier: Modifier
+            inviter: 'Inviter un bureau central'
+            renvoyer: 'Renvoyer l’invitation'
+            suspendre: Suspendre
+            reactiver: Réactiver
+            archiver: Archiver
+            supprimer: Supprimer
+        non_renseigne: 'Non renseigné'
+        jamais: 'Jamais'
+        total: '{nombre, plural, one {Total · # association} other {Total · # associations}}'
+        pied: 'Suspendue, une association ferme l’accès à tous ses comptes sans rien perdre ; archivée, elle est close. Une association ne se supprime que vide, sans ville ni compte.'
+        export:
+            nom: Nom
+            identifiant: Identifiant
+            village: Village
+            statut: Statut
+            villes: Villes
+            villes_brouillon: 'Villes en brouillon'
+            comptes: Comptes
+            comptes_en_attente: 'Comptes en attente'
+            bureau_central: 'Bureau central'
+            invitation: 'Invitation du bureau central'
+            invitation_en_attente: 'en attente'
+            invitation_expiree: expirée
+            email_contact: 'E-mail de contact'
+            telephone: Téléphone
+            derniere_activite: 'Dernière activité'
+            creee_le: 'Créée le'
+            abonnement_formule: 'Abonnement · formule'
+            abonnement_statut: 'Abonnement · statut'
+            abonnement_montant: 'Abonnement · montant (€)'
+            abonnement_echeance: 'Abonnement · échéance'
+        colonne:
+            association: Association
+            statut: Statut
+            villes: Villes
+            comptes: Comptes
+            bureau_central: 'Bureau central'
+            contact: Contact
+            activite: 'Dernière activité'
+            abonnement: Abonnement
+            creee_le: 'Créée le'
+        brouillons: '{nombre, plural, one {dont # brouillon} other {dont # brouillons}}'
+        en_attente: '{nombre, plural, one {dont # en attente} other {dont # en attente}}'
+        aucun_bureau_central: 'Aucun compte'
+        invitation_envoyee: 'Invitation envoyée'
+        invitation_expiree: 'Invitation expirée'
+    abonnement:
+        titre: Abonnement
+        modifier: 'Modifier l’abonnement'
+        modifier_titre: 'Abonnement de l’association'
+        modifier_sous_titre: 'Renseigné à la main : aucun paiement n’est encaissé par la plateforme pour l’instant.'
+        enregistrer: 'Enregistrer l’abonnement'
+        modifie: 'Abonnement enregistré pour {nom}.'
+        paye: 'Paiement enregistré pour {nom} : prochaine échéance le {echeance}.'
+        paiement_impossible: 'Aucun paiement attendu pour {nom} : son abonnement est offert ou résilié.'
+        paye_confirmation: 'Enregistrer un paiement reçu pour {nom} ? L’échéance avancera d’une période.'
+        marquer_paye: 'Marquer comme payé'
+        gratuit: Offert
+        bientot: 'sous 30 jours'
+        sans_echeance: 'Aucune échéance'
+        aucun_paiement: 'Aucun paiement enregistré'
+        aide: 'Préparation de la facturation : quand le modèle sera fixé, Stripe Billing ou les factures s’appuieront sur ces informations.'
+        formule:
+            label: Formule
+            aide: 'Le nom de l’offre, par exemple « Gratuit » ou « Standard ».'
+        statut:
+            label: Statut
+            aide: 'À souscrire : le bureau central choisira son offre en activant son compte. Offert : rien à payer. À jour, en retard (échéance dépassée), résilié (plus d’échéance).'
+        montant:
+            label: 'Montant par période (€)'
+            aide: 'En euros, hors taxes. 0 pour un abonnement offert.'
+        periodicite:
+            label: Périodicité
+        debut:
+            label: 'Début de l’abonnement'
+        echeance:
+            label: 'Prochaine échéance'
+            aide: 'La date à laquelle le prochain paiement est attendu. Vide pour un abonnement offert.'
+        dernier_paiement:
+            label: 'Dernier paiement'
+        notes:
+            label: Notes
+            aide: 'Conditions particulières, contact de facturation, historique.'
+    abonnements:
+        titre: Abonnements
+        sous_titre: 'Ce que chaque association doit à la plateforme. Préparation : rien n’est encaissé ici.'
+        en_chiffres: 'Les abonnements en chiffres'
+        aucun: 'Aucun abonnement : chaque association en reçoit un à sa création.'
+        depassee: 'Échéance dépassée'
+        pied: 'Un paiement reçu se marque depuis le menu de la ligne : l’échéance avance d’une période. Un abonnement en retard peut mener à la suspension de l’association, depuis sa fiche, jamais automatiquement.'
+        kpi:
+            mensuel: 'Revenu mensuel récurrent'
+            annuel: 'soit {montant} par an'
+            actifs: 'Abonnements payants à jour'
+            offerts: '{nombre, plural, =0 {aucun offert} one {# offert} other {# offerts}}'
+            a_souscrire: '{nombre, plural, one {# à souscrire} other {# à souscrire}}'
+            en_retard: 'En retard'
+            echeances_proches: '{nombre, plural, one {# échéance sous 30 jours} other {# échéances sous 30 jours}}'
+            resilies: '{nombre, plural, =0 {aucun résilié} one {# résilié} other {# résiliés}}'
+        colonne:
+            association: Association
+            statut: Statut
+            formule: Formule
+            montant: Montant
+            echeance: 'Prochaine échéance'
+            dernier_paiement: 'Dernier paiement'
+    association:
+        village:
+            label: Village
+            aide: 'Affiché sous le logo pour les membres, par exemple « Moudery ». Il donne aussi l’identifiant dans les adresses.'
+        identifiant:
+            apercu: 'Adresse de l’association :'
+            modifier: 'Choisir un autre identifiant dans les adresses'
+        contact:
+            titre: Contact
+        email_contact:
+            label: 'E-mail de contact'
+            aide: 'L’adresse publique de l’association, distincte de celle du bureau central.'
+        telephone:
+            label: Téléphone
+        adresse:
+            label: 'Adresse du siège'
+        juridique:
+            titre: 'Existence juridique'
+            intro: 'Demandée par Stripe pour connecter les comptes bancaires. Facultatif tant que les paiements en ligne ne sont pas activés.'
+        rna:
+            label: 'Numéro RNA'
+            aide: 'Numéro au répertoire national des associations : W suivi de neuf chiffres.'
+        siren:
+            label: SIREN
+            aide: 'Neuf chiffres, si l’association en a un.'
+        gestion:
+            titre: 'Paramètres de gestion'
+        exercice:
+            label: 'Début de l’exercice'
+            aide: 'Le mois où commence l’exercice comptable, par exemple octobre pour un exercice d’octobre à septembre.'
+        premier_exercice:
+            label: 'Premier exercice suivi'
+            aide: 'L’année civile du premier exercice géré dans Caisses (2025 pour Moudery) : le tableau de bord et les filtres d’année partent de là, les années plus anciennes ne sont que de l’historique importé.'
+        taux:
+            label: 'Reversement au central par défaut (%)'
+            aide: 'Proposé pour chaque nouveau type de contribution ; chaque type garde son propre taux.'
+        relances:
+            label: 'Calendrier des relances'
+            aide: 'En jours par rapport à l’échéance, séparés par des virgules : négatif avant, positif après. Par défaut « -7, 0, 15 ».'
+        stripe:
+            label: 'Compte Stripe du central'
+        statut:
+            titre: Statut
+            aide: 'Suspendre ferme l’accès à tous les comptes de l’association, sans rien perdre. Archiver la clôt. Réactiver rouvre l’accès.'
+        statut_change: '{nom} est maintenant {statut}.'
+        statut_impossible: 'Ce changement de statut n’est pas possible pour {nom}.'
+        suspendre_confirmation: 'Suspendre {nom} ? Ses comptes ne pourront plus se connecter jusqu’à sa réactivation.'
+        archiver_confirmation: 'Archiver {nom} ? L’association sera close ; elle restera consultable et pourra être réactivée.'
+        suspendue_info: 'Cette association est suspendue : ses comptes ne peuvent plus se connecter. Réactivez-la pour rouvrir l’accès.'
+        archivee_info: 'Cette association est archivée : elle est close, ses données restent consultables.'
+        creer: 'Créer une association'
+        titre: 'Nouvelle association'
+        sous_titre: 'Un nouvel espace, étanche aux autres : ses villes, ses membres, ses caisses.'
+        nom:
+            label: 'Nom de l’association'
+            aide: 'Tel qu’il apparaîtra aux membres, par exemple « Association de Moudery ».'
+        slug:
+            label: 'Identifiant dans les adresses'
+            aide: 'Minuscules, chiffres et tirets. Laissez vide pour le déduire du village, ou du nom à défaut.'
+            aide_modification: 'Minuscules, chiffres et tirets. Attention : les adresses des pages de l’association changent avec lui.'
+        bureau_central:
+            titre: 'Son bureau central'
+            intro: 'La personne reçoit un e-mail avec un lien valable 7 jours pour créer son compte et choisir son mot de passe. Elle pourra ensuite inviter les autres responsables.'
+            label: 'Adresse e-mail du bureau central'
+            aide: 'Cette adresse deviendra son identifiant de connexion.'
+        annuler: Annuler
+        enregistrer: 'Créer l’association et inviter'
+        creee: 'L’association « {nom} » est créée. Une invitation est partie à {email}.'
+        fiche:
+            identite: 'Identité et paramètres'
+            non_renseigne: 'Non renseigné'
+            exercice: 'Débute en {mois}'
+            relances: 'Jours {jours} par rapport à l’échéance'
+            stripe_absent: 'Non connecté'
+            creee_le: 'créée le {date}'
+            villes: Villes
+            toutes_les_villes: 'Toutes les villes'
+            comptes: Comptes
+            sans_bureau_central: 'Aucun bureau central'
+            invitation_en_attente: 'Invitation envoyée à {email}, valable jusqu’au {date}.'
+            invitation_expiree: 'Invitation envoyée à {email}, expirée le {date}. Renvoyez un lien de 7 jours.'
+            aucune_invitation: 'Aucune invitation en cours : invitez la personne qui administrera cette association.'
+            aucune_ville: 'Aucune ville. Créez la première depuis l’assistant, ou depuis la liste des villes.'
+            aucun_compte: 'Aucun compte dans cette association.'
+        modifier: Modifier
+        modifier_titre: 'Modifier l’association'
+        modifier_sous_titre: 'Le nom et l’identifiant changent partout, y compris dans les adresses des pages.'
+        enregistrer_modifications: 'Enregistrer les modifications'
+        modifiee: 'L’association « {nom} » est modifiée.'
+        supprimer: 'Supprimer l’association'
+        supprimer_confirmation: 'Supprimer définitivement « {nom} » ? Cette action ne peut pas être annulée.'
+        supprimee: 'L’association « {nom} » est supprimée.'
+        suppression_impossible: 'Impossible de supprimer « {nom} » : elle contient encore des villes ou des comptes.'
+        suppression_aide: 'Une association ne se supprime que vide : sans ville ni compte. Ses invitations en attente sont annulées.'
+        suppression_impossible_aide: 'Cette association contient des villes ou des comptes : elle ne peut pas être supprimée.'
+    villes:
+        titre: Villes
+        sous_titre: '{nombre, plural, =0 {Aucune ville} one {# ville} other {# villes}} sur la plateforme'
+        sous_titre_filtre: '{nombre, plural, =0 {Aucune ville} one {# ville} other {# villes}} sur {total}'
+        exporter: 'Exporter en CSV'
+        rechercher: Rechercher
+        recherche_placeholder: 'Ville, association, village…'
+        filtre_association: Association
+        association_placeholder: 'Toutes les associations'
+        association_effacer: 'Toutes les associations'
+        association_aucune: 'Aucune association ne correspond.'
+        filtre_toutes: Toutes
+        filtre_statut: Statut
+        filtre_tous: Tous
+        filtres:
+            tous: Toutes
+            brouillon: Brouillon
+            active: Actives
+            archivee: Archivées
+            bloquees: Bloquées
+        grouper: 'Grouper par association'
+        effacer_filtres: 'Effacer les filtres'
+        bloquee_depuis: 'Sans changement depuis {jours} jours'
+        groupe_villes: '{nombre, plural, one {# ville} other {# villes}}'
+        actions_pour: 'Actions pour {nom}'
+        action:
+            assistant: 'Ouvrir l’assistant'
+            modifier: Modifier
+            association: 'Voir l’association'
+        pagination:
+            titre: Pagination
+            resume: '{de} à {a} sur {total, plural, one {# ville} other {# villes}}'
+            par_page: 'Par page'
+            position: 'Page {page} sur {pages}'
+            precedente: Précédente
+            suivante: Suivante
+        csv:
+            ville: Ville
+            association: Association
+            identifiant: Identifiant
+            village: Village
+            statut: Statut
+            etape: Étape
+            responsables: Responsables
+            creee_le: 'Créée le'
+            modifiee_le: 'Modifiée le'
+            bloquee: 'Bloquée (brouillon sans changement depuis 30 jours)'
+            oui: oui
+            non: non
+        aucune: 'Aucune ville ne correspond.'
+        colonne:
+            ville: Ville
+            association: Association
+            statut: Statut
+            etape: 'Étape de l’assistant'
+            responsables: Responsables
+            creee_le: 'Créée le'
+            actions: Actions
+        creee_le: 'créée le {date}'
+        etape: '{numero}/3 · {libelle}'
+        assistant: Assistant
+        modifier: Modifier
+    ville:
+        titre_modifier: 'Modifier la ville'
+        association:
+            label: Association
+            placeholder: 'Choisir une association'
+            aide: 'Une ville ne change pas d’association.'
+        nom:
+            label: 'Nom de la ville'
+            aide: 'Unique dans l’association, par exemple « Lyon » ou « Marseille ».'
+        statut:
+            titre: Statut
+            label: Statut
+            aide: 'Brouillon → active → archivée. Une ville archivée se réactive, jamais ne se supprime. Activer depuis ici n’envoie ni invitation ni échéance : c’est le rôle de l’assistant, à sa dernière étape.'
+        ouvrir_assistant: 'Ouvrir l’assistant'
+        annuler: Annuler
+        enregistrer: 'Enregistrer les modifications'
+        modifiee: 'La ville « {nom} » est modifiée.'
+    comptes:
+        titre: Comptes
+        sous_titre: '{nombre, plural, =0 {Aucun compte} one {# compte} other {# comptes}} · responsables, membres et super-admins'
+        inviter: 'Inviter une personne'
+        filtre_association: Association
+        filtre_toutes: Toutes
+        filtre_statut: Statut
+        filtre_tous: Tous
+        aucun: 'Aucun compte ne correspond.'
+        rechercher: Rechercher
+        recherche_placeholder: 'Nom, e-mail, association, rôle, ville…'
+        effacer_recherche: 'Effacer la recherche'
+        colonne:
+            personne: Personne
+            association: Association
+            roles: Rôles
+            statut: Statut
+            derniere_connexion: 'Dernière connexion'
+        jamais_connecte: Jamais
+        plateforme: Plateforme
+        aucun_role: 'Aucun rôle'
+        ouvrir: Ouvrir
+    compte:
+        inviter_titre: 'Inviter une personne'
+        inviter_sous_titre: 'Elle reçoit un e-mail avec un lien valable 7 jours pour créer son compte et choisir son mot de passe.'
+        association:
+            label: Association
+        role:
+            label: Rôle
+            aide: 'Le bureau central agit sur toute l’association ; trésorier, président, secrétaire et membre s’attribuent sur une ville.'
+        ville:
+            label: Ville
+            placeholder: 'Aucune ville'
+            aide: 'Obligatoire pour un trésorier, un président, un secrétaire ou un membre.'
+        email:
+            label: 'Adresse e-mail'
+            aide: 'Elle deviendra son identifiant de connexion.'
+            aide_modification: 'C’est l’identifiant de connexion : la personne se connectera avec la nouvelle adresse.'
+        envoyer: 'Envoyer l’invitation'
+        invitee: 'Une invitation est partie à {email}.'
+        fiche:
+            identite: Identité
+            email: 'Adresse e-mail'
+            association: Association
+            statut: Statut
+            cree_le: 'Compte créé le'
+            derniere_connexion: 'Dernière connexion'
+            activer: 'Activer le compte'
+            desactiver: 'Désactiver le compte'
+            mot_de_passe: 'Envoyer un lien de mot de passe'
+            mot_de_passe_aide: 'Un e-mail avec un lien valable une heure, comme « mot de passe oublié ». Réservé aux comptes actifs.'
+            affectations: 'Rôles et périmètres'
+            depuis: 'depuis le {date}'
+            retirer: Retirer
+            aucune_affectation: 'Aucun rôle : ce compte ne peut rien faire.'
+            ajouter_affectation: 'Ajouter un rôle'
+            aucun_role_possible: 'Ce compte a déjà tous les rôles qu’il peut recevoir.'
+            voir_comme: 'Voir l’application comme cette personne'
+            voir_comme_aide: 'Vous verrez exactement ce que voit cette personne, avec ses droits. Un bandeau vous permettra de revenir à votre compte. L’emprunt est consigné au journal.'
+        modifier: Modifier
+        modifier_titre: 'Modifier le compte'
+        prenom: Prénom
+        nom: Nom
+        annuler: Annuler
+        enregistrer: 'Enregistrer les modifications'
+        modifie: 'Le compte de {nom} est modifié.'
+        active: 'Le compte de {nom} est actif.'
+        desactive: 'Le compte de {nom} est désactivé : il ne peut plus se connecter.'
+        affectation_ajoutee: '{nom} est maintenant {role}.'
+        affectation_retiree: 'Le rôle {role} est retiré à {nom}.'
+        affectation_propre_interdite: 'Vous ne pouvez pas retirer votre propre rôle de super-admin.'
+        dernier_super_admin: 'Impossible : {nom} est le dernier super-admin actif de la plateforme.'
+        dernier_super_admin_desactivation: 'Impossible de désactiver {nom} : c’est le dernier super-admin actif de la plateforme.'
+        propre_compte_interdit: 'Vous ne pouvez pas désactiver votre propre compte.'
+        lien_envoye: 'Un lien de mot de passe est parti à {email}.'
+        lien_impossible: 'Le compte de {nom} n’est pas actif : activez-le d’abord.'
+
+# Espace d'une association, réservé à son bureau central (F-28).
+espace:
+    navigation: 'Navigation de l’association'
+    perimetre_aide: 'Votre association : tout ce que vous voyez ici lui appartient. Choisissez une ville pour que toute l’application se limite à elle.'
+    perimetre_ville_aide: 'Toute l’application se limite à cette ville : tableau de bord, membres, cotisations. Choisissez l’association pour revenir à l’ensemble.'
+    perimetre_toute: 'Toute l’association'
+    onglets:
+        accueil: Accueil
+        impayes: Impayés
+        plus: Plus
+    perimetre_mes_villes_aide: 'Vos villes : choisissez celle sur laquelle vous travaillez.'
+    perimetre_ma_ville_aide: 'Votre ville : tout ce que vous voyez ici lui appartient.'
+    role_bureau_central: 'Bureau central'
+    periode: Période
+    periodes:
+        30j: '30 jours'
+        3m: '3 mois'
+        12m: '12 mois'
+    nav:
+        tableau_de_bord: 'Tableau de bord'
+        villes: Villes
+        membres: Membres
+        cotisations: Cotisations
+        appels: 'Projets et appels'
+        depenses: Dépenses
+        depenses_a_valider: '{nombre, plural, one {# dépense à valider} other {# dépenses à valider}}'
+        paiements: Paiements
+        impayes: 'Impayés et relances'
+        membres_en_attente: '{nombre, plural, one {# inscription à valider} other {# inscriptions à valider}}'
+        parametres_ville: 'Paramètres de la ville'
+        impayes_en_retard: '{nombre, plural, one {# membre en retard} other {# membres en retard}}'
+        reversements: Reversements
+        reversements_a_confirmer: '{nombre, plural, one {# reversement à confirmer} other {# reversements à confirmer}}'
+        a_venir: 'Modules à venir : {modules}.'
+        rapports: 'Rapports d’AG'
+        a_venir_association: ''
+        a_venir_ville: ''
+    comparatif:
+        titre: 'Villes en comparaison'
+        aide: 'Quelle ville est en avance ou en retard ?'
+        collecte: Encaissé
+        depense: Dépensé
+        reverse: 'Reversé au central'
+        a_jour: 'Membres à jour'
+    tableau_de_bord:
+        titre: 'Tableau de bord'
+        sous_titre: '{association} · {villes, plural, =0 {aucune ville} one {# ville} other {# villes}} · données au {date}'
+        chiffres: 'Votre association en chiffres'
+        creer_ville: 'Créer une ville'
+        exercice: 'Exercice {exercice}'
+        exercice_aide: 'L’exercice comptable commence au mois {mois} : il se règle dans les paramètres de l’association.'
+        exercice_choisir: 'Changer d’exercice'
+        exercice_premier: 'premier exercice suivi'
+        rapport_ag: 'Rapport d’AG'
+        rapport_ag_aide: 'Le rapport d’assemblée générale arrive avec le module Rapports.'
+        toutes_villes: 'Toutes les villes'
+        choisir_ville: 'Choisir une ville'
+        sous_titre_ville: '{ville} · {association} · données au {date}'
+    kpi:
+        villes: Villes
+        villes_detail: '{actives, plural, =0 {aucune active} one {# active} other {# actives}}'
+        brouillons: '{nombre, plural, one {# brouillon} other {# brouillons}}'
+        avancement: 'Avancement des brouillons'
+        avancement_detail: '{nombre, plural, one {sur # ville en cours} other {sur # villes en cours}} de l’assistant'
+        avancement_aucun: 'Aucune ville en cours de création'
+        responsables: Responsables
+        en_attente: '{nombre, plural, one {# en attente} other {# en attente}}'
+        invitations: '{nombre, plural, =0 {aucune invitation en cours} one {# invitation en cours} other {# invitations en cours}}'
+        abonnement: 'Votre abonnement'
+        abonnement_echeance: 'Prochaine échéance le {date} · {montant}'
+        collecte: Collecté
+        collecte_vs: 'vs {exercice}'
+        collecte_premier: 'premier exercice suivi'
+        depense: Dépensé
+        depense_detail: 'du collecté'
+        solde: 'Solde des caisses'
+        solde_detail: 'villes et central'
+        membres_a_jour: 'Membres à jour'
+        membres_a_jour_detail: membres
+        reversements_dus: 'Reversements dus'
+        reversements_villes: '{nombre, plural, =0 {aucune ville} one {# ville} other {# villes}}'
+        reversements_dus_detail: '{villes, plural, =0 {aucune ville encore} one {sur # ville} other {sur # villes}}'
+        bientot: Bientôt
+        abonnement_offert: 'Offert par la plateforme'
+        abonnement_aucune_echeance: 'Aucune échéance prévue'
+        activite: 'Connexions sur {periode}'
+        activite_detail: '{actions, plural, =0 {aucune action consignée} one {# action consignée} other {# actions consignées}}'
+    etat:
+        titre: 'Votre association aujourd’hui'
+        villes: Villes
+        avancement_libelle: Avancement
+        abonnement: Abonnement
+        avancement: '{pourcentage} % {nombre, plural, one {sur # ville en cours} other {sur # villes en cours}}'
+    activite:
+        titre: Activité
+        sous_titre: '{connexions, plural, =0 {Aucune connexion} one {# connexion} other {# connexions}} · {actions, plural, =0 {aucune action} one {# action} other {# actions}} sur la période'
+        connexions: Connexions
+        actions: 'Actions consignées'
+    encaissements:
+        titre: 'Encaissements par mois'
+        sous_titre: '{montant} sur 12 mois · cotisations mensuelles'
+        vue: 'Vue du graphique'
+        mois: Mois
+        cumul: Cumul
+        cotisations: Cotisations
+        ponctuelles: 'Contributions ponctuelles'
+        vide: 'Aucun encaissement enregistré sur l’exercice {exercice}. Les cotisations apparaîtront ici dès la première saisie ou le premier import.'
+    a_traiter:
+        titre: 'À traiter'
+        rien: 'Rien à traiter : vos villes avancent et votre abonnement est à jour.'
+        aucune_ville: 'Commencez par créer votre première ville : l’assistant vous guide en trois étapes.'
+        abonnement_en_retard: 'Votre abonnement est en retard'
+        abonnement_en_retard_aide: '{montant} attendus depuis le {echeance} · la plateforme vous contactera'
+        premier_paiement: 'Premier paiement de votre abonnement'
+        premier_paiement_aide: '{montant} attendus avant le {echeance}, sur facture'
+        echeance_proche: 'Votre abonnement arrive à échéance'
+        echeance_proche_aide: '{montant} attendus le {echeance}'
+        ville_bloquee: '{nom} : la création est en pause depuis {jours} jours'
+        ville_bloquee_aide: 'Reprenez l’assistant là où vous l’avez laissé'
+        ville_sans_tresorier: '{nom} : aucun trésorier renseigné'
+        ville_sans_tresorier_aide: 'Un trésorier est obligatoire pour activer la ville'
+        invitation_expiree: '{nom} : l’invitation de {email} a expiré'
+        invitation_expiree_aide: '{role} · vérifiez l’adresse dans l’étape Identité, la plateforme renverra le lien'
+    villes:
+        titre: Villes
+        colonne:
+            ville: Ville
+            statut: Statut
+            avancement: Avancement
+            responsables: Responsables
+            modifiee_le: 'Modifiée le'
+            actions: Actions
+            membres_a_jour: 'Membres à jour'
+            collecte: Collecté
+            reversement: 'Reversement dû'
+        membres: '{nombre, plural, =0 {aucun membre} one {# membre} other {# membres}}'
+        avancement: '{pourcentage} %'
+        terminee: 'Assistant terminé'
+        responsables_sur: '{nombre} sur {total}'
+        reprendre: 'Reprendre'
+        ouvrir: Ouvrir
+        aucune_titre: 'Aucune ville pour l’instant'
+        aucune_texte: 'Chaque ville de « {association} » est une caisse : ses membres, ses cotisations, ses dépenses. Créez la première, l’assistant vous accompagne en trois étapes et s’enregistre à chaque pas.'
+    journal:
+        titre: 'Activité récente'
+        rien: 'Aucune activité pour l’instant.'
+
+invitation:
+    surtitre: 'Invitation : {role}'
+    surtitre_central: 'Invitation du bureau central'
+    surtitre_ville: 'Invitation de la caisse de {ville}'
+    surtitre_plateforme: 'Invitation de Caisses'
+    intro_role: 'Vous êtes invité à {role, select, bureau_central {administrer {association}} tresorier {tenir la caisse de {lieu}} president {présider la caisse de {lieu}} secretaire {tenir le secrétariat de la caisse de {lieu}} other {rejoindre la caisse de {lieu}}}. Créez votre mot de passe pour ouvrir votre espace.'
+    intro_role_par: '{personne} vous invite à {role, select, bureau_central {administrer {association}} tresorier {tenir la caisse de {lieu}} president {présider la caisse de {lieu}} secretaire {tenir le secrétariat de la caisse de {lieu}} other {rejoindre la caisse de {lieu}}}. Créez votre mot de passe pour ouvrir votre espace.'
+    suite_role: '{role, select, bureau_central {Une fois votre compte activé, vous créerez les villes de {association} et inviterez leurs responsables.} tresorier {Une fois votre compte activé, vous arrivez sur l’espace de {lieu} : membres, cotisations, paiements, dépenses et impayés.} president {Une fois votre compte activé, vous arrivez sur l’espace de {lieu} : vous validerez les dépenses et lancerez les appels à contribution.} secretaire {Une fois votre compte activé, vous arrivez sur l’espace de {lieu} : membres, foyers et inscriptions à valider.} other {Une fois votre compte activé, vous verrez vos échéances, vos reçus et où va l’argent de votre ville.}}'
+    activer_role: '{role, select, bureau_central {Activer mon compte et ouvrir {association}} membre {Activer mon compte} other {Activer mon compte et ouvrir la caisse de {lieu}}}'
+    telephone: 'Téléphone (facultatif)'
+    consentement: 'Je recevrai les e-mails de l’association'
+    consentement_responsable: 'Je recevrai les e-mails de l’association : inscriptions à valider, dépenses, relances, reçus.'
+    consentement_membre: 'Je recevrai les e-mails de l’association : appels à contribution, relances, reçus.'
+    pas_vous: 'Pas vous ?'
+    signaler: 'Signaler une erreur'
+    erreur_objet: 'Invitation reçue par erreur ({association})'
+    erreur_corps: 'Bonjour, j’ai reçu une invitation à Caisses à l’adresse {email}, mais elle ne m’est pas destinée.'
+    robustesse:
+        vide: ''
+        court: 'Trop court · '
+        faible: 'Faible · '
+        correct: 'Correct · '
+        robuste: 'Robuste · '
+    titre: 'Activer mon compte'
+    intro_par: '{personne} vous invite à administrer {association}. Créez votre mot de passe pour ouvrir votre espace.'
+    intro: 'Vous êtes invité à administrer {association}. Créez votre mot de passe pour ouvrir votre espace.'
+    suite: 'Une fois votre compte activé, vous créerez les villes de {association} et inviterez leurs responsables.'
+    deja_un_compte: 'Déjà un compte ?'
+    email_aide: 'C’est l’adresse de l’invitation. Elle servira à vous connecter.'
+    prenom: Prénom
+    nom: Nom
+    mot_de_passe: 'Mot de passe'
+    afficher: Afficher
+    masquer: Masquer
+    activer: 'Activer mon compte et ouvrir {association}'
+    activee: 'Votre compte est activé. Bienvenue dans {association}.'
+    fiche:
+        role: Rôle
+        perimetre: Périmètre
+        invitee_par: 'Invitée par'
+        du_bureau_central: ', bureau central'
+        membres: '{nombre, plural, =0 {aucun membre} one {# membre} other {# membres}}'
+        valable: Valable
+        jusquau: 'Jusqu’au {date}, une seule fois'
+        expiree_le: 'Expirée le'
+    expiree:
+        titre: 'Ce lien d’invitation n’est plus valable'
+        texte: 'Il a expiré le {date}. Une invitation reste valable 7 jours et ne sert qu’une fois. Votre compte n’a pas été créé, rien n’est perdu.'
+        deja_utilisee: 'Il a déjà servi : votre compte existe. Connectez-vous avec l’adresse de l’invitation, ou demandez un nouveau mot de passe.'
+        deja_active: 'J’ai déjà activé mon compte'
+        se_connecter: 'Se connecter'
+        demander: 'Demandez un nouveau lien à {personne} : il vous renverra une invitation à la même adresse.'
+        responsable: 'la personne qui vous a invité'
+        nouveau_lien: 'Demander un nouveau lien'
+        le_bureau_central: 'Le bureau central'
+        demander_texte: '{personne} reçoit votre demande et vous renvoie une invitation à {email}.'
+        demande_envoyee: 'Votre demande est envoyée : vous recevrez un nouveau lien à {email}.'
+        demande_deja: 'Une demande a déjà été envoyée aujourd’hui : le nouveau lien arrivera à {email}.'
+    souscrite: 'Votre compte est activé et l’abonnement {formule} est souscrit pour « {association} ». Premier paiement attendu avant le {date}.'
+    email:
+        objet: 'Votre invitation à rejoindre {association} sur Caisses'
+        objet_souscription: '{association} vous attend sur Caisses : souscrivez et ouvrez votre espace'
+        objet_redemande: '{email} demande un nouveau lien d’invitation'
+
+souscription:
+    surtitre: 'Votre association sur Caisses'
+    titre: 'Souscrire et activer mon compte'
+    intro_par: '{personne} a ouvert l’espace « {association} » et vous en confie l’administration. Choisissez l’abonnement de l’association, puis créez votre compte.'
+    intro: 'L’espace « {association} » est ouvert et vous en avez l’administration. Choisissez l’abonnement de l’association, puis créez votre compte.'
+    suite: 'Le premier paiement est attendu sous {jours} jours après la souscription, sur facture : rien n’est prélevé en ligne. Vous créerez ensuite les villes de votre association et inviterez leurs responsables.'
+    souscrire: 'Souscrire et ouvrir {association}'
+    offre:
+        label: 'L’abonnement de votre association'
+        aide: 'Une seule formule, deux rythmes. Premier paiement sous {jours} jours, sur facture. Résiliable à tout moment depuis la plateforme.'
+        mensuel_detail: 'Sans engagement.'
+        annuel_detail: 'Soit {mensuel} par mois : {economie} d’économie sur l’année.'
+    conditions:
+        label: 'J’accepte les conditions d’utilisation et le tarif choisi, facturé à {association}.'
+
+statut_association:
+    active: Active
+    suspendue: Suspendue
+    archivee: Archivée
+
+statut_abonnement:
+    a-souscrire: 'À souscrire'
+    offert: Offert
+    actif: 'À jour'
+    en-retard: 'En retard'
+    resilie: Résilié
+
+periodicite:
+    mensuelle: Mensuelle
+    annuelle: Annuelle
+    par:
+        mensuelle: 'par mois'
+        annuelle: 'par an'
+
+mois:
+    1: janvier
+    2: février
+    3: mars
+    4: avril
+    5: mai
+    6: juin
+    7: juillet
+    8: août
+    9: septembre
+    10: octobre
+    11: novembre
+    12: décembre
+
+role:
+    super-admin: 'Super-admin plateforme'
+    bureau-central: 'Bureau central'
+    tresorier: 'Trésorier ou trésorière'
+    president: 'Président ou présidente'
+    secretaire: Secrétaire
+    membre: Membre
+
+assistant_ville:
+    entete:
+        nouvelle: 'Nouvelle ville'
+        ville: 'Nouvelle ville : {nom}'
+        ville_active: '{nom}'
+    statut:
+        brouillon: Brouillon
+        active: Active
+        archivee: Archivée
+    etapes:
+        aria: 'Étapes de l’assistant'
+        resume: 'Étape {numero} sur {total} : {libelle}'
+        suite: 'Chaque étape est enregistrée : vous pouvez vous arrêter et reprendre plus tard.'
+        precedente: 'Étape précédente'
+        facultative: facultative
+        identite: Identité
+        membres: Membres
+        activation: Activation
+    panneau:
+        titre: 'Statut de la ville'
+        brouillon_info: 'Visible uniquement par le bureau central. Tant que la ville est en brouillon, elle est invisible des membres et aucun email ne part : les invitations seront envoyées à l’activation, à la dernière étape.'
+        responsables: Responsables
+        sur: '{nombre} sur {total}'
+        membres: Membres
+        active_info: 'La ville est visible de ses responsables et de ses membres. Ce qu’il reste à construire se règle depuis son espace, quand vous voulez.'
+        apres_titre: 'Après l’activation'
+        apres_texte: 'Le compte bancaire, les cotisations, les projets et l’historique se règlent depuis l’espace de la ville, dans l’ordre que vous voulez : les types de cotisation dépendent des projets et de l’historique.'
+    identite:
+        titre: 'Identité de la ville'
+        intro: 'Le nom apparaîtra dans l’espace des membres, sur les reçus et dans le rapport d’AG. Trois étapes suffisent pour ouvrir la ville : son identité, ses membres si vous les avez sous la main, puis l’activation.'
+        nom:
+            label: 'Nom de la ville'
+            aide: 'Obligatoire et unique dans l’association, par exemple « Lyon » ou « Marseille ».'
+        section_responsables: 'Inviter les responsables'
+        responsables_aide: 'Une trésorière ou un trésorier est obligatoire pour activer la ville. Une même personne peut cumuler plusieurs rôles, et vous pourrez compléter plus tard.'
+        tresorier:
+            label: 'Trésorier ou trésorière'
+            aide: 'Gère les membres et les foyers, saisit les paiements et les dépenses, suit les impayés. Une fois invité, il peut terminer l’assistant à partir de l’étape Membres.'
+        president:
+            label: 'Président ou présidente'
+            aide: 'Valide ou refuse les dépenses de la ville, lance des appels à contribution, consulte les rapports.'
+        secretaire:
+            label: Secrétaire
+            aide: 'Gère les membres : invitations et validation des inscriptions.'
+        invitation:
+            a_envoyer: 'À envoyer à l’activation'
+            envoyee: 'Invitation envoyée'
+            acceptee: 'Invitation acceptée'
+        cumul: 'Une même adresse est indiquée pour plusieurs rôles : cette personne cumulera ces rôles.'
+        enregistrer: 'Enregistrer et continuer'
+        enregistree: 'L’identité de la ville est enregistrée.'
+        quitter_confirmation: 'Des modifications ne sont pas enregistrées. Quitter la page ?'
+    activation:
+        titre: 'Activer {nom}'
+        titre_active: '{nom}'
+        intro: 'Vérifiez, puis activez : les invitations partent et la ville devient visible. Tout le reste se complète ensuite.'
+        intro_active: 'La ville est active. Voici son état et ce qu’il reste à construire.'
+        recapitulatif: Récapitulatif
+        nom: Nom
+        roles:
+            tresorier: 'Trésorier ou trésorière'
+            president: 'Président ou présidente'
+            secretaire: Secrétaire
+        non_renseigne: 'Non renseigné'
+        modifier: Modifier
+        membres: Membres
+        membres_nombre: '{nombre, plural, =0 {Aucun membre pour l’instant} one {# membre} other {# membres}}'
+        completer: 'Compléter la liste'
+        ajouter_membres: 'Ajouter des membres'
+        suite_titre: 'Ce qui se passe à l’activation'
+        suite_invitations: 'Chaque responsable reçoit un e-mail avec un lien valable 7 jours pour créer son compte. Une personne qui a déjà un compte dans l’association reçoit son rôle tout de suite.'
+        suite_visible: 'La ville devient visible de ses responsables ; elle passe d’un brouillon à une caisse ouverte, que l’on peut archiver mais jamais supprimer.'
+        suite_apres: 'Le compte bancaire, les cotisations, les projets et l’historique se règlent ensuite depuis l’espace de la ville, dans l’ordre que vous voulez.'
+        tresorier_obligatoire: 'Un trésorier ou une trésorière est obligatoire pour activer la ville.'
+        renseigner_tresorier: 'Renseigner le trésorier'
+        plus_tard: 'Plus tard'
+        bouton: 'Activer la ville'
+        tableau_de_bord: 'Revenir au tableau de bord'
+        activee: '{nom} est active. {invitations, plural, =0 {Aucune invitation à envoyer : les responsables avaient déjà leur compte.} one {Une invitation est partie.} other {# invitations sont parties.}}'
+        apres_titre: 'Et maintenant'
+        apres_membres: 'Gérer les membres et les foyers'
+        apres_compte_bancaire: 'Connecter le compte bancaire (Stripe)'
+        apres_cotisations: 'Cotisations de la ville'
+        apres_projets: 'Projets et appels à contribution'
+        apres_paiements: 'Enregistrer un paiement'
+        apres_depenses: 'Saisir ou valider une dépense'
+        compte_actif: 'Compte actif'
+        apres_historique: 'Importer l’historique des paiements'
+        bientot: Bientôt
+    membres:
+        titre: 'Membres de {ville}'
+        intro: 'Importez la liste de vos membres depuis un tableur ou ajoutez-les un par un. Les foyers regroupent les personnes qui cotisent ensemble : un membre payeur règle pour tout le foyer. Vous pourrez compléter la liste plus tard, à tout moment.'
+        stats:
+            titre: 'Les membres en chiffres'
+            actifs: 'Membres actifs'
+            en_attente: 'En attente'
+            sans_email: 'Sans e-mail'
+            foyers: Foyers
+            adhesions: 'Adhésions par année'
+        import:
+            titre: 'Importer un fichier CSV ou Excel'
+            aide: 'Un classeur Excel (.xlsx) ou un fichier CSV exporté depuis Excel, Numbers ou Google Sheets. Vous choisirez ensuite la feuille et le champ de chaque colonne, puis un aperçu vous montrera chaque ligne et ses erreurs avant tout enregistrement.'
+            colonnes: 'Colonnes reconnues : Prénom et Nom (obligatoires), E-mail, Téléphone, Foyer.'
+            modele: 'Télécharger le fichier modèle'
+            fichier: 'Fichier CSV ou Excel (.xlsx)'
+            bouton: 'Vérifier le fichier'
+            en_attente: 'Un import est en cours.'
+            reprendre: 'Reprendre l’import'
+        formulaire:
+            titre: 'Ajouter un membre'
+            prenom: Prénom
+            nom: Nom
+            email: 'Adresse e-mail'
+            email_aide: 'Facultative. Sans adresse, le membre est relancé par téléphone et n’aura pas d’espace en ligne.'
+            telephone: Téléphone
+            telephone_aide: 'Facultatif, pour les relances.'
+            localite: Localité
+            localite_aide: 'Facultative : le quartier ou la commune, quand la caisse regroupe plusieurs lieux (« Creil » pour la caisse de Paris).'
+            annee_naissance: 'Année de naissance'
+            annee_naissance_aide: 'Facultative. L’âge se déduit ; un âge saisi serait faux l’année suivante.'
+            foyer: 'Foyer existant'
+            foyer_aucun: 'Aucun foyer'
+            foyer_aide: 'Le premier membre d’un foyer en devient le payeur.'
+            nouveau_foyer: 'Ou créer un foyer'
+            nouveau_foyer_aide: 'Par exemple « Famille Diaby ». Il remplace le foyer existant choisi.'
+            bouton: 'Ajouter le membre'
+        liste:
+            titre: Liste
+            rechercher: 'Rechercher un membre'
+            recherche_placeholder: 'Nom, e-mail, téléphone, foyer…'
+            filtre_statut: 'Filtrer par statut'
+            tous: Tous
+            effacer: 'Effacer les filtres'
+            vide: 'Aucun membre pour l’instant. Importez un fichier ou ajoutez un membre ci-dessus.'
+            aucun_resultat: 'Aucun membre ne correspond à cette recherche.'
+        tableau:
+            membre: Membre
+            contact: Contact
+            foyer: Foyer
+            statut: Statut
+            actions: Actions
+            sans_contact: 'Sans contact'
+            sans_foyer: 'Sans foyer'
+            payeur: Payeur
+            adhesions: Adhésions
+            sans_adhesion: 'Aucune année'
+            age: '{age} ans'
+            retirer: Retirer
+            retirer_aria: 'Retirer {nom}'
+            retirer_confirmation: 'Retirer {nom} de la liste des membres ?'
+        pagination:
+            titre: 'Pages de membres'
+            resume: '{de} à {a} sur {total}'
+            position: 'Page {page} sur {pages}'
+            precedente: Précédente
+            suivante: Suivante
+        continuer: 'Continuer vers l’activation'
+        recapitulatif: 'Voir le récapitulatif'
+        ajoute: '{nom} est ajouté aux membres.'
+        importes: '{nombre, plural, =0 {Aucun membre importé} one {# membre importé} other {# membres importés}}{adhesions, plural, =0 {.} one {, une adhésion ajoutée.} other {, # adhésions ajoutées.}}'
+        retire: '{nom} est retiré des membres.'
+        apercu:
+            titre: 'Aperçu de l’import'
+            intro: '{nombre, plural, one {Une ligne lue} other {# lignes lues}} dans « {fichier} ». Rien n’est encore enregistré : vérifiez, puis confirmez.'
+            bilan: 'Bilan de l’aperçu'
+            valides: 'Lignes prêtes'
+            invalides: 'Lignes en erreur'
+            ignorees: 'Lignes ignorées'
+            ignoree: Ignorée
+            adhesions: 'Adhésions à ajouter'
+            adhesion: 'Adhésion {annee}'
+            motifs:
+                sans_identite: 'Aucun nom ni prénom sur cette ligne'
+                doublon_fichier: 'Même personne qu’à la ligne {ligne}'
+                deja_membre: 'Déjà membre de la ville'
+                adhesion_fichier: 'Même personne qu’à la ligne {ligne} : une année d’adhésion de plus'
+                adhesion_membre: 'Déjà membre de la ville : une année d’adhésion de plus'
+                historique_membre: 'Déjà membre de la ville : les mois de {annee} viennent compléter son adhésion'
+            lignes_masquees: '{nombre, plural, one {Une autre ligne prête n’est pas affichée} other {# autres lignes prêtes ne sont pas affichées}} : elles seront importées.'
+            avertissement: '{nombre, plural, one {Une ligne ne sera pas importée} other {# lignes ne seront pas importées}} : corrigez le fichier et recommencez, ou importez seulement les lignes prêtes.'
+            colonnes: 'Colonnes reconnues :'
+            absente: absente
+            champ:
+                prenom: Prénom
+                nom: Nom
+                nom_complet: 'Nom complet'
+                email: E-mail
+                telephone: Téléphone
+                foyer: Foyer
+                localite: Localité
+                annee: 'Année d’adhésion'
+                age: Âge
+                mois: 'Mois de cotisation'
+                mois_1: Janvier
+                mois_2: Février
+                mois_3: Mars
+                mois_4: Avril
+                mois_5: Mai
+                mois_6: Juin
+                mois_7: Juillet
+                mois_8: Août
+                mois_9: Septembre
+                mois_10: Octobre
+                mois_11: Novembre
+                mois_12: Décembre
+                rapatriement: Rapatriement
+                projet: 'Projet (200 €)'
+            historique: '{mois, plural, =0 {Rapatriement ou projet} one {# mois de cotisation} other {# mois de cotisation}}'
+            ligne: Ligne
+            etat: État
+            prete: Prête
+            sans_nom: 'Prénom ou nom manquant'
+            erreurs:
+                identite: 'Prénom et nom obligatoires'
+                email_invalide: 'Adresse e-mail invalide'
+                email_en_double: 'Adresse déjà utilisée à la ligne {ligne} par une autre personne'
+                email_deja_membre: 'Adresse déjà utilisée par un autre membre de la ville'
+            confirmer: '{nombre, plural, =0 {Rien à importer} one {Importer # membre} other {Importer # membres}}'
+            et_adhesions: '{nombre, plural, one {et # adhésion} other {et # adhésions}}'
+            confirmer_adhesions: '{nombre, plural, one {Ajouter # adhésion} other {Ajouter # adhésions}}'
+            annuler: 'Annuler l’import'
+            reglages: 'Modifier les réglages'
+        reglages:
+            titre: 'Réglages de l’import'
+            intro: 'Fichier « {fichier} ». Vérifiez la feuille et les colonnes, puis passez à l’aperçu : rien n’est encore enregistré.'
+            feuilles: 'Feuille à importer'
+            feuilles_aide: 'Le classeur contient plusieurs feuilles : choisissez celle qui liste les membres.'
+            feuille_lignes: '{nombre, plural, =0 {vide} one {# ligne} other {# lignes}}'
+            colonnes: 'Colonnes du fichier'
+            colonnes_aide: 'Pour chaque colonne, indiquez le champ qu’elle alimente. Les colonnes reconnues d’après leurs en-têtes sont déjà attribuées ; laissez « Ignorer » pour les autres.'
+            ordre: 'Quand une seule colonne porte le nom complet'
+            ordre_nom_prenom: 'Nom puis prénom (« DIABY Mamadou »)'
+            ordre_prenom_nom: 'Prénom puis nom (« Mamadou Diaby »)'
+            ordre_aide: 'Les mots en capitales font le nom quand la casse est mixte ; sinon cet ordre tranche.'
+            ligne_en_tete: 'Ligne des en-têtes'
+            ligne_en_tete_aide: 'Le numéro de la ligne qui porte les titres des colonnes, en ne comptant pas les lignes vides ; 0 si le fichier n’en a pas. Les lignes au-dessus ne sont pas importées.'
+            appliquer: Appliquer
+            colonnes_masquees: '{nombre, plural, one {Une autre colonne n’est pas proposée} other {# autres colonnes ne sont pas proposées}} : au-delà de 80, le fichier ressemble plus à un tableau de bord qu’à une liste.'
+            colonne: Colonne
+            contenu: 'Contenu du fichier'
+            champ: Champ
+            champ_de: 'Champ de la colonne {colonne}'
+            ignorer: Ignorer
+            vide: '(vide)'
+            aucune_colonne: 'Cette feuille ne contient aucune donnée.'
+            continuer: 'Continuer vers l’aperçu'
+
+statut_compte:
+    en-attente: 'En attente'
+    actif: Actif
+    desactive: Désactivé
+
+membre:
+    statut:
+        actif: Actif
+        en-attente: 'En attente'
+        sorti: Sorti
+
+membres_association:
+    titre: Membres
+    exporter_xlsx: 'Exporter en Excel'
+    ville:
+        sous_titre: '{ville} · exercice {exercice}'
+        exporter: Exporter
+        importer: Importer
+        ajouter: 'Ajouter un membre'
+        recherche_placeholder: 'Nom, e-mail ou téléphone'
+        filtre: 'Filtrer par situation'
+        filtres:
+            tous: Tous
+            a_jour: 'À jour'
+            en_retard: 'En retard'
+            en_attente: 'En attente'
+            sortis: Sortis
+        etats:
+            a_jour: 'À jour'
+            en_retard: 'En retard'
+            en_attente: 'En attente'
+            sortis: Sorti
+        tri: 'Trié par nom'
+        vide_filtre: 'Personne dans cette situation.'
+        sans_email: 'Sans adresse e-mail'
+        inscriptions: '<strong>{nombre, plural, one {# demande d’inscription attend} other {# demandes d’inscription attendent}}</strong> une validation, la plus ancienne depuis {jours, plural, =0 {aujourd’hui} one {# jour} other {# jours}} ({noms}).'
+        voir_attente: '{nombre, plural, one {Voir la demande} other {Voir les #}}'
+        tout_valider: 'Tout valider'
+        valider_confirmer: '{nombre, plural, one {Valider cette inscription ?} other {Valider les # inscriptions en attente ?}} Les fiches deviennent actives.'
+        flash_valides: '{nombre, plural, =0 {Aucune inscription en attente.} one {# inscription validée.} other {# inscriptions validées.}}'
+        actions_de: 'Actions pour {nom}'
+        colonne:
+            telephone: Téléphone
+            foyer: Foyer
+            dernier_paiement: 'Dernier paiement'
+            reste_du: 'Reste dû'
+        menu:
+            paiement: 'Enregistrer un paiement'
+        barre:
+            relancer: Relancer
+            paiement: 'Enregistrer un paiement'
+            paiement_court: Paiement
+            inviter: 'Inviter à leur espace'
+            inviter_court: Inviter
+            inviter_aide: 'Envoie un lien d’invitation aux membres cochés qui ont une adresse et pas encore de compte.'
+            exporter: Exporter
+            fermer: 'Vider la sélection'
+    sous_titre: '{ville} · {annee} · {nombre, plural, =0 {aucun membre} one {# membre} other {# membres}}'
+    toutes_villes: 'Toutes les villes'
+    toutes_annees: 'Toutes les années'
+    annee: 'Adhérents en {annee}'
+    filtre_ville: Ville
+    filtre_annee: Année
+    toutes: Toutes
+    rechercher: 'Rechercher un membre'
+    recherche_placeholder: 'Nom, e-mail, téléphone, localité, foyer…'
+    effacer: 'Effacer les filtres'
+    exporter: 'Exporter en CSV'
+    kpi:
+        membres: Membres
+        nouveaux: 'Nouveaux en {annee}'
+        nouveaux_aide: 'Première année d’adhésion'
+        sans_contact: 'Sans e-mail ni téléphone'
+        villes: Villes
+    tableau:
+        membre: Membre
+        ville: Ville
+        contact: Contact
+        adhesions: Adhésions
+        statut: Statut
+        actions: Actions
+        voir: 'Ouvrir dans la ville'
+        sans_contact: 'Sans contact'
+        sans_adhesion: 'Aucune année'
+        age: '{age} ans'
+        numero: 'N°'
+        annee: Année
+        rapatriement: Rapatr.
+        projet: Projet
+        total: Total
+        reste: Reste
+        sans_historique: '—'
+        code_aide: 'Code du classeur : {code}'
+        reste_inconnu: 'Aucun versement connu : le tarif mensuel ne peut pas être déduit.'
+        fiche: 'Voir la fiche'
+        grille_aide: 'Une ligne par membre, comme dans le classeur : les mois versés en euros, les lettres telles qu’elles ont été tapées, le total des mois, et le reste dû sur douze fois le tarif le plus fréquent. Cliquez sur un nom pour ouvrir sa fiche.'
+    mois:
+        1: Janv.
+        2: Févr.
+        3: Mars
+        4: Avr.
+        5: Mai
+        6: Juin
+        7: Juil.
+        8: Août
+        9: Sept.
+        10: Oct.
+        11: Nov.
+        12: Déc.
+    fiche:
+        retour: 'Tous les membres'
+        identite: Identité
+        ville: Ville
+        localite: Localité
+        naissance: 'Année de naissance'
+        email: 'Adresse e-mail'
+        telephone: Téléphone
+        foyer: Foyer
+        payeur: payeur
+        origine: Origine
+        origines:
+            saisie: 'Saisi à la main'
+            import: 'Importé d’un fichier'
+            inscription: 'Inscrit en ligne'
+            generation: 'Données d’essai'
+        adhesions: 'Adhésions et cotisations'
+        adhesions_aide: 'Une ligne par année, comme dans le classeur de la ville : les mois versés, le rapatriement, le projet, le total et le reste dû. Les lettres sont les codes du classeur, gardés tels quels.'
+        aucune_adhesion: 'Aucune année d’adhésion connue pour ce membre.'
+        ouvrir_ville: 'Gérer dans la ville'
+    vide: 'Aucun membre ne correspond. Importez un fichier ou ajoutez des membres depuis une ville.'
+    vide_annee: 'Aucun adhérent en {annee} dans cette sélection : choisissez une autre année ci-dessus.'
+    pagination:
+        titre: 'Pages de membres'
+        resume: '{de} à {a} sur {total}'
+        position: 'Page {page} sur {pages}'
+        precedente: Précédente
+        suivante: Suivante
+    export:
+        ville: Ville
+        nom: Nom
+        prenom: Prénom
+        email: E-mail
+        telephone: Téléphone
+        localite: Localité
+        foyer: Foyer
+        adhesions: 'Années d’adhésion'
+        statut: Statut
+        annee: Année
+        rapatriement: Rapatriement
+        projet: Projet
+        total: 'Total des mois'
+        reste: 'Reste dû'
+
+villes_association:
+    titre: Villes
+    sous_titre: '{actives, plural, =0 {Aucune active} one {# active} other {# actives}} · {brouillons, plural, =0 {aucune en création} one {# en création} other {# en création}} · {archivees, plural, =0 {aucune archivée} one {# archivée} other {# archivées}} · chiffres de l’année {annee}'
+    rechercher: 'Rechercher une ville ou un responsable'
+    recherche_placeholder: 'Rechercher une ville ou un responsable'
+    filtre_statut: Statut
+    statuts:
+        tous: Toutes
+        actives: Actives
+        brouillons: Brouillons
+        archivees: Archivées
+    effacer: 'Effacer les filtres'
+    aucune: 'Aucune ville pour l’instant.'
+    aucun_resultat: 'Aucune ville ne correspond à cette recherche.'
+    colonne:
+        ville: Ville
+        statut: Statut
+        responsables: Responsables
+        membres: Membres
+        a_jour: 'À jour {annee}'
+        collecte: 'Collecté {annee}'
+        reversement: 'Reversement dû'
+        actions: Actions
+    creee_le: 'Créée le {date}'
+    archivee_le: 'Archivée le {date}'
+    etape: 'Étape {numero} sur {total} · {libelle}'
+    invitation_a_envoyer: '{nombre, plural, one {Invitation à envoyer à l’activation} other {# invitations à envoyer à l’activation}}'
+    invitation_envoyee: '{nombre, plural, one {Invitation envoyée, en attente} other {# invitations envoyées, en attente}}'
+    a_jour_sur: '{nombre} sur {total}'
+    reversement_bientot: 'Le reversement dû arrive avec le module Reversements.'
+    reprendre: 'Reprendre la création de {ville}'
+    actions_de: 'Actions pour {ville}'
+    menu:
+        tableau_de_bord: 'Tableau de bord de la ville'
+        membres: Membres
+        cotisations: Cotisations
+        identite: 'Identité et responsables'
+        archiver: 'Archiver la ville'
+        archiver_confirmer: 'Archiver {ville} ? Ses membres n’y accèdent plus et aucun appel ne la vise ; son historique reste consultable. Réactivable ensuite.'
+        reactiver: 'Réactiver la ville'
+    flash:
+        archiver: '{ville} est archivée : son historique reste consultable.'
+        reactiver: '{ville} est de nouveau active.'
+        impossible: 'Ce changement de statut n’est pas possible pour {ville}.'
+    total: 'Total collecté sur {annee}'
+    note_archivee: 'Une ville archivée n’est jamais supprimée : son historique reste consultable et compte dans les rapports passés.'
+    exporter: Exporter
+    filtres: Filtres
+    filtres_aide: 'Affiner la liste : année des chiffres, responsables, membres'
+    filtre:
+        annee: 'Année des chiffres'
+        annee_reference: 'Année de référence ({annee})'
+        responsables: Responsables
+        responsables_tous: Tous
+        responsables_en_attente: 'Invitation à envoyer ou en attente'
+        responsables_aucun: 'Sans responsable'
+        membres: Membres
+        membres_tous: Tous
+        membres_avec: 'Avec des membres'
+        membres_sans: 'Sans membre'
+        appliquer: Appliquer
+        effacer: Effacer
+    roles:
+        tresorier: trésorier
+        president: président
+        secretaire: secrétaire
+    csv:
+        ville: Ville
+        statut: Statut
+        etape: 'Étape de création'
+        responsables: Responsables
+        invitations_en_attente: 'Invitations en attente'
+        membres: Membres
+        adherents: 'Adhérents {annee}'
+        a_jour: 'À jour {annee}'
+        taux_a_jour: 'À jour {annee} (%)'
+        collecte: 'Collecté {annee} (€)'
+        reversement: 'Reversement dû (€)'
+        creee_le: 'Créée le'
+        archivee_le: 'Archivée le'
+
+responsables_association:
+    sous_titre_onglet: 'Qui fait quoi dans votre association : les responsables de chaque ville, leurs rôles et leurs invitations.'
+    titre: 'Responsables et rôles'
+    intro: 'Un rôle s’attribue sur un périmètre : une ville, ou toute l’association. Une même personne peut cumuler plusieurs rôles ; chaque changement est tracé.'
+    onglets:
+        aria: 'Sections de la page'
+        responsables: Responsables
+        roles: 'Rôles et droits'
+        journal: Journal
+    rechercher: 'Rechercher une personne'
+    filtres:
+        tous: tous
+        perimetre: 'Périmètre : {valeur}'
+        role: 'Rôle : {valeur}'
+    compte: '{affectations, plural, =0 {aucune affectation} one {# affectation} other {# affectations}} · {personnes, plural, =0 {aucune personne} one {# personne} other {# personnes}}'
+    vide: 'Aucun responsable pour l’instant : invitez-en un, ou créez une ville et désignez ses responsables dans l’assistant.'
+    aucun_resultat: 'Personne ne correspond à ces filtres.'
+    colonne:
+        personne: Personne
+        role: Rôle
+        perimetre: Périmètre
+        depuis: Depuis
+        statut: Statut
+        actions: Actions
+    perimetre:
+        association: Association
+        toutes_villes: 'Toutes les villes'
+        brouillon: 'Ville en brouillon'
+        membres: '{nombre, plural, =0 {aucun membre} one {# membre} other {# membres}}'
+    statut:
+        actif: Actif
+        en_attente: 'En attente'
+        desactive: Désactivé
+        cumul: '{nombre, plural, =2 {Cumule deux rôles} other {Cumule # rôles}}'
+        invitation_envoyee: 'Invitation envoyée'
+        invitation_dates: 'Le {envoyee}, expire le {expire}'
+        invitation_expiree: 'Invitation expirée'
+        expiree_le: 'Expirée le {date}'
+        a_envoyer: 'À envoyer à l’activation'
+        a_envoyer_aide: 'Partira à l’activation de la ville'
+    actions_de: 'Actions pour {nom}'
+    retirer: 'Retirer le rôle'
+    retirer_confirmation: 'Retirer le rôle {role} à {nom} ?'
+    retire: 'Le rôle {role} est retiré à {nom}.'
+    renvoyer: 'Renvoyer l’invitation'
+    renvoyee: 'L’invitation est renvoyée à {email} avec un nouveau lien.'
+    ouvrir_assistant: 'Ouvrir l’assistant de la ville'
+    role_court:
+        bureau-central: 'Bureau central'
+        tresorier: Trésorier
+        president: Président
+        secretaire: Secrétaire
+        membre: Membre
+    roles_titre: 'Ce que chaque rôle peut faire'
+    roles_intro: 'Les rôles sont des regroupements de droits fixés par l’application ; ils s’attribuent sur une ville ou sur toute l’association.'
+    roles_sans_droit: 'Aucun droit de gestion dans l’application aujourd’hui : ses actions arrivent avec leurs modules.'
+    roles_note: 'Les droits listés sont ceux en place aujourd’hui ; ceux des modules à venir (cotisations, dépenses, reversements, rapports) s’ajouteront à chaque rôle.'
+    roles:
+        bureau-central: 'Vue consolidée, villes, types de contribution, taux de reversement, appels à toute l’association.'
+        tresorier: 'Membres, foyers, paiements manuels, dépenses, impayés, relances, exports.'
+        president: 'Valide ou refuse les dépenses, lance des appels de ville, consulte les rapports.'
+        secretaire: 'Invite les membres, valide les inscriptions.'
+        membre: 'Paie en ligne, voit ses reçus et les entrées anonymisées de sa ville.'
+    permissions:
+        plateforme.administrer: 'Administrer la plateforme'
+        association.creer: 'Créer une association'
+        association.consulter: 'Consulter une association'
+        association.piloter: 'Piloter l’association'
+        association.modifier: 'Modifier l’association'
+        association.supprimer: 'Supprimer l’association'
+        compte.gerer: 'Gérer les comptes et les rôles'
+        ville.creer: 'Créer une ville'
+        ville.modifier: 'Modifier une ville et ses membres'
+    journal:
+        tout: Tout
+        vide: 'Aucun changement de rôle pour l’instant.'
+        plateforme: 'La plateforme'
+        phrases:
+            role.attribue: '{acteur} a attribué le rôle {role}{ville, select, aucune {} other { de {ville}}} à {cible}.'
+            role.retire: '{acteur} a retiré le rôle {role}{ville, select, aucune {} other { de {ville}}} à {cible}.'
+            invitation.envoyee: '{renvoi, select, oui {{acteur} a renvoyé l’invitation de {cible}} other {{acteur} a invité {cible}}} comme {role}{ville, select, aucune {} other { de {ville}}}.'
+            invitation.acceptee: '{cible} a accepté son invitation{role, select, aucun {} other { comme {role}}}.'
+            compte.cree: '{cible} a créé son compte{role, select, aucun {} other { ({role})}}.'
+            compte.statut: '{acteur} a changé le statut de {cible} : {statut}.'
+            ville.creee: '{acteur} a créé la ville {cible}.'
+    inviter:
+        bouton: 'Inviter un responsable'
+        titre: 'Inviter un responsable'
+        section: 'Nouvelle invitation'
+        aide: 'La personne reçoit un e-mail avec un lien valable 7 jours pour créer son compte. Une ville en brouillon reçoit ses responsables dans l’assistant, à l’activation.'
+        email: 'Adresse e-mail'
+        email_aide: 'Ce sera son identifiant de connexion.'
+        role: Rôle
+        ville: Ville
+        ville_aucune: 'Choisir une ville'
+        ville_aide: 'Obligatoire pour un rôle de ville ; inutile pour le bureau central.'
+        annuler: Annuler
+        envoyer: 'Envoyer l’invitation'
+        envoyee: 'L’invitation est envoyée à {email}.'
+        suite_titre: 'Ce qui se passe ensuite'
+        suite_1: 'La personne reçoit l’e-mail et ouvre le lien dans les 7 jours.'
+        suite_2: 'Elle crée son compte : prénom, nom, mot de passe.'
+        suite_3: 'Elle arrive dans son espace avec son rôle ; l’invitation apparaît ici comme acceptée.'
+        aucune_ville: 'Aucune ville active à confier pour l’instant : activez une ville depuis son assistant.'
+
+import_association:
+    titre: 'Importer un fichier'
+    sous_titre: 'Un classeur pour toute l’association : chaque onglet, ou chaque valeur d’une colonne « caisse », rejoint une ville.'
+    en_cours: 'Un import de « {fichier} » est en cours.'
+    reprendre: 'Le reprendre'
+    annuler: 'Annuler l’import'
+    depot:
+        titre: 'Déposer le fichier'
+        aide: 'Un classeur Excel (.xlsx) ou un fichier CSV. Rien n’est enregistré avant votre confirmation.'
+        bouton: 'Lire le fichier'
+    comment:
+        titre: 'Comment ça se passe'
+        etape_1: 'Le fichier est lu : ses onglets, la ligne des en-têtes et les colonnes (prénom, nom, e-mail, téléphone, foyer, localité, année) sont reconnus.'
+        etape_2: 'Vous rattachez chaque onglet à une ville, ou vous désignez la colonne qui indique la caisse de chaque ligne. Une ville qui manque est créée en brouillon.'
+        etape_3: 'Un aperçu par ville vous montre ce qui sera créé et les lignes en erreur, puis vous confirmez.'
+        villes: '{nombre, plural, =0 {L’association n’a pas encore de ville : elles seront créées d’après le fichier.} one {L’association a une ville, proposée quand un nom correspond.} other {L’association a # villes, proposées quand un nom correspond.}}'
+        memoire: '{nombre, plural, one {Une colonne apprise} other {# colonnes apprises}} d’un import précédent : le même fichier se reconnaît tout seul.'
+    rattachement:
+        titre: 'Rattacher aux villes'
+        sous_titre: 'Fichier « {fichier} ». Indiquez la ville de chaque onglet ou de chaque valeur, puis lancez l’analyse : rien n’est encore enregistré.'
+        mode: 'Le fichier est organisé'
+        mode_onglets: 'Un onglet par ville'
+        mode_colonne: 'Une colonne indique la ville'
+        mode_onglets_aide: 'Chaque onglet qui liste des membres est rattaché à une ville. Les onglets sans colonnes Nom et Prénom (synthèses, totaux) sont écartés.'
+        mode_colonne_aide: 'Une seule liste, avec une colonne qui indique la caisse de chaque ligne : chaque valeur de cette colonne est rattachée à une ville.'
+        onglets_titre: Onglets
+        onglets_aide: 'La ville dont le nom correspond est proposée ; sinon, la ville est créée avec le nom de l’onglet. Vous pourrez la renommer dans l’assistant.'
+        onglet: Onglet
+        lignes: Lignes
+        colonnes: 'Colonnes reconnues'
+        ville: Ville
+        ville_de: 'Ville pour « {nom} »'
+        non_importable: 'Pas de colonnes Nom et Prénom'
+        ignoree: 'Écarté'
+        ignorer: 'Ne pas importer'
+        creer: 'Créer la ville « {nom} »'
+        feuille: Feuille
+        feuille_unique: 'Le fichier'
+        colonne: 'Colonne qui indique la caisse'
+        colonne_titre: 'Feuille et colonne'
+        colonne_aide: 'Choisissez la feuille et la colonne, puis « Appliquer » pour relire les valeurs.'
+        appliquer: Appliquer
+        valeurs_titre: 'Valeurs de la colonne « {colonne} »'
+        valeur: Valeur
+        aucune_valeur: 'Cette colonne est vide : choisissez-en une autre.'
+        continuer: 'Analyser et voir l’aperçu'
+    apercu:
+        titre: 'Aperçu de l’import'
+        sous_titre: 'Fichier « {fichier} ». Rien n’est encore enregistré : vérifiez le bilan par ville, puis confirmez.'
+        membres: 'Membres à créer'
+        adhesions: 'Adhésions'
+        villes_a_creer: 'Villes à créer'
+        erreurs: 'Lignes en erreur'
+        ignorees: 'Lignes ignorées'
+        par_ville: 'Par ville'
+        a_creer: 'À créer'
+        total: Total
+        erreurs_de: 'Erreurs · {libelle} ({nombre})'
+        erreurs_suite: '{nombre, plural, one {Une autre ligne en erreur n’est pas affichée} other {# autres lignes en erreur ne sont pas affichées}}.'
+        modifier: 'Modifier le rattachement'
+        confirmer: '{membres, plural, =0 {Rien à importer} one {Importer # membre} other {Importer # membres}} dans {villes, plural, one {# ville} other {# villes}}'
+    bilan:
+        titre: 'Import terminé'
+        sous_titre: 'Fichier « {fichier} ».'
+        succes: '{membres, plural, =0 {Aucun membre créé} one {# membre créé} other {# membres créés}}, {adhesions, plural, =0 {aucune adhésion ajoutée} one {# adhésion ajoutée} other {# adhésions ajoutées}}, {villes, plural, =0 {aucune ville créée} one {# ville créée} other {# villes créées}}.'
+        membres: 'Membres créés'
+        villes_creees: 'Villes créées'
+        creee: Créée
+        voir: 'Voir les membres'
+        villes_aide: 'Les villes créées sont en brouillon, sans responsables : ouvrez chacune dans l’assistant pour compléter son identité et l’activer.'
+        nouvel_import: 'Nouvel import'
+        tableau_de_bord: 'Tableau de bord'
+
+journal:
+    type:
+        connexion: Connexion
+        compte.cree: 'Compte créé'
+        compte.modifie: 'Compte modifié'
+        compte.statut: 'Statut du compte changé'
+        compte.lien_mot_de_passe: 'Lien de mot de passe envoyé'
+        role.attribue: 'Rôle attribué'
+        role.retire: 'Rôle retiré'
+        compte.vu_comme: 'Application vue comme une autre personne'
+        compte.mot_de_passe_change: 'Mot de passe changé'
+        invitation.envoyee: 'Invitation envoyée'
+        invitation.acceptee: 'Invitation acceptée'
+        invitation.redemandee: 'Nouveau lien d’invitation demandé'
+        association.creee: 'Association créée'
+        association.statut: 'Statut de l’association changé'
+        association.parametres: 'Paramètres de l’association modifiés'
+        ville.creee: 'Ville créée'
+        ville.statut: 'Statut de la ville changé'
+        membre.ajoute: 'Membre ajouté'
+        membre.importes: 'Membres importés'
+        membre.retire: 'Membre retiré'
+        membre.modifie: 'Fiche de membre modifiée'
+        membre.statut: 'Statut d’un membre changé'
+        membre.transfere: 'Membre transféré vers une autre ville'
+        abonnement.initial: 'Abonnement initial'
+        abonnement.souscrit: 'Abonnement souscrit'
+        abonnement.modifie: 'Abonnement modifié'
+        abonnement.paye: 'Abonnement payé'
+        appel.enregistre: 'Appel à contribution enregistré'
+        appel.lance: 'Appel à contribution lancé'
+        depense.soumise: 'Dépense soumise'
+        depense.validee: 'Dépense validée'
+        depense.refusee: 'Dépense refusée'
+        depense.payee: 'Dépense payée'
+        depense.signalee: 'Dépense sans valideur signalée au bureau central'
+        cotisation.ouverte: 'Cotisation de l’année ouverte'
+        cotisation.modifiee: 'Cotisation modifiée'
+        paiement.enregistre: 'Paiement enregistré'
+        paiement.annule: 'Paiement annulé'
+        relance.envoyee: 'Relance envoyée'
+        relance.appel: 'Membre appelé au téléphone'
+        reversement.declare: 'Reversement déclaré par une ville'
+        reversement.confirme: 'Reversement confirmé par le bureau central'
+    categorie:
+        connexion: Connexions
+        compte: 'Comptes et rôles'
+        association: Associations
+        ville: Villes
+        membre: Membres
+        abonnement: Abonnements
+        appel: 'Appels à contribution'
+        depense: Dépenses
+        cotisation: Cotisations
+        paiement: Paiements
+        relance: Relances
+        reversement: Reversements
+
+emprunt:
+    texte: 'Vous voyez Caisses comme {nom} ({email}), avec ses droits.'
+    autre: 'Voir une autre personne'
+    revenir: 'Revenir à mon compte ({nom})'
+
+menu_compte:
+    ouvrir: 'Menu du compte'
+    parametres: Paramètres
+
+parametres:
+    titre: Paramètres
+    sous_titre: 'Votre identité, votre adresse de connexion et votre mot de passe.'
+    profil:
+        titre: 'Identité et adresse'
+        prenom: Prénom
+        nom: Nom
+        email: 'Adresse e-mail'
+        email_aide: 'C’est votre identifiant de connexion : vous vous connecterez avec la nouvelle adresse.'
+        bouton: Enregistrer
+        enregistre: 'Vos informations sont enregistrées.'
+    mot_de_passe:
+        titre: 'Mot de passe'
+        actuel: 'Mot de passe actuel'
+        nouveau: 'Nouveau mot de passe'
+        confirmation: 'Confirmez le nouveau mot de passe'
+        aide: '12 caractères minimum. Mélangez lettres, chiffres et ponctuation.'
+        bouton: 'Changer le mot de passe'
+        change: 'Votre mot de passe est changé. Vous restez connecté sur cet appareil.'
+    onglets:
+        abonnement: Abonnement
+        aria: 'Sections des paramètres'
+        compte: 'Mon compte'
+        association: Association
+        contributions: 'Types de contribution'
+
+temps:
+    a_l_instant: 'à l’instant'
+    minutes: 'il y a {n} min'
+    heures: 'il y a {n} h'
+    hier: hier
+    jours: 'il y a {n} jours'
+
+cotisations_association:
+    titre: Cotisations
+    sous_titre: '{ville} · {annee} · {nombre, plural, =0 {aucun adhérent} one {# adhérent} other {# adhérents}}'
+    choisir_sous_titre: 'Les cotisations se lisent ville par ville, comme les onglets du classeur.'
+    choisir_titre: 'Choisir une ville'
+    choisir_texte: 'La ville choisie devient le périmètre de toute l’application : tableau de bord, membres et cotisations. Vous en changez à tout moment depuis la barre latérale.'
+    aucune_ville: 'Aucune ville pour l’instant : créez-en une depuis le tableau de bord.'
+    membres_ville: '{nombre, plural, =0 {aucun membre} one {# membre} other {# membres}}'
+    choix_collecte: 'collecté {annee} : {montant}'
+    choix_sans_historique: 'aucun versement connu en {annee}'
+    filtre_annee: Année
+    rechercher: 'Rechercher un adhérent'
+    recherche_placeholder: 'Nom, prénom, localité…'
+    effacer: 'Effacer la recherche'
+    exporter: 'Exporter en CSV'
+    exporter_xlsx: 'Exporter en Excel'
+    kpi:
+        adherents: Adhérents
+        adherents_detail: '{nombre, plural, =0 {aucun avec des versements connus} one {# avec des versements connus} other {# avec des versements connus}}'
+        collecte: Collecté
+        collecte_detail: 'somme des mois versés'
+        reste: 'Reste dû'
+        reste_detail: 'sur douze fois le tarif de chacun'
+        a_jour: 'À jour'
+        a_jour_detail: '{nombre, plural, =0 {sur aucun adhérent renseigné} one {sur # adhérent renseigné} other {sur # adhérents renseignés}}'
+    vide: 'Aucun adhérent en {annee} dans cette ville : choisissez une autre année ci-dessus.'
+    vide_recherche: 'Aucun adhérent ne correspond à cette recherche.'
+    ouverture:
+        titre: 'Cotisation {annee}'
+        a_ouvrir: 'Les cotisations {annee} de {ville} ne sont pas encore ouvertes : fixez le tarif mensuel et l’application créera une mensualité par mois pour chaque adhérent.'
+        a_ouvrir_courte: 'Cotisations {annee} à ouvrir'
+        ouvrir: 'Ouvrir les cotisations {annee}'
+        ouvrir_titre: 'Ouvrir les cotisations {annee} · {ville}'
+        ouvrir_intro: 'Chaque adhérent concerné reçoit douze mensualités, une par mois de l’exercice, au tarif ci-dessous. Les mois déjà versés d’après le classeur importé sont marqués payés.'
+        type: 'Type de contribution'
+        type_aide: 'Décide qui paie : chaque personne, ou le payeur de chaque foyer.'
+        montant: 'Tarif mensuel (€)'
+        montant_aide: 'Le même pour tous les adhérents de la ville cette année ; modifiable ensuite pour les mois encore dus.'
+        jour: 'Jour d’échéance'
+        jour_aide: 'Le jour du mois où la mensualité est due (1 à 28). Les relances se calent dessus.'
+        valider: 'Ouvrir les cotisations'
+        modifier: 'Modifier le tarif'
+        modifier_titre: 'Modifier le tarif {annee} · {ville}'
+        modifier_intro: 'Le nouveau tarif s’applique aux mensualités encore dues ; celles déjà payées ne changent pas.'
+        enregistrer: 'Enregistrer le tarif'
+        generer: 'Mettre à jour les échéances'
+        generer_aide: 'Crée les mensualités manquantes, par exemple pour les membres arrivés depuis l’ouverture.'
+        tarif: '{montant} par mois · échéance le {jour}'
+        type_libelle: '{type} · {unite}'
+        unite:
+            personne: 'chaque personne'
+            foyer: 'chaque foyer'
+        mensualites: '{payees} mensualités payées sur {total}'
+        en_retard: '{nombre, plural, =0 {aucune en retard} one {# en retard} other {# en retard}} · {montant}'
+        membres: '{nombre, plural, one {# adhérent concerné} other {# adhérents concernés}}'
+        enregistrer_paiement: 'Enregistrer un paiement'
+        impayes: 'Voir les impayés'
+        flash_ouverte: 'Cotisations {annee} ouvertes pour {ville} : {membres, plural, one {# adhérent} other {# adhérents}}, {echeances, plural, one {# mensualité créée} other {# mensualités créées}}{versees, plural, =0 {} one {, # déjà versée} other {, # déjà versées}}.'
+        flash_modifiee: 'Le tarif {annee} de {ville} est enregistré.'
+        flash_generee: '{echeances, plural, =0 {Aucune mensualité à créer : tout est à jour} one {# mensualité créée} other {# mensualités créées}}.'
+        flash_deja: 'Les cotisations {annee} de {ville} sont déjà ouvertes.'
+        aucun_type: 'Aucun type de contribution actif : ajoutez-en un dans les paramètres.'
+
+appels_association:
+    titre: 'Projets et appels'
+    sous_titre: 'Les appels à contribution de l’association : décès, projet du village, fête… Rien n’est envoyé tant qu’un appel est en brouillon.'
+    vide: 'Aucun appel pour l’instant.'
+    sans_objet: 'Appel sans objet'
+    toutes_villes: 'Toutes les villes'
+    colonne:
+        objet: Appel
+        statut: Statut
+        perimetre: 'Qui est concerné'
+        montant: Montant
+        date_limite: 'Date limite'
+        echeances: Échéances
+        collecte: Collecté
+    statut:
+        brouillon: Brouillon
+        ouvert: Ouvert
+        cloture: Clôturé
+    mode:
+        fixe: 'Montant fixe'
+        libre: 'Montant libre'
+    type:
+        par_adulte: '{montant} par adulte'
+        par_foyer: 'Par foyer'
+        libre: 'Montant libre'
+        taux: '{taux} % au central'
+        reste_ville: 'reste à la ville'
+        taux_a_preciser: 'Taux à préciser'
+    nouveau:
+        bouton: 'Nouvel appel'
+        titre: 'Nouvel appel à contribution'
+        intro: 'À l’ouverture, une échéance est créée pour chaque membre concerné et un e-mail part aussitôt. Rien n’est envoyé tant que vous n’avez pas lancé l’appel.'
+        enregistre: 'Brouillon enregistré à {heure}'
+        lancer: '{nombre, plural, =0 {Aucun membre concerné} one {Lancer l’appel à # membre} other {Lancer l’appel à # membres}}'
+        confirmer: 'Lancer l’appel maintenant ? Les échéances sont créées et les e-mails partent aussitôt ; l’appel ne se modifie plus ensuite.'
+    formulaire:
+        type: 'Type de contribution'
+        details: Détails
+        objet: 'Objet de l’appel'
+        objet_exemple: 'Contribution décès · famille Sakho'
+        objet_aide: 'Apparaît dans l’e-mail, sur les reçus et dans l’espace membre.'
+        montant: Montant
+        montant_suggere: 'Montant suggéré'
+        mode: Mode
+        date_limite: 'Date limite'
+        perimetre: 'Qui est concerné'
+        toutes: '{nombre, plural, =0 {Toutes les villes · aucun membre} one {Toutes les villes · # membre} other {Toutes les villes · # membres}}'
+        une_ville: '{nombre, plural, =0 {{ville} · aucun membre} one {{ville} · # membre} other {{ville} · # membres}}'
+        reversement: Reversement
+        reversement_fixe: '{taux} % au bureau central'
+        reste_ville: 'Tout reste à la ville'
+        fixe_par_type: 'fixé par le type'
+        message: 'Message aux membres'
+        message_exemple: 'Quelques mots pour expliquer l’appel : ils apparaissent dans l’e-mail.'
+        relances: 'Relances automatiques'
+        relances_libelle: 'Relances automatiques à {calendrier}'
+        jour_j: 'le jour J'
+        enregistrer: 'Enregistrer et fermer'
+    synthese:
+        titre: 'Ce qui va se passer'
+        membres: 'Membres concernés'
+        echeances: 'Échéances créées'
+        echeances_fixe: '{nombre} × {montant}'
+        echeances_libre: '{nombre} · montant libre'
+        objectif: 'Objectif de collecte'
+        part_central: 'Part du bureau central'
+        emails: 'E-mails à l’ouverture'
+        sans_email: 'Sans adresse e-mail'
+        relances: Relances
+        aucune: Aucune
+        note_sans_email: '{nombre, plural, one {Le membre sans adresse apparaîtra dans les impayés de sa ville pour un rappel par le trésorier.} other {Les # membres sans adresse apparaîtront dans les impayés de leur ville pour un rappel par le trésorier.}}'
+    apercu:
+        bouton: 'Aperçu de l’e-mail'
+        titre: 'Aperçu de l’e-mail'
+        objet_vide: 'Objet de l’appel'
+        bonjour: 'Bonjour {prenom},'
+        bonjour_anonyme: 'Bonjour,'
+        corps_fixe: '{association} lance un appel à contribution de {montant}, à régler avant le {date}.'
+        corps_libre: '{association} lance un appel à contribution, montant libre, à régler avant le {date}.'
+        payer_fixe: 'Payer {montant} en ligne'
+        payer_libre: 'Contribuer en ligne'
+    flash:
+        enregistre: 'Le brouillon « {objet} » est enregistré. Rien n’est parti.'
+        lance: '{echeances, plural, one {Appel lancé : # échéance créée} other {Appel lancé : # échéances créées}}, {emails, plural, =0 {aucun e-mail envoyé} one {# e-mail envoyé} other {# e-mails envoyés}}.'
+        aucun_membre: 'Aucun membre concerné : choisissez un autre périmètre avant de lancer l’appel.'
+    suivi:
+        sous_titre: '{type} · lancé le {date}'
+        progression: 'Progression vers l’objectif'
+        sur_objectif: 'sur {objectif}'
+        contributeurs: '{nombre, plural, =0 {Aucun contributeur pour l’instant} one {# contributeur} other {# contributeurs}} sur {total, plural, one {# échéance} other {# échéances}}'
+        contributeurs_libelle: Contributeurs
+        sur_echeances: '{nombre, plural, one {sur # échéance} other {sur # échéances}}'
+        reste: 'Reste à collecter'
+        dues: '{nombre, plural, =0 {tout est réglé} one {# échéance due} other {# échéances dues}}{retard, plural, =0 {} other {, # en retard}}'
+        dues_libre: 'échéances à montant libre encore ouvertes'
+        part_central: 'Part du bureau central'
+        taux: '{taux} % au bureau central'
+        date_limite: 'Date limite'
+        par_membre: '{montant} par membre'
+        jour_par_jour: 'Collecte jour par jour'
+        periode: 'Du {du} au {au} · une barre par jour ({jours} jours)'
+        legende_jour: 'Encaissé ce jour-là'
+        legende_cumul: 'Cumul depuis l’ouverture ({total})'
+        aria: 'Collecte jour par jour sur {jours} jours, {total} au total, au plus {maximum} en une journée'
+        aucun_paiement: 'Aucun paiement encore reçu pour cet appel.'
+        cumul: 'cumul {montant}'
+        jour: Jour
+        encaisse: Encaissé
+        cumul_libelle: Cumul
+        par_ville: 'Par ville'
+        ville: Ville
+        impayes: '{nombre, plural, one {# échéance due} other {# échéances dues}}'
+        echeances: 'Échéances créées'
+        collecte: Collecté
+        objectif: 'Objectif de collecte'
+
+depenses_association:
+    titre: Dépenses
+    sous_titre: 'Les dépenses de la caisse du bureau central et celles des villes. Une dépense est toujours validée par une autre personne que celle qui l’a saisie.'
+    sous_titre_ville: 'Les dépenses de la caisse de {ville}.'
+    saisir: 'Saisir une dépense'
+    vide: 'Aucune dépense pour l’instant.'
+    vide_filtre: 'Aucune dépense dans ce filtre.'
+    sans_libelle: 'Dépense sans libellé'
+    caisse_centrale: 'Bureau central'
+    vous: Vous
+    personne_inconnue: 'Compte supprimé'
+    filtre: 'Filtrer par statut'
+    filtres:
+        toutes: Toutes
+        a_valider: 'À valider'
+        a_payer: 'À payer'
+        payees: Payées
+        brouillons: 'À terminer'
+    kpi:
+        a_valider: 'À valider'
+        a_payer: 'Validées, à payer'
+        payees: 'Payées sur l’exercice {exercice}'
+        payees_detail: 'seules les dépenses payées touchent le solde'
+        brouillons: 'À terminer'
+        brouillons_detail: 'brouillons et dépenses refusées'
+    colonne:
+        depense: Dépense
+        caisse: Caisse
+        date: Date
+        saisie_par: 'Saisie par'
+        statut: Statut
+        montant: Montant
+        decision: Décision
+        par: Par
+        motif: Motif
+    statut:
+        brouillon: Brouillon
+        soumise: 'En attente de validation'
+        validee: 'Validée, à payer'
+        refusee: Refusée
+        payee: Payée
+    categorie:
+        aide-sociale: 'Aide sociale (décès, maladie)'
+        projets-village: 'Projets du village'
+        fetes: 'Fêtes et événements'
+        fonctionnement: 'Fonctionnement (frais bancaires, fournitures)'
+        transport: Transport
+        autre: Autre
+    moyen:
+        virement: 'Virement depuis le compte'
+        especes: Espèces
+        carte: 'Carte bancaire'
+        cheque: Chèque
+    decisions:
+        titre: 'Historique des décisions'
+        vide: 'Aucune dépense validée ou refusée pour l’instant.'
+        validee: Validée
+        refusee: Refusée
+    nouvelle:
+        titre: 'Nouvelle dépense'
+        sous_titre: 'Caisse du bureau central · dépense n° {numero}'
+        sous_titre_ville: 'Caisse de {ville} · dépense n° {numero}'
+    modifier:
+        titre: 'Modifier la dépense n° {numero}'
+        refusee: 'Cette dépense a été refusée : {motif} Corrigez-la puis soumettez-la à nouveau.'
+    formulaire:
+        libelle: Libellé
+        montant: Montant
+        date: 'Date de la dépense'
+        categorie: Catégorie
+        appel: 'Projet ou appel lié'
+        appel_aide: 'Facultatif : l’appel à contribution que cette dépense concerne.'
+        aucun_appel: Aucun
+        beneficiaire: 'Payé à'
+        moyen: 'Moyen de paiement'
+        justificatif: 'Justificatif (obligatoire pour soumettre)'
+        justificatif_titre: 'Joignez la facture, le ticket ou une photo lisible'
+        justificatif_joint: 'Justificatif joint : {nom}. Choisissez un autre fichier pour le remplacer.'
+        justificatif_aide: 'PDF, JPG ou PNG · 10 Mo maximum'
+        commentaire: 'Commentaire pour le valideur'
+        commentaire_aide: 'Facultatif : par exemple « devis retenu parmi trois, le moins cher ».'
+        soumettre: 'Soumettre pour validation'
+        brouillon: 'Enregistrer en brouillon'
+    caisse:
+        titre: 'Caisse du bureau central'
+        titre_ville: 'Caisse de {ville}'
+        en_attente: 'Dépenses en attente'
+        a_payer: 'Validées, à payer'
+        payees: 'Déjà payées'
+    circuit:
+        titre: 'Circuit de validation'
+        saisie: '<strong>Saisie</strong> par vous, avec le justificatif.'
+        validation: '<strong>Validation</strong> par une autre personne du bureau central : {noms}.'
+        validation_personne: '<strong>Validation</strong> par une autre personne du bureau central.'
+        validation_ville: '<strong>Validation</strong> par le président de la ville : {noms}.'
+        validation_personne_ville: '<strong>Validation</strong> par le président de la ville.'
+        aucun_valideur_ville: 'Aucun président n’a encore de compte pour {ville} : une dépense soumise attendra sa validation. Le bureau central peut l’inviter depuis Paramètres › Responsables et rôles.'
+        paiement: '<strong>Paiement</strong>, puis publication anonymisée dans les dépenses visibles des membres.'
+        aucun_valideur: 'Personne d’autre n’a de compte au bureau central : une dépense soumise attendra qu’une seconde personne la valide.'
+    fiche:
+        titre: 'Dépense n° {numero}'
+        modifier: Modifier
+        saisie_par: 'Saisie par'
+        commentaire: Commentaire
+        motif: 'Motif du refus'
+        justificatif: 'Justificatif · {type} · {taille} Mo'
+        ouvrir: Ouvrir
+        sans_justificatif: 'Aucun justificatif joint : la dépense ne peut pas être soumise sans pièce.'
+        decision: Décision
+        valider: 'Valider la dépense'
+        refuser: Refuser
+        motif_libelle: 'Motif du refus (obligatoire)'
+        motif_aide: 'Le motif sera envoyé à {nom}.'
+        confirmer_refus: 'Confirmer le refus'
+        verrou_titre: 'Vous ne pouvez pas valider cette dépense : vous l’avez saisie.'
+        verrou_texte: 'Une dépense est toujours validée par une autre personne.'
+        verrou_qui: '{noms} peut la valider.'
+        verrou_aucun: 'Personne d’autre n’a de compte au bureau central : invitez une seconde personne pour débloquer la validation.'
+        paiement: Paiement
+        paiement_texte: 'La dépense est validée. Une fois réglée, marquez-la payée : elle entre alors dans le solde de la caisse.'
+        marquer_payee: 'Marquer comme payée'
+        ville: 'Cette dépense de {ville} se valide par le président de la ville.'
+        suivi: Suivi
+        a_decider: 'En attente de votre décision'
+        feu_vert_titre: 'Vous pouvez valider cette dépense.'
+        feu_vert: 'Elle a été saisie par {qui} : une dépense n’est jamais validée par la personne qui l’a saisie. Votre décision sera tracée et l’auteur prévenu.'
+        feu_vert_ville: 'Elle a été saisie par {qui} : une dépense n’est jamais validée par la personne qui l’a saisie. Votre décision sera tracée et la trésorière prévenue.'
+        refus_note: 'Un refus demande un motif, envoyé à la personne qui a saisi la dépense.'
+        verrou_aucun_ville: 'Aucun président n’a de compte pour {ville} : demandez au bureau central d’en nommer un.'
+        verrou_note: 'Le bouton « Valider » n’apparaît jamais sur sa propre dépense.'
+        prevenir: 'Prévenir le bureau central'
+    suivi:
+        brouillon: 'Brouillon, pas encore soumis'
+        soumise: 'Soumise par {qui}, avec justificatif'
+        validation: 'Validation par une autre personne'
+        validation_ville: 'Décision du président'
+        validee: 'Validée par {qui}'
+        refusee: 'Refusée par {qui}'
+        bloquee: bloquée
+        payee: Payée
+        payee_par: 'Payée, enregistré par {qui}'
+    flash:
+        brouillon: 'La dépense n° {numero} est enregistrée en brouillon.'
+        soumise: 'La dépense n° {numero} est soumise pour validation.'
+        validee: 'La dépense n° {numero} est validée.'
+        refusee: 'La dépense n° {numero} est refusée : son auteur est prévenu.'
+        central_prevenu: '{nombre, plural, one {Le bureau central est prévenu} other {Les # personnes du bureau central sont prévenues}} : un président pourra être nommé.'
+        central_absent: 'Aucun compte actif au bureau central : personne à prévenir.'
+        payee: 'La dépense n° {numero} est payée.'
+        motif_obligatoire: 'Indiquez le motif du refus.'
+    email:
+        objet_soumise: 'Dépense à valider : {libelle}'
+        objet_validee: 'Dépense validée : {libelle}'
+        objet_refusee: 'Dépense refusée : {libelle}'
+        objet_sans_valideur: 'Dépense n° {numero} de la ville : aucun président pour la valider'
+
+reversements_association:
+    titre: Reversements
+    sous_titre: 'Part du bureau central : {taux} % de ce que chaque ville encaisse · exercice {exercice}'
+    sous_titre_ville: '{ville} · part du bureau central : {taux} % de ses encaissements · exercice {exercice}'
+    exercice: 'Exercice {exercice}'
+    exercice_choisir: 'Changer d’exercice'
+    exporter: Exporter
+    enregistrer: 'Enregistrer un reversement'
+    declarer: 'Déclarer un reversement effectué'
+    declaration:
+        titre: 'Déclarer un reversement effectué'
+        sous_titre: 'Le virement de {ville} vers le compte du bureau central est parti : déclarez-le, le central le confirmera à réception.'
+        valider: 'Déclarer le reversement'
+    kpi:
+        du: 'Dû par les villes'
+        du_ville: 'Dû par la ville'
+        du_detail: '{taux} % de {collecte} collectés'
+        recu: 'Reçu et confirmé'
+        recu_detail: '{nombre, plural, =0 {aucun virement} one {# virement} other {# virements}} sur l’exercice'
+        restant: 'Restant dû'
+        restant_detail: 'dont {montant} déclarés, à confirmer'
+        restant_rien: 'rien en attente'
+        date_limite: 'Date limite'
+        date_limite_detail: 'fin du mois qui suit la clôture de l’exercice'
+        date_limite_dans: '{jours, plural, =0 {aujourd’hui} one {dans # jour} other {dans # jours}}'
+        date_limite_depassee: 'dépassée depuis {jours, plural, one {# jour} other {# jours}}'
+    a_confirmer:
+        titre: 'Reversements déclarés, à confirmer'
+        aide: 'Une ville a annoncé un virement. Confirmez-le quand il apparaît sur le relevé du bureau central ; si le montant reçu diffère, corrigez-le avant de confirmer, l’écart restera visible.'
+        declare_par: 'déclaré par {personne} le {date}'
+        reference: 'réf. {reference}'
+        montant: 'Montant reçu'
+        confirmer: 'Confirmer la réception'
+        confirmer_de: 'Confirmer le reversement de {ville}'
+        en_attente: 'En attente du central'
+        aide_ville: 'Vos virements déclarés, en attente de confirmation par le bureau central.'
+    tableau:
+        titre: 'Montant dû par ville'
+        aide: 'Le dû se calcule sur les cotisations de l’exercice au taux par défaut de l’association, plus les échéances d’appels encaissées à la main au taux de chaque appel, arrondi au centime inférieur. Seul un reversement confirmé compte dans le reçu.'
+        vide: 'Aucune ville active : rien n’est dû pour l’instant.'
+        vide_ville: 'Cette ville n’est pas encore active.'
+        total: Total
+        dernier: 'dernier reversement le {date}'
+        aucun_reversement: 'aucun reversement'
+        appels: 'dont {montant} sur les appels'
+    colonne:
+        ville: Ville
+        collecte: 'Collecté {exercice}'
+        du: Dû
+        recu: Reçu
+        restant: Restant
+        statut: Statut
+    statut:
+        rien: 'Rien à reverser'
+        a_reverser: 'À reverser'
+        partiel: Partiel
+        solde: Soldé
+        en_retard: 'En retard'
+    graphique:
+        titre: 'Reçus et restant dus'
+        aide: 'Qui doit encore de l’argent au central ?'
+        recu: Reçu
+        restant: 'Restant dû'
+        donnees: 'Voir les données'
+        vide: 'Rien n’est dû sur cet exercice.'
+    historique:
+        titre: 'Historique des reversements'
+        vide: 'Aucun reversement sur cet exercice.'
+        date: Date
+        ville: Ville
+        reference: Référence
+        declare_par: 'Déclaré par'
+        confirme_par: 'Confirmé par'
+        montant: Montant
+        en_attente: 'En attente'
+        ecart: 'déclaré {montant}'
+        note: Note
+        personne_inconnue: 'Compte supprimé'
+        vous: Vous
+    nouveau:
+        titre: 'Enregistrer un reversement'
+        sous_titre: 'Un virement reçu d’une ville sur le compte du bureau central. Il compte aussitôt dans le reçu de l’exercice choisi.'
+        valider: 'Enregistrer le reversement'
+        annuler: Annuler
+        cote_titre: 'Restant dû · {exercice}'
+        cote_aide: 'Part du bureau central : {taux} %.'
+        cote_vide: 'Rien n’est dû sur cet exercice.'
+    formulaire:
+        ville: Ville
+        ville_choisir: 'Choisir une ville'
+        exercice: Exercice
+        montant: 'Montant reçu (€)'
+        recu_le: 'Date du virement'
+        reference: 'Référence du virement'
+        reference_aide: 'Le libellé qui apparaît sur le relevé, pour retrouver l’opération.'
+        note: Note
+        note_aide: 'Facultatif : un commentaire pour l’historique.'
+    flash:
+        enregistre: 'Reversement de {ville} enregistré : {montant, number, ::currency/EUR}.'
+        confirme: 'Reversement de {ville} confirmé : {montant, number, ::currency/EUR}.'
+        deja_confirme: 'Ce reversement était déjà confirmé.'
+        declare: 'Reversement de {montant, number, ::currency/EUR} déclaré : le bureau central le confirmera à réception.'
+        montant_invalide: 'Indiquez un montant reçu en euros, par exemple 1200 ou 1200,50.'
+    csv:
+        ville: Ville
+        collecte: 'Collecté {exercice} (€)'
+        taux: 'Taux (%)'
+        appels: 'Part sur les appels (€)'
+        du: 'Dû (€)'
+        recu: 'Reçu (€)'
+        declare: 'Déclaré à confirmer (€)'
+        restant: 'Restant (€)'
+        statut: Statut
+        dernier: 'Dernier reversement'
+        total: Total
+
+rapport_association:
+    exporter_xlsx: 'Exporter en Excel'
+    titre: 'Rapport d’AG'
+    sous_titre: 'Exercice {exercice} · arrêté au {date} · toutes les villes'
+    sous_titre_ville: 'Exercice {exercice} · arrêté au {date} · caisse de {ville}'
+    caisse: 'caisse de {ville}'
+    aide: 'Le rapport se construit à partir des données de l’application. « Imprimer ou PDF » ouvre l’impression du navigateur : choisissez « Enregistrer au format PDF » pour obtenir le document de l’assemblée générale.'
+    imprimer: 'Imprimer ou PDF'
+    exporter: 'Exporter pour Excel'
+    meta: '{association} · Assemblée générale'
+    meta_court: '{association} · AG {exercice}'
+    periode: 'Exercice du {du} au {au}'
+    total: Total
+    page: 'Page {page} sur 3'
+    arrete: 'Arrêté au {date}'
+    approuve: 'Approuvé par l’assemblée générale du ………………'
+    synthese:
+        numero: '1 · Synthèse'
+        titre: 'L’exercice en un coup d’œil'
+        texte: '{villes, plural, =0 {Aucune ville active n’a encore collecté.} one {La ville a collecté {collecte} auprès de {membres} membres.} other {Les # villes ont collecté {collecte} auprès de {membres} membres.}} {reverse} ont été reversés au bureau central, sur {du} dus. Les dépenses payées s’élèvent à {depense}.'
+        texte_ville: 'La caisse de {ville} a collecté {collecte} auprès de {membres} membres. {reverse} ont été reversés au bureau central, sur {du} dus. Les dépenses payées de la ville s’élèvent à {depense}.'
+    kpi:
+        collecte: Collecté
+        variation: '{variation} % sur {exercice}'
+        premier: 'premier exercice suivi'
+        depense: Dépensé
+        depense_detail: '{pourcentage} % du collecté'
+        solde: 'Solde des caisses'
+        solde_detail: 'villes et central'
+        membres: Membres
+        membres_detail: '{villes, plural, =0 {aucune ville active} one {# ville} other {# villes}}'
+        a_jour: 'À jour'
+        a_jour_detail: '{nombre} sur {total} renseignés'
+        reverse: 'Reversé au central'
+        reverse_detail: 'sur {du} dus'
+    entrees:
+        titre: Entrées
+        cotisations: Cotisations
+    depenses:
+        titre: Dépenses
+        aucune: 'Aucune dépense payée sur l’exercice.'
+    faits:
+        titre: 'Faits marquants'
+        appels: '{nombre, plural, =0 {Aucun appel à contribution lancé sur l’exercice.} one {# appel à contribution lancé sur l’exercice.} other {# appels à contribution lancés sur l’exercice.}}'
+        depenses: 'Dépenses payées sur l’exercice : {montant}.'
+        villes: '{actives, plural, =0 {Aucune ville active} one {# ville active} other {# villes actives}}{creation, plural, =0 {.} one {, # en cours de création.} other {, # en cours de création.}}'
+    graphiques:
+        numero: '2 · Graphiques'
+        encaissements: 'Encaissements par mois'
+        encaissements_aria: 'Encaissements par mois de l’exercice, {total} au total'
+        depenses: 'Dépenses par catégorie'
+        a_jour: 'Membres à jour par ville'
+        pied: 'Les données détaillées figurent en page 3.'
+    villes:
+        numero: '3 · Tableaux par ville'
+        titre: 'Comptes des villes'
+        ville: Ville
+        membres: Membres
+        a_jour: 'À jour'
+        a_jour_sur: 'À jour / membres'
+        collecte: Collecté
+        depense: Dépensé
+        recu: 'Reversé'
+        du: 'Dû au central'
+        reverse_sur_du: 'Reversé / dû'
+        solde: 'Solde de l’exercice'
+        central: 'Bureau central (dépenses propres)'
+        aucune: 'Aucune ville active.'
+        note: 'Solde de l’exercice = collecté − part due au central − dépenses de la ville. Le bureau central a dépensé {central} en propre.'
+        note_ville: 'Solde de l’exercice = collecté − part due au central − dépenses payées de la ville.'
+    appels:
+        titre: 'Projets et appels'
+        appel: Appel
+        type: Type
+        echeances: Échéances
+        objectif: Objectif
+        collecte: Collecté
+        etat: État
+        aucun: 'Aucun appel lancé sur l’exercice.'
+    signature:
+        tresorier: 'Le trésorier général'
+        president: 'Le président'
+        signature: Signature
+    csv:
+        titre: 'Rapport d’AG · {association} · exercice {exercice}'
+        montant: 'Montant (€)'
+
+parametres_association:
+    titre: 'Paramètres de l’association'
+    sous_titre: '{association} · contact public, exercice comptable, reversement au central et relances.'
+    enregistrer: 'Enregistrer les paramètres'
+    enregistre: 'Les paramètres de l’association sont enregistrés.'
+    contact:
+        titre: 'Contact de l’association'
+        aide: 'Le nom, l’identifiant dans les adresses et les numéros RNA et SIREN se modifient par l’équipe de la plateforme.'
+    gestion:
+        titre: 'Exercice, reversement et relances'
+        taux_aide: 'La part du bureau central sur les cotisations encaissées par les villes ; les appels à contribution portent chacun leur propre taux.'
+        relances_aide: 'Jours par rapport à l’échéance, séparés par des virgules : « -7, 0, 15 » relance une semaine avant, le jour même et quinze jours après.'
+
+contributions_association:
+    titre: 'Types de contribution'
+    sous_titre: 'Ce que les membres peuvent payer : cotisation, décès, projet, fête… Chaque appel à contribution part d’un type.'
+    ajouter: 'Ajouter un type'
+    modifier: Modifier
+    modifier_titre: 'Modifier « {nom} »'
+    archiver: Archiver
+    reactiver: Réactiver
+    vide: 'Aucun type de contribution pour l’instant.'
+    aide: 'Un type archivé ne se propose plus pour un nouvel appel ; les appels passés le gardent. Le dernier type actif ne s’archive pas.'
+    actions_de: 'Actions pour {nom}'
+    montant_fixe: '{montant} par défaut'
+    montant_suggere: '{montant} suggérés'
+    taux: '{taux} % au central'
+    taux_a_preciser: 'à préciser sur chaque appel'
+    colonne:
+        type: Type
+        unite: 'Qui paie'
+        montant: Montant
+        reversement: 'Part du central'
+        appels: Appels
+        statut: Statut
+        actions: Actions
+    unite:
+        personne: 'Chaque personne'
+        foyer: 'Chaque foyer'
+    statut:
+        actif: Actif
+        archive: Archivé
+    formulaire:
+        sous_titre: 'Le code du type ne change jamais : les appels passés y renvoient.'
+        nom: Nom
+        unite: 'Qui paie'
+        unite_aide: 'Par foyer, seul le payeur du foyer reçoit la demande ; son paiement vaut pour tout le foyer.'
+        mode: 'Montant'
+        mode_aide: 'Fixe : le même montant pour tous. Libre : chacun choisit, avec un montant suggéré facultatif.'
+        montant: 'Montant par défaut (€)'
+        montant_aide: 'Proposé quand on lance un appel de ce type ; modifiable à chaque appel.'
+        taux: 'Part du bureau central (%)'
+        taux_aide: 'Laissez vide pour choisir le taux à chaque appel.'
+        ajouter: 'Ajouter le type'
+        enregistrer: 'Enregistrer le type'
+    regles:
+        titre: 'Bon à savoir'
+        unite: 'Par personne ou par foyer : ce choix décide qui reçoit l’échéance et l’e-mail d’un appel.'
+        taux: 'Le taux de reversement du type est proposé à chaque appel ; un appel de ville peut le surcharger, par exemple 0 % pour un projet purement local.'
+        archive: 'Rien ne se supprime : un type dont on ne veut plus s’archive, et ses appels passés restent lisibles.'
+    flash:
+        ajoute: 'Le type « {nom} » est ajouté.'
+        modifie: 'Le type « {nom} » est enregistré.'
+        archive: 'Le type « {nom} » est archivé : il ne se propose plus pour un nouvel appel.'
+        reactive: 'Le type « {nom} » est de nouveau proposé.'
+        dernier_actif: 'Le dernier type actif ne peut pas être archivé : un appel a toujours besoin d’un type.'
+
+paiements_association:
+    titre: Paiements
+    exporter_xlsx: 'Exporter en Excel'
+    sous_titre: 'Les paiements reçus à la main : espèces, virement, chèque ou carte, enregistrés par le trésorier ou le bureau central.'
+    sous_titre_ville: 'Les paiements reçus à la main par la caisse de {ville}.'
+    enregistrer: 'Enregistrer un paiement'
+    exporter: Exporter
+    vide: 'Aucun paiement enregistré pour l’instant.'
+    vide_periode: 'Aucun paiement sur cette période.'
+    kpi:
+        encaisse: 'Encaissé sur l’exercice {exercice}'
+        encaisse_detail: '{nombre, plural, =0 {aucun paiement} one {# paiement} other {# paiements}}'
+        mois: 'Encaissé ce mois-ci'
+        mois_detail: 'paiements enregistrés'
+        annules: Annulés
+        annules_detail: 'saisies corrigées, gardées dans l’historique'
+    colonne:
+        date: Date
+        membre: Membre
+        ville: Ville
+        objet: Règle
+        moyen: Moyen
+        montant: Montant
+        par: 'Enregistré par'
+        statut: Statut
+        actions: Actions
+    moyen:
+        especes: Espèces
+        virement: Virement
+        cheque: Chèque
+        carte: Carte
+    statut:
+        enregistre: Enregistré
+        annule: Annulé
+    objet:
+        cotisation: 'Cotisation {mois} {annee}'
+        cotisations: '{nombre} mensualités {annee}'
+        appel: '{objet}'
+        mixte: '{nombre} échéances'
+    menu:
+        recu: 'Voir le reçu'
+        membre: 'Fiche du membre'
+        annuler: 'Annuler ce paiement'
+        annuler_confirmer: 'Annuler ce paiement ? Ses échéances redeviennent dues. Le paiement reste dans l’historique comme annulé.'
+    actions_de: 'Actions pour le paiement de {membre}'
+    nouveau:
+        titre: 'Enregistrer un paiement'
+        sous_titre: 'Cochez les membres qui ont payé et ce qu’ils règlent : un paiement par membre, en un seul envoi. « Détail » ouvre la saisie fine d’un membre.'
+        rechercher: 'Rechercher un membre'
+        recherche_placeholder: 'Nom, prénom, e-mail, téléphone…'
+        chercher: Chercher
+        aucun_resultat: 'Aucun membre ne correspond.'
+        choisir: Choisir
+        membre_sans_echeance: '{membre} ne doit rien pour l’instant : aucune échéance due.'
+        echeances_de: 'Ce que {membre} doit'
+        changer_membre: 'Changer de membre'
+        foyer: Foyer
+        montant_libre: 'Montant versé (€)'
+        total: 'Total du paiement'
+        valider: 'Enregistrer le paiement'
+        annuler: Annuler
+        recu_envoye: 'Un reçu partira par e-mail si le membre a une adresse et a accepté les e-mails.'
+    groupe:
+        cibles: 'Ce qu’ils règlent'
+        mois_de: 'Cotisation {annee} · {montant} par mois'
+        appels: 'Appels à contribution ouverts'
+        aucune_cible: 'Aucune cotisation ouverte cette année et aucun appel en cours.'
+        ouvrir_cotisations: 'Ouvrir les cotisations de l’année'
+        choisir_ville: 'Choisissez une ville dans la barre latérale pour régler des mois de cotisation.'
+        comment: 'Comment'
+        reference_exemple: 'Réunion du 5, chèque n° 12…'
+        qui: 'Qui a payé'
+        filtrer: 'Filtrer par nom, e-mail, téléphone, foyer…'
+        doit: 'Doit encore'
+        dues: '{nombre, plural, one {# échéance} other {# échéances}} · {montant}'
+        retard: '{nombre, plural, one {# en retard} other {# en retard}}'
+        a_jour: 'à jour'
+        rien_du: 'Ce membre ne doit rien.'
+        detail: Détail
+        aucun_membre: 'Aucun membre actif dans ce périmètre.'
+        aucun_coche: 'Cochez les membres qui ont payé, puis les mois ou appels réglés.'
+        valider: '{nombre, plural, =0 {Enregistrer les paiements} one {Enregistrer # paiement} other {Enregistrer # paiements}}'
+        flash:
+            incomplet: 'Cochez au moins un membre et une échéance à régler, avec un moyen et une date valides.'
+            bilan: '{paiements, plural, =0 {Aucun paiement enregistré} one {# paiement enregistré} other {# paiements enregistrés}}{paiements, plural, =0 {} other { · {montant, number, ::currency/EUR}}}{recus, plural, =0 {} one { · # reçu envoyé} other { · # reçus envoyés}}{ignores, plural, =0 {} one { · # membre ignoré, rien à régler parmi ces échéances : {noms}} other { · # membres ignorés, rien à régler parmi ces échéances : {noms}}}.'
+    formulaire:
+        echeances: 'Échéances réglées'
+        moyen: 'Moyen de paiement'
+        recu_le: 'Reçu le'
+        reference: Référence
+        reference_aide: 'Numéro de chèque, libellé du virement…'
+        note: Note
+    echeance:
+        cotisation: 'Cotisation · {mois} {annee}'
+        appel: 'Appel · {objet}'
+        retard: 'en retard de {jours, plural, one {# jour} other {# jours}}'
+        due_le: 'due le {date}'
+        libre: 'montant libre'
+    recu:
+        simulation: 'paiement en ligne simulé'
+        titre: 'Reçu n° {numero}'
+        sous_titre: 'Paiement de {membre} · {date}'
+        imprimer: Imprimer
+        retour: 'Retour aux paiements'
+        recu_par: 'Reçu par {association} pour la caisse de {ville}'
+        regle: 'Ce paiement règle'
+        moyen: 'Moyen : {moyen}'
+        reference: 'Référence : {reference}'
+        enregistre_par: 'Enregistré par {personne} le {date}'
+        annule: 'Paiement annulé le {date} : ce reçu ne vaut plus.'
+        mention: 'Reçu délivré par l’association {association}. Les montants sont en euros.'
+    flash:
+        enregistre: 'Paiement de {montant, number, ::currency/EUR} enregistré pour {membre}.'
+        enregistre_recu: 'Paiement de {montant, number, ::currency/EUR} enregistré pour {membre} ; le reçu part par e-mail.'
+        annule: 'Le paiement de {membre} est annulé : ses échéances redeviennent dues.'
+        deja_annule: 'Ce paiement était déjà annulé.'
+        membre_introuvable: 'Membre introuvable dans cette association.'
+        echeances_obligatoires: 'Cochez au moins une échéance.'
+        montant_libre: 'Indiquez le montant versé pour chaque échéance à montant libre.'
+    csv:
+        date: Date
+        membre: Membre
+        ville: Ville
+        objet: Règle
+        moyen: Moyen
+        montant: 'Montant (€)'
+        reference: Référence
+        statut: Statut
+        par: 'Enregistré par'
+
+impayes_association:
+    titre: 'Impayés et relances'
+    sous_titre: 'Toute l’association · relances automatiques par e-mail {calendrier}.'
+    sous_titre_ville: '{ville} · relances automatiques par e-mail {calendrier}.'
+    calendrier: 'J{jours, number, ::sign-always}'
+    exporter: Exporter
+    exporter_csv: 'CSV (tableur)'
+    exporter_xlsx: 'Excel'
+    calendrier_bouton: 'Calendrier des relances'
+    calendrier_panneau:
+        titre: 'Relances automatiques par e-mail'
+        regle: '{jours, plural, =0 {Le jour de l’échéance} one {# jour {sens, select, avant {avant} other {après}} l’échéance} other {# jours {sens, select, avant {avant} other {après}} l’échéance}}'
+        aucune_regle: 'Aucune relance automatique : le calendrier de l’association est vide.'
+        prochaines: 'Prochains envois'
+        prochaine: 'J{jours, number, ::sign-always} · {membres, plural, =0 {aucun membre joignable} one {# membre} other {# membres}}{injoignables, plural, =0 {} other { · # sans e-mail}}'
+        aucune_prochaine: 'Aucun envoi prévu : aucune échéance due ne tombe sur le calendrier.'
+        note: 'Chaque envoi rappelle au membre tout ce qu’il doit. Un appel lancé sans relances automatiques n’en déclenche pas.'
+        modifier: 'Modifier le calendrier'
+    relancer_tous: '{nombre, plural, one {Relancer # membre} other {Relancer les # membres}}'
+    relancer_tous_confirmer: 'Envoyer un e-mail de rappel {nombre, plural, one {au membre joignable} other {aux # membres joignables}} en retard ? Une personne déjà relancée aujourd’hui ne le sera pas deux fois.'
+    tout_cocher: 'Tout cocher'
+    vide: 'Aucun impayé : tout le monde est à jour.'
+    vide_filtre: 'Aucun membre ne correspond à cette recherche.'
+    kpi:
+        montant: 'Montant dû'
+        montant_detail: '{membres, plural, =0 {aucun membre} one {# membre} other {# membres}}, {echeances, plural, =0 {aucune échéance} one {# échéance} other {# échéances}}'
+        plus_60: 'Plus de 60 jours'
+        plus_60_detail: '{membres, plural, =0 {aucun membre} one {# membre · à appeler} other {# membres · à appeler}}'
+        sans_email: 'Sans adresse e-mail'
+        sans_email_detail: 'Relance impossible par e-mail'
+        prochaine: 'Prochaine relance auto'
+        prochaine_detail: 'J{jours, number, ::sign-always} · {membres, plural, =0 {aucun membre joignable} one {# membre concerné} other {# membres concernés}}'
+        prochaine_aucune: Aucune
+        prochaine_aucune_detail: 'Aucune échéance due au calendrier'
+    anciennete:
+        titre: 'Par ancienneté du retard'
+        tranche_0_30: '0 à 30 jours'
+        tranche_31_60: '31 à 60 jours'
+        tranche_61: 'Plus de 60 jours'
+        legende: '{tranche} · {membres, plural, =0 {aucun membre} one {# membre} other {# membres}} · {montant}'
+        description: 'Impayés par ancienneté du retard : {detail}.'
+        donnees: 'Tableau de données'
+        membres: Membres
+    rechercher: 'Rechercher un membre en retard'
+    recherche_placeholder: 'Nom ou e-mail'
+    filtre: 'Filtrer les impayés'
+    filtres:
+        tous: Tous
+        plus_60: 'Plus de 60 j'
+        sans_email: 'Sans e-mail'
+    echeance: Échéance
+    echeance_toutes: toutes
+    echeance_membres: '{nombre, plural, one {# membre} other {# membres}}'
+    effacer: Effacer
+    tri: 'Du retard le plus long au plus court'
+    colonne:
+        membre: Membre
+        du: 'Ce qui est dû'
+        echeances: Échéances
+        montant: Montant
+        retard: Retard
+        derniere_relance: 'Dernière relance'
+        actions: Actions
+    source:
+        cotisation: '{libelle} · {nombre, plural, one {# mensualité} other {# mensualités}}'
+        cotisation_depuis: 'Depuis le {date}'
+        appel_avant: 'Avant le {date}'
+    retard_jours: '{jours} j'
+    retard_jours_long: '{jours, plural, one {# jour de retard} other {# jours de retard}}'
+    sans_email: 'Sans adresse e-mail'
+    sans_consentement: 'Refuse les e-mails'
+    jamais_relance: Jamais
+    a_appeler: 'à appeler'
+    relance_le: '{date} · {canal, select, telephone {appel téléphonique} other {{automatique, select, oui {e-mail automatique} other {e-mail}}}}{rang, plural, =0 {} =1 {} other {, {rang, selectordinal, one {#er} other {#e}} rappel}}'
+    menu:
+        relancer: 'Relancer par e-mail'
+        appeler: 'Marquer comme appelé'
+        paiement: 'Enregistrer un paiement'
+        fiche: 'Voir la fiche'
+    barre:
+        relancer: 'Relancer par e-mail'
+        relancer_court: Relancer
+        paiement: 'Enregistrer un paiement'
+        paiement_court: Paiement
+        appeler: 'Marquer comme appelé'
+        appeler_court: Appelé
+        fermer: 'Vider la sélection'
+    flash:
+        envoyees: '{nombre, plural, =0 {Aucune relance envoyée} one {# relance envoyée} other {# relances envoyées}}{ignores, plural, =0 {} one { · # membre ignoré (sans e-mail, sans accord, ou déjà relancé aujourd’hui)} other { · # membres ignorés (sans e-mail, sans accord, ou déjà relancés aujourd’hui)}}.'
+        appeles: '{nombre, plural, =0 {Aucun membre marqué comme appelé} one {# membre marqué comme appelé} other {# membres marqués comme appelés}}{ignores, plural, =0 {} one { · # ignoré (rien en retard, ou déjà noté aujourd’hui)} other { · # ignorés (rien en retard, ou déjà notés aujourd’hui)}}.'
+        aucun_choix: 'Cochez au moins un membre.'
+    csv:
+        membre: Membre
+        ville: Ville
+        du: 'Ce qui est dû'
+        echeances: Échéances
+        montant: 'Montant (€)'
+        retard: 'Retard (jours)'
+        derniere_relance: 'Dernière relance'
+        canal: Canal
+        canal_email: 'e-mail'
+        canal_auto: 'e-mail automatique'
+        canal_telephone: 'téléphone'
+        rappels: Rappels
+        email: E-mail
+
+membre_fiche:
+    modifier: 'Modifier la fiche'
+    modifier_titre: 'Modifier {nom}'
+    modifier_intro: 'identité, contact, localité, foyer. Le statut et la ville se changent depuis la fiche.'
+    enregistrer: 'Enregistrer la fiche'
+    enregistrer_paiement: 'Enregistrer un paiement'
+    autres_actions: 'Autres actions'
+    sortir: 'Marquer comme sorti'
+    sortir_confirmer: 'Marquer {nom} comme sorti ? La fiche quitte son foyer et ne reçoit plus d’échéance ; l’historique reste.'
+    reactiver: 'Réactiver la fiche'
+    valider: 'Valider l’inscription'
+    compte:
+        titre: 'Compte du membre'
+        dues: '{nombre, plural, =0 {Rien à payer} one {# échéance due} other {# échéances dues}}'
+        paiements: '{nombre, plural, =0 {Aucun paiement} one {# paiement} other {# paiements}}'
+    transfert:
+        titre: 'Transférer vers une autre ville'
+        ville: 'Ville d’arrivée'
+        aide: 'L’historique (adhésions, paiements, relances) reste dans la caisse d’origine ; les mensualités encore dues ici sont annulées, et la nouvelle ville lui crée les siennes si ses cotisations de l’année sont ouvertes.'
+        bouton: 'Transférer'
+        confirmer: 'Transférer {nom} ? La fiche quitte son foyer et sa ville, l’historique reste à la caisse d’origine.'
+    regles:
+        email: 'L’adresse e-mail est unique dans la ville : elle sert de repère aux imports et aux reçus.'
+        foyer: 'Un foyer regroupe les membres qui paient ensemble ; son payeur reçoit les échéances par foyer.'
+        transfert: 'Pour changer de ville, utilisez « Transférer » sur la fiche : l’historique reste à la caisse d’origine.'
+    flash:
+        modifie: 'La fiche de {nom} est enregistrée.'
+        sorti: '{nom} est marqué sorti.'
+        reactive: '{nom} est de nouveau actif.'
+        transfere: '{nom} est transféré de {de} vers {vers}.'
+        ville_invalide: 'Choisissez une ville active de l’association, différente de la ville actuelle.'
+        email_pris: 'Impossible : cette adresse e-mail est déjà celle d’un membre de {ville}.'
+
+mon_espace:
+    navigation: 'Mon espace'
+    compte: 'Paramètres du compte'
+    bonjour: 'Bonjour {prenom} · {ville}'
+    onglets:
+        echeances: Échéances
+        historique: Historique
+        ville: 'Ma ville'
+        profil: Profil
+    echeances:
+        titre: 'Mes échéances'
+        a_payer: 'À payer'
+        paye: 'Payé en {exercice}'
+        a_jour: 'Vous êtes à jour : aucune échéance à payer.'
+        cotisation: 'Cotisation de {mois} {annee}'
+        avant: 'Avant le {date}'
+        en_retard: 'En retard depuis le {date}'
+        libre: 'Montant libre'
+        regler: 'Paiement en ligne : pour l’instant une simulation, aucune carte n’est débitée. Vous pouvez aussi régler auprès du trésorier de {ville}.'
+        payer: 'Payer en ligne'
+    payer:
+        titre: 'Payer mes échéances'
+        retour: '‹ Mes échéances'
+        choisir: 'Ce que je règle'
+        libre: 'Ma contribution'
+        suggere: '({montant} suggérés)'
+        total: Total
+        bouton: 'Payer maintenant'
+        simulation: 'Simulation : le paiement par carte (Stripe) n’est pas encore branché. Aucune carte n’est demandée ni débitée ; le paiement est enregistré comme s’il avait été reçu, avec son reçu.'
+    merci:
+        titre: 'Merci {prenom}, votre paiement est reçu'
+        recu_envoye: 'Un reçu a été envoyé à {email}.'
+        recu_espace: 'Votre reçu est dans votre historique.'
+        simulation: 'Paiement simulé : aucun argent n’a circulé.'
+        recu: Reçu
+        numero: 'n° {numero}'
+        date: Date
+        total: 'Total payé'
+        reste_ville: 'Reste à la caisse de {ville}'
+        central: 'Reversé au bureau central'
+        voir_recu: 'Voir le reçu'
+        retour: 'Retour à mes échéances'
+    historique:
+        titre: Historique
+        vide: 'Aucun paiement enregistré pour l’instant.'
+        paiement: Paiement
+        annule: annulé
+        recu: Reçu
+        recu_aria: 'Voir le reçu du {date}'
+        annee: Année
+        vide_annee: 'Aucun paiement enregistré en {annee}.'
+        total: 'Total payé en {annee} : {montant}'
+        attestation: 'Attestation de paiements {annee}'
+    ville:
+        titre: 'Où va l’argent de ma ville'
+        surtitre: '{ville} · exercice {exercice}'
+        anonyme: 'Les entrées sont anonymes : aucun nom de membre n’est jamais affiché.'
+        entrees: 'Entrées de l’exercice'
+        reverse: 'Reversé au bureau central'
+        depenses: 'Dépenses payées'
+        solde: 'Solde au {date}'
+        par_type: 'Entrées par type'
+        cotisations: Cotisations
+        cotisation: Cotisation
+        contribution: Contribution
+        par_categorie: 'Dépenses par catégorie'
+        aucune_depense: 'Aucune dépense payée sur l’exercice.'
+        depenses_payees: '{nombre, plural, one {La dépense payée} other {Les # dépenses payées}}'
+        dernieres: 'Dernières entrées'
+        depenses_recentes: 'Dernières dépenses payées'
+        voir_depenses: '{nombre, plural, one {Voir la dépense} other {Voir les # dépenses}}'
+        un_membre: 'un membre · {date}'
+    attestation:
+        titre: 'Attestation de paiements {annee}'
+        texte: '{association} atteste que {membre}, membre de la caisse de {ville}, a versé les sommes suivantes au cours de l’année {annee}.'
+        detail: 'Paiements de l’année'
+        total: 'Total versé en {annee}'
+        fait_le: 'Fait le {date}, pour valoir ce que de droit.'
+        retour: 'Mon historique'
+        rna: 'RNA {rna}'
+        siren: 'SIREN {siren}'
+    depenses:
+        titre: 'Les dépenses de ma ville'
+        intro: '{nombre, plural, =0 {Aucune dépense payée} one {# dépense payée} other {# dépenses payées}} par la caisse de {ville} sur l’exercice, {total} au total.'
+    profil:
+        titre: 'Mon profil'
+        nom: Nom
+        ville: Ville
+        foyer: 'foyer {foyer}'
+        email: 'Adresse e-mail'
+        telephone: Téléphone
+        telephone_aide: 'Facultatif : pour que le trésorier puisse vous joindre.'
+        consentement: 'Recevoir les e-mails de l’association'
+        consentement_aide: 'Appels à contribution, relances et reçus. Sans cet accord, le trésorier vous préviendra autrement.'
+        enregistrer: Enregistrer
+        enregistre: 'Votre profil est enregistré.'
+        compte: 'Pour changer votre adresse de connexion ou votre mot de passe :'
+
+accueil_ville:
+    titre: 'Accueil · {ville}'
+    bonjour: 'Bonjour {prenom}'
+    sous_titre: '{ville} · {membres, plural, =0 {aucun membre} one {# membre} other {# membres}} · exercice {exercice}'
+    a_jour_detail: '{nombre} sur {total}'
+    impayes: Impayés
+    impayes_detail: '{nombre, plural, =0 {personne en retard} one {# membre} other {# membres}}'
+    solde: 'Solde de la caisse'
+    solde_detail: '{depense} dépensés sur l’exercice'
+    a_faire:
+        titre: 'À faire'
+        rien: 'Rien à faire : la caisse est à jour.'
+        inscriptions: '{nombre, plural, one {# demande d’inscription} other {# demandes d’inscription}}'
+        inscriptions_detail: 'des membres en attente de validation'
+        impayes: '{nombre, plural, one {# membre en retard} other {# membres en retard}}'
+        impayes_detail: '{montant} · relances automatiques selon le calendrier'
+        depenses: '{nombre, plural, one {# dépense en attente} other {# dépenses en attente}}'
+        depenses_detail: '{montant} · à décider par le président'
+        reversement: 'Reversement au bureau central'
+        reversement_detail: '{montant} à virer avant le {date}'
+        cotisations: 'Cotisations de l’année à ouvrir'
+        cotisations_detail: 'fixez le tarif mensuel, les mensualités se créent pour chaque adhérent'
+        action_valider: Valider
+        action_relancer: Relancer
+        action_decider: Décider
+        action_declarer: Déclarer
+        action_ouvrir: Ouvrir
+        action_voir: Voir
+    paiements:
+        titre: 'Derniers paiements'
+        tous: Tous
+        aucun: 'Aucun paiement enregistré pour l’instant.'
+
+
+mon_espace_attente:
+    titre: 'Votre inscription attend la validation de {ville}'
+    texte: 'Un responsable de la ville va la valider. En attendant, votre espace est ouvert, mais vos échéances apparaîtront après la validation.'
+
+membre_invitation:
+    bouton: 'Inviter à son espace'
+    renvoyer: 'Renvoyer l’invitation'
+    aide: 'Un lien valable 7 jours part à {email} : le membre crée son mot de passe et voit ses échéances, ses reçus et où va l’argent de sa ville.'
+    sans_email: 'Ajoutez une adresse e-mail à la fiche pour inviter ce membre à son espace.'
+    a_un_compte: 'Ce membre a un compte : il se connecte avec {email}.'
+    en_cours: 'Invitation envoyée le {date}, valable jusqu’au {fin}.'
+    envoyee: 'Invitation envoyée à {email} : {nom} recevra un lien valable 7 jours.'
+    impossible: '{nom} ne peut pas être invité : il lui faut une adresse e-mail et pas encore de compte.'
+    bilan: '{envoyees, plural, =0 {Aucune invitation envoyée} one {# invitation envoyée} other {# invitations envoyées}}{ignores, plural, =0 {.} other { · # ignorés (sans adresse, déjà un compte ou hors de votre ville).}}'
+
+
+abonnement_association:
+    titre: Abonnement
+    sous_titre: 'L’abonnement de votre association à Caisses et ses paiements.'
+    formule: 'Formule {formule}'
+    statut:
+        actif: 'À jour'
+        offert: Offert
+        en_retard: 'Paiement en retard'
+        a_souscrire: 'À souscrire'
+        resilie: Résilié
+    montant: Montant
+    a_choisir: 'À choisir ci-dessous'
+    offert: 'Offert par l’équipe de Caisses'
+    par:
+        mensuelle: '{montant} par mois'
+        annuelle: '{montant} par an'
+    prochaine: 'Prochaine échéance'
+    dernier: 'Dernier paiement'
+    depuis: Depuis
+    choisir: 'Choisir une offre'
+    economie: '{montant} d’économie sur un an'
+    souscrire: 'Souscrire et payer'
+    passer: 'Votre abonnement est offert. Vous pouvez passer à la formule payante à tout moment.'
+    payer: 'Payer {montant}'
+    simulation: 'Simulation : le paiement par carte n’est pas encore branché. Aucune carte n’est demandée ni débitée ; le paiement est enregistré comme reçu.'
+    paiements: 'Paiements'
+    aucun: 'Aucun paiement pour l’instant.'
+    date: Date
+    note: Note
+    flash:
+        paye: 'Paiement de {montant, number, ::currency/EUR} enregistré (simulation). Merci !'
+        offre: 'Choisissez une offre pour souscrire.'
+        rien_a_payer: 'Cet abonnement n’attend aucun paiement.'
+graphiques:
+    filtres:
+        aria: 'Filtres de la page'
+        type: 'Type de contribution'
+        tout: Tout
+        cotisations: Cotisations
+        ponctuelles: 'Contributions ponctuelles'
+        comparer: 'Comparer avec {exercice}'
+    comparer:
+        kpi: '{exercice} : {montant}'
+        legende: 'Exercice {exercice}'
+    png:
+        bouton: PNG
+        aide: 'Enregistrer ce graphique en image PNG'
+    flux:
+        titre: 'Où va chaque euro collecté'
+        sous_titre: 'Des membres aux villes, puis aux dépenses, au bureau central et aux caisses · exercice {exercice}'
+        aria: 'Flux de l’argent sur l’exercice : {total} versés par les membres, répartis par ville puis entre dépenses, part du bureau central et solde des caisses.'
+        vide: 'Aucun encaissement sur cet exercice : le flux de l’argent apparaîtra avec les premiers paiements.'
+        sans_sorties: 'Avec un type de contribution choisi, seules les entrées sont montrées : les dépenses et la part du central ne se répartissent pas par type.'
+        noeud:
+            cotisations: Cotisations
+            ponctuelles: 'Contributions ponctuelles'
+            depense: 'Dépenses des villes'
+            du: 'Part du bureau central'
+            reste: 'Reste dans les caisses'
+    carte:
+        titre: 'Les villes sur la carte'
+        sous_titre_collecte: 'Bulle proportionnelle au montant collecté'
+        sous_titre_membres: 'Bulle proportionnelle au nombre d’adhérents'
+        aria_collecte: '{villes, plural, =0 {Aucune ville placée sur la carte} one {Une ville placée sur la carte, bulle selon le montant collecté} other {# villes placées sur la carte, bulles selon le montant collecté}}'
+        aria_membres: '{villes, plural, =0 {Aucune ville placée sur la carte} one {Une ville placée sur la carte, bulle selon le nombre d’adhérents} other {# villes placées sur la carte, bulles selon le nombre d’adhérents}}'
+        legende_collecte: 'Plus la bulle est grande, plus la ville a collecté sur l’exercice.'
+        legende_membres: 'Rien n’est encore collecté : les bulles suivent le nombre d’adhérents.'
+        absentes: '{nombre, plural, one {Non placée faute de coordonnées : {villes}.} other {Non placées faute de coordonnées : {villes}.}}'
+        membres: '{nombre, plural, one {# adhérent} other {# adhérents}}'
+        collecte: Collecté
+        adherents: Adhérents
+legal:
+    aria: 'Pages légales'
+    mentions: 'Mentions légales'
+    confidentialite: 'Politique de confidentialité'
+    mise_a_jour: 'Mise à jour le {date}.'

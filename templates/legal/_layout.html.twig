@@ -1,0 +1,22 @@
+{# Pages légales : en-tête avec le logo, texte lisible sur une colonne, lien retour. #}
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/legal.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="legal">
+        <header class="legal__entete">
+            {{ include('composants/logo.html.twig', {taille: 36, lien: path('accueil')}) }}
+            <nav class="legal__liens" aria-label="{{ 'legal.aria'|trans }}">
+                <a href="{{ path('mentions_legales') }}"{% if page == 'mentions' %} aria-current="page"{% endif %}>{{ 'legal.mentions'|trans }}</a>
+                <a href="{{ path('confidentialite') }}"{% if page == 'confidentialite' %} aria-current="page"{% endif %}>{{ 'legal.confidentialite'|trans }}</a>
+            </nav>
+        </header>
+        <main class="legal__corps" id="contenu">
+            {% block contenu %}{% endblock %}
+            <p class="legal__maj">{{ 'legal.mise_a_jour'|trans({date: '2026-09-29'|format_date('long')}) }}</p>
+        </main>
+    </div>
+{% endblock %}

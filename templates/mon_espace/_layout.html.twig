@@ -1,0 +1,42 @@
+{# Coquille de l'espace membre (F-26), mobile d'abord comme la maquette « Espace membre » : en-tête (logo, prénom,
+   menu du compte), contenu, onglets Échéances · Historique · Ma ville · Profil en bas sur téléphone, en haut sur un
+   grand écran. Variables : membre, onglet. #}
+{% extends 'base.html.twig' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/mon_espace.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/legal.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="espace-membre">
+        <header class="espace-membre__entete">
+            {{ include('composants/logo.html.twig', {taille: 32, permanent: true, village: membre.association.nomVillage, lien: path('accueil')}) }}
+            <details class="menu espace-membre__compte" data-controller="menu" data-action="toggle->menu#ouvrir">
+                <summary class="espace-membre__avatar" aria-label="{{ 'menu_compte.ouvrir'|trans }}">{{ membre.initiales }}</summary>
+                <div class="menu__liste">
+                    <span class="menu__item menu__item--info">{{ membre.nomComplet }}<span class="menu__note">{{ membre.ville.nom }}</span></span>
+                    {% if not is_granted('IS_IMPERSONATOR') %}<a class="menu__item" href="{{ path('parametres') }}">{{ icones.icone('reglages', 15) }}{{ 'mon_espace.compte'|trans }}</a>{% endif %}
+                    {{ formulaire.deconnexion() }}
+                </div>
+            </details>
+        </header>
+
+        <nav class="espace-membre__onglets" aria-label="{{ 'mon_espace.navigation'|trans }}">
+            {% for cle, route in {echeances: 'mon_espace', historique: 'mon_espace_historique', ville: 'mon_espace_ville', profil: 'mon_espace_profil'} %}
+                <a class="espace-membre__onglet" href="{{ path(route) }}"{% if onglet == cle %} aria-current="page"{% endif %}>{{ ('mon_espace.onglets.' ~ cle)|trans }}</a>
+            {% endfor %}
+        </nav>
+
+        <main class="espace-membre__contenu" id="contenu">
+            {% for message in app.flashes('succes') %}<p class="alerte alerte--succes" role="status">{{ message }}</p>{% endfor %}
+            {% if membre.statut.value == 'en-attente' %}
+                <div class="alerte alerte--attention espace-membre__attente" role="status"><strong>{{ 'mon_espace_attente.titre'|trans({ville: membre.ville.nom}) }}</strong> {{ 'mon_espace_attente.texte'|trans }}</div>
+            {% endif %}
+            {% block contenu %}{% endblock %}
+            {{ include('composants/pied_legal.html.twig') }}
+        </main>
+    </div>
+{% endblock %}

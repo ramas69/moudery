@@ -1,0 +1,80 @@
+{# Onglet « Abonnement » des Paramètres : l'abonnement de l'association à Caisses, son règlement en ligne SIMULÉ et
+   l'historique des paiements. Variables : association, abonnement, paiements, offres, economie, aujourdhui. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'parametres' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% macro euros(centimes) %}{{ (centimes / 100)|format_currency('EUR', centimes % 100 == 0 ? {fraction_digit: 0} : {}) }}{% endmacro %}
+{% import _self as r %}
+
+{% block title %}{{ 'abonnement_association.titre'|trans }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}{{ 'parametres.titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'abonnement_association.sous_titre'|trans }}</p>{% endblock %}
+
+{% block contenu %}
+    {{ include('parametres/_onglets.html.twig', {actif: 'abonnement'}) }}
+    {% set enRetard = abonnement.estEnRetard(aujourdhui) %}
+    {% set statut = enRetard ? 'en-retard' : abonnement.statut.value %}
+    <div class="fiche-grille">
+        <section class="section abonnement" aria-labelledby="abonnement-titre">
+            <div class="section__entete">
+                <h2 id="abonnement-titre">{{ 'abonnement_association.formule'|trans({formule: abonnement.formule}) }}</h2>
+                <span class="pastille pastille--{{ {'actif': 'succes', 'offert': 'succes', 'en-retard': 'erreur', 'a-souscrire': 'attente', 'resilie': 'archivee'}[statut] }}">{{ ('abonnement_association.statut.' ~ statut|replace({'-': '_'}))|trans }}</span>
+            </div>
+            <dl class="abonnement__details">
+                {% if abonnement.attendLaSouscription %}
+                    <div><dt>{{ 'abonnement_association.montant'|trans }}</dt><dd>{{ 'abonnement_association.a_choisir'|trans }}</dd></div>
+                {% elseif abonnement.statut.value == 'offert' %}
+                    <div><dt>{{ 'abonnement_association.montant'|trans }}</dt><dd>{{ 'abonnement_association.offert'|trans }}</dd></div>
+                {% else %}
+                    <div><dt>{{ 'abonnement_association.montant'|trans }}</dt><dd>{{ ('abonnement_association.par.' ~ abonnement.periodicite.value)|trans({montant: r.euros(abonnement.montant)}) }}</dd></div>
+                    {% if abonnement.prochaineEcheanceLe %}<div><dt>{{ 'abonnement_association.prochaine'|trans }}</dt><dd{% if enRetard %} class="abonnement__retard"{% endif %}>{{ abonnement.prochaineEcheanceLe|format_date('long') }}</dd></div>{% endif %}
+                    {% if abonnement.dernierPaiementLe %}<div><dt>{{ 'abonnement_association.dernier'|trans }}</dt><dd>{{ abonnement.dernierPaiementLe|format_date('long') }}</dd></div>{% endif %}
+                {% endif %}
+                <div><dt>{{ 'abonnement_association.depuis'|trans }}</dt><dd>{{ abonnement.debutLe|format_date('long') }}</dd></div>
+            </dl>
+
+            {% set choisir = abonnement.attendLaSouscription or abonnement.statut.value == 'offert' %}
+            {% if choisir or abonnement.estFacturable %}
+                <form method="post" action="{{ path('association_abonnement_payer', {slug: association.slug}) }}" class="abonnement__payer">
+                    <input type="hidden" name="_token" value="{{ csrf_token('abonnement-payer') }}">
+                    {% if choisir %}
+                        {% if abonnement.statut.value == 'offert' %}<p class="section__aide">{{ 'abonnement_association.passer'|trans }}</p>{% endif %}
+                        <fieldset class="abonnement__offres">
+                            <legend>{{ 'abonnement_association.choisir'|trans }}</legend>
+                            {% for offre in offres %}
+                                <label class="abonnement__offre">
+                                    <input type="radio" name="offre" value="{{ offre.code }}"{% if loop.first %} checked{% endif %}>
+                                    <span><strong>{{ ('abonnement_association.par.' ~ offre.periodicite.value)|trans({montant: r.euros(offre.montant)}) }}</strong>{% if offre.periodicite.value == 'annuelle' %}<span class="abonnement__economie">{{ 'abonnement_association.economie'|trans({montant: r.euros(economie)}) }}</span>{% endif %}</span>
+                                </label>
+                            {% endfor %}
+                        </fieldset>
+                        <button type="submit" class="bouton bouton--primaire">{{ icones.icone('euro', 15) }}{{ 'abonnement_association.souscrire'|trans }}</button>
+                    {% else %}
+                        <button type="submit" class="bouton bouton--primaire">{{ icones.icone('euro', 15) }}{{ 'abonnement_association.payer'|trans({montant: r.euros(abonnement.montant)}) }}</button>
+                    {% endif %}
+                    <p class="alerte alerte--info abonnement__simulation">{{ 'abonnement_association.simulation'|trans }}</p>
+                </form>
+            {% endif %}
+        </section>
+
+        <section class="section" aria-labelledby="paiements-titre">
+            <div class="section__entete"><h2 id="paiements-titre">{{ 'abonnement_association.paiements'|trans }}</h2></div>
+            {% if paiements is empty %}
+                <p class="section__vide">{{ 'abonnement_association.aucun'|trans }}</p>
+            {% else %}
+                <table class="tableau">
+                    <thead><tr><th scope="col">{{ 'abonnement_association.date'|trans }}</th><th scope="col" class="numerique">{{ 'abonnement_association.montant'|trans }}</th><th scope="col" class="tableau__secondaire">{{ 'abonnement_association.note'|trans }}</th></tr></thead>
+                    <tbody>
+                        {% for p in paiements %}
+                            <tr>
+                                <td>{{ p.recuLe|format_date('medium') }}</td>
+                                <td class="numerique"><strong>{{ r.euros(p.montant) }}</strong></td>
+                                <td class="tableau__secondaire">{{ p.note ?? '—' }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </section>
+    </div>
+{% endblock %}

@@ -1,0 +1,8 @@
+framework:
+    rate_limiter:
+        # Demandes de lien « mot de passe oublié » par adresse IP.
+        mot_de_passe_oublie:
+            policy: sliding_window
+            limit: 5
+            interval: '15 minutes'
+

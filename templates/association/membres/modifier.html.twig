@@ -1,0 +1,47 @@
+{# Modification d'une fiche de membre : identité, contact, localité, année de naissance, foyer. Variables : association, membre, form. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'membres' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block title %}{{ 'membre_fiche.modifier_titre'|trans({nom: membre.nomComplet}) }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}<span class="console__fil"><a href="{{ path('association_membre', {slug: association.slug, id: membre.id}) }}">{{ membre.nomComplet }}</a> <span aria-hidden="true">›</span> </span>{{ 'membre_fiche.modifier'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ membre.ville.nom }} · {{ 'membre_fiche.modifier_intro'|trans }}</p>{% endblock %}
+
+{% block contenu %}
+    <div class="depense-saisie">
+        {{ form_start(form, {attr: {class: 'section depense-saisie__formulaire', novalidate: 'novalidate'}}) }}
+            {% if form.vars.submitted and not form.vars.valid %}<p class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</p>{% endif %}
+            <div class="depense-saisie__grille depense-saisie__grille--2">
+                {{ formulaire.champ(form.prenom, null) }}
+                {{ formulaire.champ(form.nom, null) }}
+            </div>
+            <div class="depense-saisie__grille depense-saisie__grille--2">
+                {{ formulaire.champ(form.email, null) }}
+                {{ formulaire.champ(form.telephone, null) }}
+            </div>
+            <div class="depense-saisie__grille depense-saisie__grille--2">
+                {{ formulaire.champ(form.localite, null) }}
+                {{ formulaire.champ(form.anneeNaissance, null) }}
+            </div>
+            <div class="depense-saisie__grille depense-saisie__grille--2">
+                {{ formulaire.champ(form.foyer, null) }}
+                {{ formulaire.champ(form.nouveauFoyer, null) }}
+            </div>
+            <div class="depense-saisie__actions">
+                <button type="submit" class="bouton bouton--primaire">{{ icones.icone('coche', 15) }}{{ 'membre_fiche.enregistrer'|trans }}</button>
+                <a class="bouton bouton--discret" href="{{ path('association_membre', {slug: association.slug, id: membre.id}) }}">{{ 'reversements_association.nouveau.annuler'|trans }}</a>
+            </div>
+        {{ form_end(form) }}
+        <aside class="depense-saisie__cote">
+            <section class="section" aria-labelledby="regles-titre">
+                <div class="section__entete"><h2 id="regles-titre">{{ 'contributions_association.regles.titre'|trans }}</h2></div>
+                <ul class="contributions__regles">
+                    <li>{{ 'membre_fiche.regles.email'|trans }}</li>
+                    <li>{{ 'membre_fiche.regles.foyer'|trans }}</li>
+                    <li>{{ 'membre_fiche.regles.transfert'|trans }}</li>
+                </ul>
+            </section>
+        </aside>
+    </div>
+{% endblock %}

@@ -1,0 +1,159 @@
+{# Rapport d'assemblée générale (F-30), d'après la maquette « Rapport AG » : trois feuilles A4 (synthèse, graphiques,
+   comptes des villes et appels, signatures), en direction Console. À l'écran, une barre d'outils (exercice, imprimer ou
+   enregistrer en PDF, exporter pour Excel) ; à l'impression, seules les feuilles restent. Variables : celles de
+   `RapportAg::construire()` (dont `ville` : null pour le consolidé, sinon la seule caisse de cette ville) et association. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'rapport' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% macro euros(centimes) %}{{ centimes is null ? '—' : (centimes / 100)|format_currency('EUR', {fraction_digit: 0}) }}{% endmacro %}
+{% import _self as r %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/rapport.css') }}">
+{% endblock %}
+
+{% block title %}{{ 'rapport_association.titre'|trans }} {{ libelle }} · {{ ville ? ville.nom : association.nom }}{% endblock %}
+{% block titre_page %}{{ 'rapport_association.titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ (ville ? 'rapport_association.sous_titre_ville' : 'rapport_association.sous_titre')|trans({exercice: libelle, date: arreteLe|format_date('long'), ville: ville ? ville.nom : ''}) }}</p>{% endblock %}
+
+{% block actions %}
+    {% if exercices|length > 1 %}
+        <details class="menu exercice-menu" data-controller="menu" data-action="toggle->menu#ouvrir">
+            <summary class="exercice exercice--choix">{{ icones.icone('calendrier', 15) }}{{ 'espace.tableau_de_bord.exercice'|trans({exercice: libelle}) }}{{ icones.icone('chevron', 14) }}</summary>
+            <div class="menu__liste">
+                {% for e in exercices %}
+                    <a class="menu__item{{ e.annee == exercice ? ' menu__item--actif' }}" href="{{ path('association_rapport', {slug: association.slug}|merge(loop.first ? {} : {exercice: e.annee})) }}">{{ 'espace.tableau_de_bord.exercice'|trans({exercice: e.libelle}) }}</a>
+                {% endfor %}
+            </div>
+        </details>
+    {% endif %}
+    <a class="bouton bouton--secondaire" href="{{ path('association_rapport_export', {slug: association.slug, exercice: exercice, format: 'csv'}) }}">{{ icones.icone('export', 15) }}{{ 'rapport_association.exporter'|trans }}</a>
+    <a class="bouton bouton--secondaire" href="{{ path('association_rapport_export', {slug: association.slug, exercice: exercice, format: 'xlsx'}) }}">{{ icones.icone('export', 15) }}{{ 'rapport_association.exporter_xlsx'|trans }}</a>
+    <button type="button" class="bouton bouton--primaire" onclick="window.print()">{{ icones.icone('recu', 15) }}{{ 'rapport_association.imprimer'|trans }}</button>
+{% endblock %}
+
+{% block contenu %}
+    {% set f = finances %}
+    <p class="rapport__aide">{{ 'rapport_association.aide'|trans }}</p>
+    <div class="rapport">
+        {# Page 1 · Synthèse #}
+        <section class="rapport__page" aria-labelledby="rapport-synthese">
+            <header class="rapport__entete">
+                {{ include('composants/logo.html.twig', {taille: 34, village: association.nomVillage}) }}
+                <span class="rapport__meta">{{ 'rapport_association.meta'|trans({association: ville ? association.nom ~ ' · ' ~ 'rapport_association.caisse'|trans({ville: ville.nom}) : association.nom}) }}<br>{{ 'rapport_association.periode'|trans({du: debut|format_date('long'), au: fin|format_date('long')}) }}</span>
+            </header>
+            <p class="rapport__section">{{ 'rapport_association.synthese.numero'|trans }}</p>
+            <h2 class="rapport__titre" id="rapport-synthese">{{ 'rapport_association.synthese.titre'|trans }}</h2>
+            <dl class="rapport__kpis">
+                <div><dt>{{ 'rapport_association.kpi.collecte'|trans }}</dt><dd>{{ r.euros(f.collecte) }}</dd><dd class="rapport__kpi-detail">{{ f.exercicePrecedent is null ? 'rapport_association.kpi.premier'|trans : 'rapport_association.kpi.variation'|trans({variation: (f.variation > 0 ? '+' : '') ~ f.variation, exercice: f.exercicePrecedent}) }}</dd></div>
+                <div><dt>{{ 'rapport_association.kpi.depense'|trans }}</dt><dd>{{ r.euros(f.depense) }}</dd><dd class="rapport__kpi-detail">{{ 'rapport_association.kpi.depense_detail'|trans({pourcentage: f.collecte > 0 ? (f.depense / f.collecte * 100)|round : 0}) }}</dd></div>
+                <div><dt>{{ 'rapport_association.kpi.solde'|trans }}</dt><dd>{{ r.euros(f.solde) }}</dd><dd class="rapport__kpi-detail">{{ 'rapport_association.kpi.solde_detail'|trans }}</dd></div>
+                <div><dt>{{ 'rapport_association.kpi.membres'|trans }}</dt><dd>{{ membres }}</dd><dd class="rapport__kpi-detail">{{ 'rapport_association.kpi.membres_detail'|trans({villes: nombreVilles}) }}</dd></div>
+                <div><dt>{{ 'rapport_association.kpi.a_jour'|trans }}</dt><dd>{{ f.avecHistorique > 0 ? f.pourcentageAJour ~ ' %' : '—' }}</dd><dd class="rapport__kpi-detail">{{ 'rapport_association.kpi.a_jour_detail'|trans({nombre: f.aJour, total: f.avecHistorique}) }}</dd></div>
+                <div><dt>{{ 'rapport_association.kpi.reverse'|trans }}</dt><dd>{{ r.euros(reverse) }}</dd><dd class="rapport__kpi-detail">{{ 'rapport_association.kpi.reverse_detail'|trans({du: r.euros(du)|trim}) }}</dd></div>
+            </dl>
+            <p class="rapport__texte">{{ (ville ? 'rapport_association.synthese.texte_ville' : 'rapport_association.synthese.texte')|trans({ville: ville ? ville.nom : '', villes: nombreVilles, collecte: r.euros(f.collecte)|trim, membres: membres, reverse: r.euros(reverse)|trim, du: r.euros(du)|trim, depense: r.euros(f.depense)|trim}) }}</p>
+            <div class="rapport__deux">
+                <table class="rapport__table">
+                    <caption>{{ 'rapport_association.entrees.titre'|trans }}</caption>
+                    <tbody>
+                        {% for e in entrees %}<tr><td>{{ e.libelle == 'cotisations' ? 'rapport_association.entrees.cotisations'|trans : e.libelle }}</td><td class="numerique">{{ r.euros(e.montant) }}</td></tr>{% endfor %}
+                    </tbody>
+                    <tfoot><tr><th scope="row">{{ 'rapport_association.total'|trans }}</th><td class="numerique">{{ r.euros(totalEntrees) }}</td></tr></tfoot>
+                </table>
+                <table class="rapport__table">
+                    <caption>{{ 'rapport_association.depenses.titre'|trans }}</caption>
+                    <tbody>
+                        {% for categorie, montant in depensesParCategorie %}<tr><td>{{ ('depenses_association.categorie.' ~ categorie)|trans }}</td><td class="numerique">{{ r.euros(montant) }}</td></tr>{% else %}<tr><td colspan="2" class="rapport__vide">{{ 'rapport_association.depenses.aucune'|trans }}</td></tr>{% endfor %}
+                    </tbody>
+                    <tfoot><tr><th scope="row">{{ 'rapport_association.total'|trans }}</th><td class="numerique">{{ r.euros(totalDepenses) }}</td></tr></tfoot>
+                </table>
+            </div>
+            <h3 class="rapport__sous-titre">{{ 'rapport_association.faits.titre'|trans }}</h3>
+            <ul class="rapport__faits">
+                <li>{{ 'rapport_association.faits.appels'|trans({nombre: appels|length}) }}</li>
+                <li>{{ 'rapport_association.faits.depenses'|trans({montant: r.euros(totalDepenses)|trim}) }}</li>
+                {% if not ville %}<li>{{ 'rapport_association.faits.villes'|trans({actives: nombreVilles, creation: villesEnCreation}) }}</li>{% endif %}
+            </ul>
+            <footer class="rapport__pied"><span>{{ 'rapport_association.arrete'|trans({date: arreteLe|format_date('long')}) }}</span><span>{{ 'rapport_association.page'|trans({page: 1}) }}</span></footer>
+        </section>
+
+        {# Page 2 · Graphiques #}
+        <section class="rapport__page" aria-labelledby="rapport-graphiques">
+            <header class="rapport__entete rapport__entete--suite"><span class="rapport__section" id="rapport-graphiques">{{ 'rapport_association.graphiques.numero'|trans }}</span><span class="rapport__meta">{{ 'rapport_association.meta_court'|trans({association: ville ? ville.nom : association.nom, exercice: libelle}) }}</span></header>
+            <h3 class="rapport__sous-titre">{{ 'rapport_association.graphiques.encaissements'|trans }}</h3>
+            {% set maximum = 1 %}{% for m in f.mois %}{% set maximum = max(maximum, m.cotisations + m.ponctuelles) %}{% endfor %}
+            <div class="rapport__barres" role="img" aria-label="{{ 'rapport_association.graphiques.encaissements_aria'|trans({total: r.euros(f.collecte)|trim}) }}">
+                {% for m in f.mois %}
+                    <div class="rapport__colonne"><span class="rapport__valeur">{{ m.cotisations > 0 ? r.euros(m.cotisations) }}</span><span class="rapport__barre" style="height: {{ ((m.cotisations + m.ponctuelles) / maximum * 100)|round(1) }}%"></span><span class="rapport__mois">{{ ('membres_association.mois.' ~ m.mois)|trans }}</span></div>
+                {% endfor %}
+            </div>
+            <div class="rapport__deux">
+                <div>
+                    <h3 class="rapport__sous-titre">{{ 'rapport_association.graphiques.depenses'|trans }}</h3>
+                    {% if depensesParCategorie is empty %}<p class="rapport__vide">{{ 'rapport_association.depenses.aucune'|trans }}</p>{% endif %}
+                    <ul class="rapport__horizontales">
+                        {% for categorie, montant in depensesParCategorie %}
+                            <li><span class="rapport__libelle">{{ ('depenses_association.categorie.' ~ categorie)|trans }}</span><span class="rapport__piste"><span style="width: {{ (montant / maximumCategorie * 100)|round(1) }}%"></span></span><span class="numerique">{{ r.euros(montant) }}</span></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="rapport__sous-titre">{{ 'rapport_association.graphiques.a_jour'|trans }}</h3>
+                    <ul class="rapport__horizontales">
+                        {% for v in villes %}
+                            {% set taux = v.avecHistorique > 0 ? (v.aJour / v.avecHistorique * 100)|round : null %}
+                            <li><span class="rapport__libelle">{{ v.ville.nom }}</span><span class="rapport__piste"><span style="width: {{ taux ?? 0 }}%"></span></span><span class="numerique">{{ taux is null ? '—' : taux ~ ' %' }}</span></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <h3 class="rapport__sous-titre">{{ 'graphiques.flux.titre'|trans }}</h3>
+            <div class="rapport__flux">{{ include('composants/flux.html.twig', {flux: flux, id: 'rapport-flux', compact: true}) }}</div>
+            <footer class="rapport__pied"><span>{{ 'rapport_association.graphiques.pied'|trans }}</span><span>{{ 'rapport_association.page'|trans({page: 2}) }}</span></footer>
+        </section>
+
+        {# Page 3 · Tableaux par ville, appels, signatures #}
+        <section class="rapport__page" aria-labelledby="rapport-villes">
+            <header class="rapport__entete rapport__entete--suite"><span class="rapport__section">{{ 'rapport_association.villes.numero'|trans }}</span><span class="rapport__meta">{{ 'rapport_association.meta_court'|trans({association: ville ? ville.nom : association.nom, exercice: libelle}) }}</span></header>
+            <table class="rapport__table rapport__table--large">
+                <caption id="rapport-villes">{{ 'rapport_association.villes.titre'|trans }}</caption>
+                <thead><tr>
+                    <th scope="col">{{ 'rapport_association.villes.ville'|trans }}</th>
+                    <th scope="col" class="numerique">{{ 'rapport_association.villes.a_jour_sur'|trans }}</th>
+                    <th scope="col" class="numerique">{{ 'rapport_association.villes.collecte'|trans }}</th>
+                    <th scope="col" class="numerique">{{ 'rapport_association.villes.depense'|trans }}</th>
+                    <th scope="col" class="numerique">{{ 'rapport_association.villes.reverse_sur_du'|trans }}</th>
+                    <th scope="col" class="numerique">{{ 'rapport_association.villes.solde'|trans }}</th>
+                </tr></thead>
+                <tbody>
+                    {% for v in villes %}
+                        <tr><th scope="row">{{ v.ville.nom }}</th><td class="numerique">{{ v.aJour }} / {{ v.membres }}</td><td class="numerique">{{ r.euros(v.collecte) }}</td><td class="numerique">{{ r.euros(v.depense) }}</td><td class="numerique">{{ r.euros(v.recu) }} / {{ r.euros(v.du) }}</td><td class="numerique"><strong>{{ r.euros(v.solde) }}</strong></td></tr>
+                    {% else %}
+                        <tr><td colspan="6" class="rapport__vide">{{ 'rapport_association.villes.aucune'|trans }}</td></tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot><tr><th scope="row">{{ 'rapport_association.total'|trans }}</th><td class="numerique">{{ totaux.aJour }} / {{ totaux.membres }}</td><td class="numerique">{{ r.euros(totaux.collecte) }}</td><td class="numerique">{{ r.euros(totaux.depense) }}</td><td class="numerique">{{ r.euros(totaux.recu) }} / {{ r.euros(totaux.du) }}</td><td class="numerique">{{ r.euros(totaux.solde) }}</td></tr></tfoot>
+            </table>
+            <p class="rapport__note">{{ ville ? 'rapport_association.villes.note_ville'|trans : 'rapport_association.villes.note'|trans({central: r.euros(depenseCentral)|trim}) }}</p>
+            <table class="rapport__table rapport__table--large">
+                <caption>{{ 'rapport_association.appels.titre'|trans }}</caption>
+                <thead><tr><th scope="col">{{ 'rapport_association.appels.appel'|trans }}</th><th scope="col" class="numerique">{{ 'rapport_association.appels.objectif'|trans }}</th><th scope="col" class="numerique">{{ 'rapport_association.appels.collecte'|trans }}</th><th scope="col" class="numerique">{{ 'rapport_association.appels.etat'|trans }}</th></tr></thead>
+                <tbody>
+                    {% for a in appels %}
+                        <tr><td>{{ a.appel.objet }}<span class="rapport__detail"> · {{ a.appel.type.nom }}</span></td><td class="numerique">{{ r.euros(a.objectif) }}</td><td class="numerique">{{ r.euros(a.collecte) }}</td><td class="numerique">{{ ('appels_association.statut.' ~ a.appel.statut.value)|trans }}</td></tr>
+                    {% else %}
+                        <tr><td colspan="4" class="rapport__vide">{{ 'rapport_association.appels.aucun'|trans }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="rapport__signatures">
+                <div><span>{{ 'rapport_association.signature.tresorier'|trans }}</span><span>{{ 'rapport_association.signature.signature'|trans }}</span></div>
+                <div><span>{{ 'rapport_association.signature.president'|trans }}</span><span>{{ 'rapport_association.signature.signature'|trans }}</span></div>
+            </div>
+            <footer class="rapport__pied"><span>{{ 'rapport_association.approuve'|trans }}</span><span>{{ 'rapport_association.page'|trans({page: 3}) }}</span></footer>
+        </section>
+    </div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% macro euros(centimes) %}{{ (centimes / 100)|format_currency('EUR') }}{% endmacro %}
+
+{% macro statut(depense) %}
+    {% set classe = {brouillon: 'brouillon', soumise: 'attente', validee: 'info', refusee: 'erreur', payee: 'succes'}[depense.statut.value] %}
+    <span class="pastille pastille--{{ classe }}">{{ ('depenses_association.statut.' ~ depense.statut.value)|trans }}</span>
+{% endmacro %}
+
+{% macro caisse(depense) %}{{ depense.ville ? depense.ville.nom : 'depenses_association.caisse_centrale'|trans }}{% endmacro %}
+
+{% macro personne(utilisateur, moi) %}{{ utilisateur is null ? 'depenses_association.personne_inconnue'|trans : (moi and utilisateur.id == moi.id ? 'depenses_association.vous'|trans : utilisateur.nomComplet) }}{% endmacro %}

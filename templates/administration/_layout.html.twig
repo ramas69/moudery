@@ -1,0 +1,79 @@
+{# Coquille « Console » de l'administration de la plateforme, d'après le canevas Console (navigation, tableau de bord) :
+   barre latérale à gauche sur écran large, en-tête de page, contenu blanc. Réservée au super-admin.
+   Variable facultative « page » : l'entrée de navigation active (tableau-de-bord, associations, villes, comptes). #}
+{% extends 'base.html.twig' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/console.css') }}">
+{% endblock %}
+
+{% block body %}
+    {% set page = page|default('tableau-de-bord') %}
+    <div class="console">
+        <aside class="console__barre">
+            <div class="console__marque">
+                {{ include('composants/logo.html.twig', {taille: 32, permanent: true, lien: path('accueil')}) }}
+            </div>
+            <div class="console__perimetre" title="{{ 'administration.perimetre_aide'|trans }}">
+                <span class="console__perimetre-initiales" aria-hidden="true">P</span>
+                <span class="console__perimetre-nom">{{ 'administration.perimetre'|trans }}</span>
+            </div>
+            <nav class="console__nav" aria-label="{{ 'administration.navigation'|trans }}">
+                <a class="console__lien" href="{{ path('administration_accueil') }}"{% if page == 'tableau-de-bord' %} aria-current="page"{% endif %}>
+                    {{ icones.icone('tableau-de-bord') }}<span>{{ 'administration.nav.tableau_de_bord'|trans }}</span>
+                </a>
+                <a class="console__lien" href="{{ path('administration_associations') }}"{% if page == 'associations' %} aria-current="page"{% endif %}>
+                    {{ icones.icone('associations') }}<span>{{ 'administration.nav.associations'|trans }}</span>
+                </a>
+                <a class="console__lien" href="{{ path('administration_villes') }}"{% if page == 'villes' %} aria-current="page"{% endif %}>
+                    {{ icones.icone('villes') }}<span>{{ 'administration.nav.villes'|trans }}</span>
+                </a>
+                <a class="console__lien" href="{{ path('administration_comptes') }}"{% if page == 'comptes' %} aria-current="page"{% endif %}>
+                    {{ icones.icone('comptes') }}<span>{{ 'administration.nav.comptes'|trans }}</span>
+                </a>
+                <a class="console__lien" href="{{ path('administration_equipe') }}"{% if page == 'equipe' %} aria-current="page"{% endif %}>
+                    {{ icones.icone('cle') }}<span>{{ 'administration.nav.equipe'|trans }}</span>
+                </a>
+                <a class="console__lien" href="{{ path('administration_abonnements') }}"{% if page == 'abonnements' %} aria-current="page"{% endif %}>
+                    {{ icones.icone('abonnements') }}<span>{{ 'administration.nav.abonnements'|trans }}</span>
+                </a>
+                <a class="console__lien" href="{{ path('administration_activite') }}"{% if page == 'activite' %} aria-current="page"{% endif %}>
+                    {{ icones.icone('activite') }}<span>{{ 'administration.nav.activite'|trans }}</span>
+                </a>
+                <a class="console__lien" href="{{ path('administration_voir_comme') }}"{% if page == 'voir-comme' %} aria-current="page"{% endif %}>
+                    {{ icones.icone('oeil') }}<span>{{ 'administration.nav.voir_comme'|trans }}</span>
+                </a>
+            </nav>
+            <div class="console__bas">
+                {% if not is_granted('IS_IMPERSONATOR') %}
+                    <nav class="console__bas-nav" aria-label="{{ 'menu_compte.parametres'|trans }}">
+                        <a class="console__lien" href="{{ path('parametres') }}"{% if page == 'parametres' %} aria-current="page"{% endif %}>{{ icones.icone('reglages') }}<span>{{ 'menu_compte.parametres'|trans }}</span></a>
+                    </nav>
+                {% endif %}
+                {{ include('composants/menu_compte.html.twig', {role: 'administration.role'|trans}) }}
+            </div>
+        </aside>
+
+        <div class="console__principal">
+            <header class="console__entete">
+                <div class="console__entete-titre">
+                    {% block fil_ariane %}{% endblock %}
+                    <h1 class="console__titre">{% block titre_page %}{% endblock %}</h1>
+                    {% block sous_titre %}{% endblock %}
+                </div>
+                <div class="console__actions">{% block actions %}{% endblock %}</div>
+            </header>
+            <main class="console__contenu" id="contenu">
+                {% for message in app.flashes('succes') %}
+                    <p class="alerte alerte--succes" role="status">{{ message }}</p>
+                {% endfor %}
+                {% for message in app.flashes('erreur') %}
+                    <p class="alerte alerte--erreur" role="alert">{{ message }}</p>
+                {% endfor %}
+                {% block contenu %}{% endblock %}
+            </main>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{# « Voir comme » : le super-admin choisit une personne et voit l'application avec ses droits.
+   Le sélecteur bascule dès qu'une personne est choisie ; la liste en dessous sert à parcourir. Variables : personnes. #}
+{% extends 'administration/_layout.html.twig' %}
+{% set page = 'voir-comme' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'administration/_macros.html.twig' as macros %}
+
+{% block title %}{{ 'administration.voir_comme.titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block titre_page %}{{ 'administration.voir_comme.titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'administration.voir_comme.sous_titre'|trans }}</p>{% endblock %}
+
+{% block contenu %}
+    <section class="section" aria-labelledby="choisir-titre">
+        <div class="section__entete">
+            <h2 id="choisir-titre">{{ 'administration.voir_comme.choisir.titre'|trans }}</h2>
+        </div>
+        <form method="get" action="{{ path('administration_voir_comme_aller') }}" class="barre-outils">
+            <div class="combobox" data-controller="combobox">
+                <label class="visuellement-cache" for="voir-comme-personne">{{ 'administration.voir_comme.choisir.label'|trans }}</label>
+                <input class="combobox__saisie" id="voir-comme-personne" type="text" name="personne" placeholder="{{ 'administration.voir_comme.choisir.placeholder'|trans }}" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="voir-comme-liste" aria-describedby="voir-comme-aide" data-combobox-target="saisie" data-action="focus->combobox#ouvrir input->combobox#filtrer keydown->combobox#clavier blur->combobox#fermerBientot">
+                <ul class="combobox__liste" id="voir-comme-liste" role="listbox" data-combobox-target="liste" hidden>
+                    {% for personne in personnes %}
+                        <li class="combobox__option" id="voir-comme-{{ personne.id }}" role="option" aria-selected="false" data-combobox-target="option" data-valeur="{{ personne.email }}" data-libelle="{{ personne.nomComplet }} {{ personne.email }}{% if personne.association %} {{ personne.association.nom }}{% endif %}{% for affectation in personne.affectations %} {{ macros.affectation(affectation) }}{% endfor %}" data-action="mousedown->combobox#selectionner">
+                            <span class="combobox__nom">{{ personne.nomComplet }}</span>
+                            <span class="combobox__detail">{{ personne.email }}{% if personne.association %} · {{ personne.association.nom }}{% endif %}{% for affectation in personne.affectations %} · {{ macros.affectation(affectation) }}{% endfor %}</span>
+                        </li>
+                    {% endfor %}
+                    <li class="combobox__vide" role="presentation" data-combobox-target="vide" hidden>{{ 'administration.voir_comme.choisir.aucune'|trans }}</li>
+                </ul>
+            </div>
+            <button type="submit" class="bouton bouton--primaire">{{ icones.icone('oeil', 15) }}{{ 'administration.voir_comme.choisir.bouton'|trans }}</button>
+        </form>
+        <p class="section__aide" id="voir-comme-aide">{{ 'administration.voir_comme.choisir.aide'|trans }}</p>
+    </section>
+
+    <section class="section" aria-labelledby="personnes-titre">
+        <div class="section__entete">
+            <h2 id="personnes-titre">{{ 'administration.voir_comme.liste.titre'|trans }} <span class="compteur">{{ personnes|length }}</span></h2>
+        </div>
+        <div class="tableau">
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">{{ 'administration.voir_comme.liste.colonne.personne'|trans }}</th>
+                        <th scope="col" class="tableau__tertiaire">{{ 'administration.voir_comme.liste.colonne.association'|trans }}</th>
+                        <th scope="col" class="tableau__secondaire">{{ 'administration.voir_comme.liste.colonne.roles'|trans }}</th>
+                        <th scope="col"><span class="visuellement-cache">{{ 'administration.villes.colonne.actions'|trans }}</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for personne in personnes %}
+                        <tr>
+                            <td>
+                                <span class="entite">
+                                    <span class="entite__initiales entite__initiales--rond" aria-hidden="true">{{ macros.initiales(personne.prenom, personne.nom) }}</span>
+                                    <span class="entite__texte">
+                                        <span class="entite__nom">{{ personne.nomComplet }}</span>
+                                        <span class="entite__detail">{{ personne.email }}</span>
+                                    </span>
+                                </span>
+                            </td>
+                            <td class="tableau__tertiaire">
+                                {% if personne.association %}
+                                    {{ personne.association.nom }}
+                                {% else %}
+                                    <span class="tableau__precision tableau__precision--neutre">{{ 'administration.comptes.plateforme'|trans }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="tableau__secondaire">{{ macros.roles(personne) }}</td>
+                            <td class="tableau__actions">
+                                <a class="bouton bouton--secondaire bouton--petit" href="{{ path('accueil', {'_voir_comme': personne.email}) }}" aria-label="{{ 'administration.voir_comme.liste.voir_pour'|trans({nom: personne.nomComplet}) }}">{{ icones.icone('oeil', 14) }}{{ 'administration.voir_comme.liste.voir'|trans }}</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="4" class="tableau__vide">{{ 'administration.voir_comme.liste.aucune'|trans }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p class="section__aide">{{ 'administration.voir_comme.journal_aide'|trans }}</p>
+    </section>
+{% endblock %}

@@ -1,0 +1,120 @@
+{# Dépenses (F-21 à F-23), vue du bureau central : chiffres (à valider, validées à payer, payées sur l'exercice, à
+   terminer), filtres de statut, tableau des dépenses (toutes les caisses, ou la ville du périmètre) et historique des
+   décisions (maquette « 08b Validation des dépenses »). Variables : association, ville, lignes, filtre, compteurs,
+   synthese, exercice, payeesExercice, decisions, moi. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'depenses' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'association/depenses/_macros.html.twig' as d %}
+
+{% block title %}{{ 'depenses_association.titre'|trans }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}{{ 'depenses_association.titre'|trans }} <span class="compteur">{{ compteurs.toutes }}</span>{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ (ville ? 'depenses_association.sous_titre_ville' : 'depenses_association.sous_titre')|trans({ville: ville ? ville.nom : ''}) }}</p>{% endblock %}
+
+{% block actions %}
+{% if peutSaisir %}    <a class="bouton bouton--primaire" href="{{ path('association_depense_nouvelle', {slug: association.slug}) }}">{{ icones.icone('plus', 15) }}{{ 'depenses_association.saisir'|trans }}</a>{% endif %}
+{% endblock %}
+
+{% block contenu %}
+    <div class="kpis">
+        <a class="kpi kpi--lien" href="{{ path('association_depenses', {slug: association.slug, statut: 'a_valider'}) }}">
+            <span class="kpi__libelle">{{ 'depenses_association.kpi.a_valider'|trans }}</span>
+            <span class="kpi__valeur{{ synthese.aValider > 0 ? ' kpi__valeur--attention' }}">{{ synthese.aValider }}</span>
+            <span class="kpi__detail">{{ d.euros(synthese.aValiderMontant) }}</span>
+        </a>
+        <a class="kpi kpi--lien" href="{{ path('association_depenses', {slug: association.slug, statut: 'a_payer'}) }}">
+            <span class="kpi__libelle">{{ 'depenses_association.kpi.a_payer'|trans }}</span>
+            <span class="kpi__valeur">{{ synthese.aPayer }}</span>
+            <span class="kpi__detail">{{ d.euros(synthese.aPayerMontant) }}</span>
+        </a>
+        <a class="kpi kpi--lien" href="{{ path('association_depenses', {slug: association.slug, statut: 'payees'}) }}">
+            <span class="kpi__libelle">{{ 'depenses_association.kpi.payees'|trans({exercice: exercice}) }}</span>
+            <span class="kpi__valeur">{{ d.euros(payeesExercice) }}</span>
+            <span class="kpi__detail">{{ 'depenses_association.kpi.payees_detail'|trans }}</span>
+        </a>
+        <a class="kpi kpi--lien" href="{{ path('association_depenses', {slug: association.slug, statut: 'brouillons'}) }}">
+            <span class="kpi__libelle">{{ 'depenses_association.kpi.brouillons'|trans }}</span>
+            <span class="kpi__valeur">{{ synthese.brouillons }}</span>
+            <span class="kpi__detail">{{ 'depenses_association.kpi.brouillons_detail'|trans }}</span>
+        </a>
+    </div>
+
+    <div class="filtres" role="group" aria-label="{{ 'depenses_association.filtre'|trans }}">
+        {% for cle in ['toutes', 'a_valider', 'a_payer', 'payees', 'brouillons'] %}
+            <a class="filtre" href="{{ path('association_depenses', {slug: association.slug}|merge(cle == 'toutes' ? {} : {statut: cle})) }}"{% if filtre == cle %} aria-current="true"{% endif %}>{{ ('depenses_association.filtres.' ~ cle)|trans }} · {{ compteurs[cle] }}</a>
+        {% endfor %}
+    </div>
+
+    <section class="section" aria-labelledby="depenses-liste">
+        <h2 class="visuellement-cache" id="depenses-liste">{{ 'depenses_association.titre'|trans }}</h2>
+        {% if lignes is empty %}
+            <p class="section__vide">{{ (compteurs.toutes == 0 ? 'depenses_association.vide' : 'depenses_association.vide_filtre')|trans }}{% if compteurs.toutes == 0 %} <a href="{{ path('association_depense_nouvelle', {slug: association.slug}) }}">{{ 'depenses_association.saisir'|trans }}</a>{% endif %}</p>
+        {% else %}
+            <div class="tableau tableau--depenses">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ 'depenses_association.colonne.depense'|trans }}</th>
+                            <th scope="col" class="tableau__tertiaire">{{ 'depenses_association.colonne.caisse'|trans }}</th>
+                            <th scope="col" class="tableau__secondaire">{{ 'depenses_association.colonne.date'|trans }}</th>
+                            <th scope="col" class="tableau__large">{{ 'depenses_association.colonne.saisie_par'|trans }}</th>
+                            <th scope="col">{{ 'depenses_association.colonne.statut'|trans }}</th>
+                            <th scope="col" class="numerique">{{ 'depenses_association.colonne.montant'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for depense in lignes %}
+                            <tr>
+                                <td>
+                                    <span class="entite__texte">
+                                        <a class="entite__nom" href="{{ path('association_depense', {slug: association.slug, id: depense.id}) }}">{{ depense.libelle ?: 'depenses_association.sans_libelle'|trans }}</a>
+                                        <span class="entite__detail">{{ depense.numero }} · {{ ('depenses_association.categorie.' ~ depense.categorie.value)|trans }}</span>
+                                    </span>
+                                </td>
+                                <td class="tableau__tertiaire">{{ d.caisse(depense) }}</td>
+                                <td class="tableau__secondaire"><time datetime="{{ depense.dateDepense|date('Y-m-d') }}">{{ depense.dateDepense|format_date('medium') }}</time></td>
+                                <td class="tableau__large">{{ d.personne(depense.saisiePar, moi) }}</td>
+                                <td>{{ d.statut(depense) }}</td>
+                                <td class="numerique"><strong>{{ d.euros(depense.montant) }}</strong></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </section>
+
+    <section class="section" aria-labelledby="depenses-decisions">
+        <div class="section__entete"><h2 id="depenses-decisions">{{ 'depenses_association.decisions.titre'|trans }}</h2></div>
+        {% if decisions is empty %}
+            <p class="section__vide">{{ 'depenses_association.decisions.vide'|trans }}</p>
+        {% else %}
+            <div class="tableau">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col" class="tableau__secondaire">{{ 'depenses_association.colonne.date'|trans }}</th>
+                            <th scope="col">{{ 'depenses_association.colonne.depense'|trans }}</th>
+                            <th scope="col">{{ 'depenses_association.colonne.decision'|trans }}</th>
+                            <th scope="col" class="tableau__tertiaire">{{ 'depenses_association.colonne.par'|trans }}</th>
+                            <th scope="col" class="tableau__large">{{ 'depenses_association.colonne.motif'|trans }}</th>
+                            <th scope="col" class="numerique">{{ 'depenses_association.colonne.montant'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for depense in decisions %}
+                            <tr>
+                                <td class="tableau__secondaire">{{ depense.decisionLe|format_date('medium') }}</td>
+                                <td><a class="entite__nom" href="{{ path('association_depense', {slug: association.slug, id: depense.id}) }}">{{ depense.libelle }}</a></td>
+                                <td><span class="pastille pastille--{{ depense.statut.value == 'refusee' ? 'erreur' : 'succes' }}">{{ (depense.statut.value == 'refusee' ? 'depenses_association.decisions.refusee' : 'depenses_association.decisions.validee')|trans }}</span></td>
+                                <td class="tableau__tertiaire">{{ d.personne(depense.decisionPar, moi) }}</td>
+                                <td class="tableau__large">{{ depense.motifRefus ?? '—' }}</td>
+                                <td class="numerique">{{ d.euros(depense.montant) }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

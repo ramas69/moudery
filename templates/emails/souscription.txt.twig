@@ -1,0 +1,17 @@
+Bonjour,
+
+{% if invitation.inviteePar %}{{ invitation.inviteePar.nomComplet }} a ouvert{% else %}Nous avons ouvert{% endif %} l’espace « {{ invitation.association.nom }} » sur {{ 'app.nom'|trans }} et vous en confie l’administration, comme {{ ('role.' ~ invitation.role.value)|trans|lower }}.
+
+Pour l’activer, choisissez l’abonnement de votre association et créez votre compte :
+{% for offre in offres %}
+- {{ offre.formule }}, {{ ('periodicite.' ~ offre.periodicite.value)|trans|lower }} : {{ (offre.montant / 100)|format_currency('EUR') }} {{ ('periodicite.par.' ~ offre.periodicite.value)|trans }}{% if offre.periodicite.value == 'annuelle' and economie > 0 %}, soit {{ (economie / 100)|format_currency('EUR') }} d’économie par rapport au mensuel{% endif %}.
+{% endfor %}
+
+Le premier paiement est attendu sous {{ joursPremierPaiement }} jours après la souscription, sur facture : rien n’est prélevé en ligne.
+
+Souscrire et créer mon compte :
+{{ lien }}
+
+Ce lien est valable jusqu’au {{ invitation.expireLe|format_datetime('long', 'short') }} et une seule fois.
+
+Si vous n’attendiez pas ce message, ignorez-le : aucun compte ne sera créé et rien ne sera facturé.

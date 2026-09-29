@@ -1,0 +1,22 @@
+{# Nouveau mot de passe, depuis le lien reçu par email (F-03). #}
+{% extends 'securite/_layout.html.twig' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+
+{% block title %}{{ 'reinitialisation.titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block contenu %}
+    <div class="securite__entete">
+        <span class="surtitre">{{ 'reinitialisation.surtitre'|trans }}</span>
+        <h1 class="securite__titre">{{ 'reinitialisation.titre'|trans }}</h1>
+    </div>
+
+    {{ form_start(form, {attr: {class: 'securite__formulaire', novalidate: 'novalidate'}}) }}
+        {% if form.vars.submitted and not form.vars.valid %}
+            <div class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</div>
+        {% endif %}
+        {{ form_errors(form) }}
+        {{ formulaire.champ(form.motDePasse, 'reinitialisation.aide'|trans) }}
+        {{ formulaire.champ(form.confirmation, null) }}
+        <button type="submit" class="bouton bouton--primaire bouton--large">{{ 'reinitialisation.bouton'|trans }}</button>
+    {{ form_end(form) }}
+{% endblock %}

@@ -1,0 +1,52 @@
+{# Inviter un responsable (F-02) depuis l'espace de l'association : adresse, rôle, ville active. L'invitation part par
+   e-mail avec un lien valable 7 jours. Variables : association, form, villes, roles. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'parametres' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block title %}{{ 'responsables_association.inviter.titre'|trans }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}<span class="console__fil"><a href="{{ path('parametres') }}">{{ 'parametres.titre'|trans }}</a> <span aria-hidden="true">›</span> <a href="{{ path('association_responsables', {slug: association.slug}) }}">{{ 'responsables_association.titre'|trans }}</a> <span aria-hidden="true">›</span> </span>{{ 'responsables_association.inviter.titre'|trans }}{% endblock %}
+
+{% block contenu %}
+    <div class="fiche-grille">
+        <section class="section" aria-labelledby="inviter-titre">
+            <div class="section__entete"><h2 id="inviter-titre">{{ 'responsables_association.inviter.section'|trans }}</h2></div>
+            <p class="section__aide">{{ 'responsables_association.inviter.aide'|trans }}</p>
+            {{ form_start(form, {attr: {class: 'section__formulaire', novalidate: 'novalidate'}}) }}
+                {% if form.vars.submitted and not form.vars.valid %}
+                    <div class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</div>
+                {% endif %}
+                {{ form_errors(form) }}
+                <div class="section__formulaire-champs section__formulaire-champs--colonne">
+                    {{ formulaire.champ(form.email, 'responsables_association.inviter.email_aide'|trans) }}
+                    <fieldset class="champ{{ form.role.vars.errors|length > 0 ? ' champ--erreur' }}">
+                        <legend class="champ__label">{{ 'responsables_association.inviter.role'|trans }}</legend>
+                        <div class="inviter__roles">
+                            {% for choix in form.role %}
+                                <label class="case inviter__role">{{ form_widget(choix) }}<span><strong>{{ choix.vars.label|trans }}</strong><span class="inviter__role-aide">{{ ('responsables_association.roles.' ~ choix.vars.value)|trans }}</span></span></label>
+                            {% endfor %}
+                        </div>
+                        {% if form.role.vars.errors|length > 0 %}<p class="champ__erreur">{% for erreur in form.role.vars.errors %}{{ erreur.message }}{% endfor %}</p>{% endif %}
+                    </fieldset>
+                    {{ formulaire.champ(form.ville, 'responsables_association.inviter.ville_aide'|trans) }}
+                </div>
+                <div class="section__formulaire-actions inviter__actions">
+                    <a class="bouton bouton--secondaire" href="{{ path('association_responsables', {slug: association.slug}) }}">{{ 'responsables_association.inviter.annuler'|trans }}</a>
+                    <button type="submit" class="bouton bouton--primaire">{{ icones.icone('envoyer', 15) }}{{ 'responsables_association.inviter.envoyer'|trans }}</button>
+                </div>
+            {{ form_end(form) }}
+        </section>
+        <section class="section" aria-labelledby="inviter-suite-titre">
+            <div class="section__entete"><h2 id="inviter-suite-titre">{{ 'responsables_association.inviter.suite_titre'|trans }}</h2></div>
+            <ol class="import__etapes">
+                <li>{{ 'responsables_association.inviter.suite_1'|trans }}</li>
+                <li>{{ 'responsables_association.inviter.suite_2'|trans }}</li>
+                <li>{{ 'responsables_association.inviter.suite_3'|trans }}</li>
+            </ol>
+            {% if villes is empty %}
+                <p class="section__aide">{{ 'responsables_association.inviter.aucune_ville'|trans }}</p>
+            {% endif %}
+        </section>
+    </div>
+{% endblock %}

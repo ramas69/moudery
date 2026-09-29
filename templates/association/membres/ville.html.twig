@@ -1,0 +1,162 @@
+{# Les membres d'une ville, d'après l'artboard « 05 Membres · trésorière » du canevas Console : bandeau des inscriptions
+   à valider, recherche, chips Tous / À jour / En retard / En attente, tableau (membre, téléphone, foyer, dernier
+   paiement, reste dû, statut), sélection multiple avec une barre d'actions (relancer, enregistrer un paiement, exporter).
+   Variables : association, ville, aujourdhui, q, filtre, compteurs, lignes (membre, etat, du {nombre, montant, retard},
+   dernier), total, enAttente, peutGerer, peutSaisir, pagination. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'membres' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% macro euros(centimes) %}{{ (centimes / 100)|format_currency('EUR') }}{% endmacro %}
+{% set params = {slug: association.slug}|merge(q != '' ? {q: q} : {})|merge(filtre != 'tous' ? {filtre: filtre} : {}) %}
+
+{% block title %}{{ 'membres_association.titre'|trans }} · {{ ville.nom }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}{{ 'membres_association.titre'|trans }} <span class="compteur">{{ compteurs.tous }}</span>{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'membres_association.ville.sous_titre'|trans({ville: ville.nom, exercice: 'now'|date('Y')}) }}</p>{% endblock %}
+
+{% block actions %}
+    <a class="bouton bouton--secondaire" href="{{ path('association_membres_export', {slug: association.slug, ville: ville.id, annee: 'toutes', format: 'csv'}) }}">{{ icones.icone('export', 15) }}{{ 'membres_association.ville.exporter'|trans }}</a>
+    {% if peutGerer %}
+        <a class="bouton bouton--secondaire" href="{{ path('ville_assistant_membres', {slug: association.slug, id: ville.id}) }}#import">{{ icones.icone('import', 15) }}{{ 'membres_association.ville.importer'|trans }}</a>
+        <a class="bouton bouton--primaire" href="{{ path('ville_assistant_membres', {slug: association.slug, id: ville.id}) }}#ajouter">{{ icones.icone('personne-plus', 15) }}{{ 'membres_association.ville.ajouter'|trans }}</a>
+    {% endif %}
+{% endblock %}
+
+{% block contenu %}
+    {% if enAttente is not empty %}
+        <div class="bandeau bandeau--attente" role="status">
+            <span class="bandeau__icone" aria-hidden="true">{{ icones.icone('personne-plus', 16) }}</span>
+            <p class="bandeau__texte">{{ 'membres_association.ville.inscriptions'|trans({nombre: enAttente|length, jours: ((aujourdhui|date('U') - (enAttente|first).creeLe|date('U')) / 86400)|round(0, 'floor'), noms: enAttente|slice(0, 2)|map(m => m.nomComplet)|join(', ') ~ (enAttente|length > 2 ? '…' : '')})|raw }}</p>
+            <span class="bandeau__actions">
+                <a class="bouton bouton--secondaire bouton--petit" href="{{ path('association_membres', {slug: association.slug, filtre: 'en_attente'}) }}">{{ 'membres_association.ville.voir_attente'|trans({nombre: enAttente|length}) }}</a>
+                {% if peutGerer %}
+                    <form method="post" action="{{ path('association_membres_valider', {slug: association.slug}) }}" data-turbo-confirm="{{ 'membres_association.ville.valider_confirmer'|trans({nombre: enAttente|length}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('membres-valider') }}">
+                        <button type="submit" class="bouton bouton--primaire bouton--petit">{{ 'membres_association.ville.tout_valider'|trans }}</button>
+                    </form>
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+
+    {# Frame Turbo : la recherche (instantanée, contrôleur `recherche`), les chips et la pagination ne rechargent que la
+       liste ; tout autre lien ou formulaire de la frame conduit la page entière (target="_top"). #}
+    <turbo-frame id="membres-ville" class="frame-liste" target="_top" data-turbo-action="advance">
+    <div class="barre-outils">
+        <form method="get" action="{{ path('association_membres', {slug: association.slug}) }}" class="barre-outils__form" role="search" data-turbo-frame="membres-ville" data-controller="recherche" data-recherche-valeur-value="{{ q }}" data-action="input->recherche#saisir submit->recherche#annuler">
+            <label class="recherche" id="recherche-membres" data-turbo-permanent>
+                <span class="visuellement-cache">{{ 'membres_association.rechercher'|trans }}</span>
+                {{ icones.icone('recherche', 15) }}
+                <input class="recherche__saisie" type="search" name="q" value="{{ q }}" placeholder="{{ 'membres_association.ville.recherche_placeholder'|trans }}" autocomplete="off">
+            </label>
+            {% if filtre != 'tous' %}<input type="hidden" name="filtre" value="{{ filtre }}">{% endif %}
+            <button type="submit" class="visuellement-cache">{{ 'membres_association.rechercher'|trans }}</button>
+        </form>
+        <div class="filtres" role="group" aria-label="{{ 'membres_association.ville.filtre'|trans }}">
+            {% for f in ['tous', 'a_jour', 'en_retard', 'en_attente'] %}
+                <a class="filtre" href="{{ path('association_membres', {slug: association.slug}|merge(q != '' ? {q: q} : {})|merge(f == 'tous' ? {} : {filtre: f})) }}" data-turbo-frame="membres-ville"{% if filtre == f %} aria-current="true"{% endif %}>{{ ('membres_association.ville.filtres.' ~ f)|trans }} · {{ compteurs[f] }}</a>
+            {% endfor %}
+            {% if compteurs.sortis > 0 %}<a class="filtre" href="{{ path('association_membres', {slug: association.slug}|merge(q != '' ? {q: q} : {})|merge({filtre: 'sortis'})) }}" data-turbo-frame="membres-ville"{% if filtre == 'sortis' %} aria-current="true"{% endif %}>{{ 'membres_association.ville.filtres.sortis'|trans }} · {{ compteurs.sortis }}</a>{% endif %}
+        </div>
+        {% if q != '' or filtre != 'tous' %}
+            <a class="bouton bouton--discret" href="{{ path('association_membres', {slug: association.slug}) }}" data-turbo-frame="membres-ville">{{ icones.icone('croix', 15) }}{{ 'membres_association.effacer'|trans }}</a>
+        {% endif %}
+        <span class="barre-outils__fin tableau__precision tableau__precision--neutre">{{ 'membres_association.ville.tri'|trans }}</span>
+    </div>
+
+    <section class="section" aria-labelledby="membres-liste" data-controller="selection" data-selection-relancer-value="{{ path('association_impayes_relancer', {slug: association.slug}) }}" data-selection-paiement-value="{{ path('association_paiement_nouveau', {slug: association.slug}) }}">
+        <h2 class="visuellement-cache" id="membres-liste">{{ ville.nom }}</h2>
+        {% if lignes is empty %}
+            <p class="section__vide">{{ (q != '' ? 'membres_association.vide' : 'membres_association.ville.vide_filtre')|trans }}</p>
+        {% else %}
+            <div class="tableau tableau--menus tableau--serre tableau--membres-ville">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col" class="impayes__case"><input type="checkbox" aria-label="{{ 'impayes_association.tout_cocher'|trans }}" data-selection-target="toutCocher" data-action="change->selection#toutCocher"></th>
+                            <th scope="col">{{ 'membres_association.tableau.membre'|trans }}</th>
+                            <th scope="col" class="tableau__tertiaire">{{ 'membres_association.ville.colonne.telephone'|trans }}</th>
+                            <th scope="col" class="numerique tableau__large">{{ 'membres_association.ville.colonne.foyer'|trans }}</th>
+                            <th scope="col" class="tableau__secondaire">{{ 'membres_association.ville.colonne.dernier_paiement'|trans }}</th>
+                            <th scope="col" class="numerique membres-ville__colonne-du">{{ 'membres_association.ville.colonne.reste_du'|trans }}</th>
+                            <th scope="col">{{ 'membres_association.tableau.statut'|trans }}</th>
+                            <th scope="col"><span class="visuellement-cache">{{ 'membres_association.tableau.actions'|trans }}</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for l in lignes %}
+                            {% set m = l.membre %}
+                            {% set teinte = {a_jour: 'succes', en_retard: 'erreur', en_attente: 'attente', sortis: 'archivee'}[l.etat] %}
+                            <tr data-selection-target="ligne">
+                                <td class="impayes__case"><input type="checkbox" name="membres[]" value="{{ m.id }}" aria-label="{{ m.nomComplet }}" data-du="{{ l.du.montant }}" data-invitable="{{ m.email and not m.compte ? '1' : '0' }}" data-action="change->selection#compter"></td>
+                                <td>
+                                    <span class="entite">
+                                        <span class="entite__initiales entite__initiales--rond" aria-hidden="true">{{ m.initiales }}</span>
+                                        <span class="entite__texte">
+                                            <a class="entite__nom" href="{{ path('association_membre', {slug: association.slug, id: m.id}) }}">{{ m.nomComplet }}</a>
+                                            <span class="entite__detail">{% if m.email %}{{ m.email }}{% else %}{{ 'membres_association.ville.sans_email'|trans }}{% endif %}</span>
+                                            {# Sous 48 rem, la colonne « Reste dû » disparaît et le montant passe sous le nom. #}
+                                            {% if l.du.montant > 0 %}<span class="entite__detail membres-ville__du-mobile{{ l.etat == 'en_retard' ? ' membres-ville__du' }}">{{ 'membres_association.ville.colonne.reste_du'|trans }} · {{ _self.euros(l.du.montant) }}</span>{% endif %}
+                                        </span>
+                                    </span>
+                                </td>
+                                <td class="tableau__tertiaire">{{ m.telephoneAffiche ?? '—' }}</td>
+                                <td class="numerique tableau__large">{% if m.foyer %}{{ m.foyer.membres|length }}{% else %}—{% endif %}</td>
+                                <td class="tableau__secondaire">{{ l.dernier ? l.dernier|format_date('medium') : '—' }}</td>
+                                <td class="numerique membres-ville__colonne-du">{% if l.du.montant > 0 and l.etat == 'en_retard' %}<strong class="membres-ville__du">{{ _self.euros(l.du.montant) }}</strong>{% elseif l.du.montant > 0 %}{{ _self.euros(l.du.montant) }}{% else %}<span class="tableau__precision tableau__precision--neutre">—</span>{% endif %}</td>
+                                <td><span class="pastille pastille--{{ teinte }}">{{ ('membres_association.ville.etats.' ~ l.etat)|trans }}</span></td>
+                                <td class="tableau__menu">
+                                    <details class="menu" data-controller="menu" data-action="toggle->menu#ouvrir">
+                                        <summary class="bouton bouton--discret bouton--icone" aria-label="{{ 'membres_association.ville.actions_de'|trans({nom: m.nomComplet}) }}">{{ icones.icone('menu', 16) }}</summary>
+                                        <div class="menu__liste">
+                                            <a class="menu__item" href="{{ path('association_membre', {slug: association.slug, id: m.id}) }}">{{ icones.icone('comptes', 15) }}{{ 'membres_association.tableau.fiche'|trans }}</a>
+                                            {% if peutSaisir and l.du.nombre > 0 %}<a class="menu__item" href="{{ path('association_paiement_nouveau', {slug: association.slug, membre: m.id}) }}">{{ icones.icone('paiement', 15) }}{{ 'membres_association.ville.menu.paiement'|trans }}</a>{% endif %}
+                                            {% if peutGerer %}<a class="menu__item" href="{{ path('association_membre_modifier', {slug: association.slug, id: m.id}) }}">{{ icones.icone('modifier', 15) }}{{ 'membre_fiche.modifier'|trans }}</a>{% endif %}
+                                        </div>
+                                    </details>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <nav class="pagination" aria-label="{{ 'membres_association.pagination.titre'|trans }}">
+                <span class="pagination__resume" aria-live="polite">{{ 'membres_association.pagination.resume'|trans({de: pagination.de, a: pagination.a, total: total}) }}</span>
+                {% if pagination.pages > 1 %}
+                    <span class="pagination__pages">
+                        {% if pagination.page > 1 %}<a class="bouton bouton--secondaire bouton--petit" href="{{ path('association_membres', params|merge({page: pagination.page - 1})) }}" data-turbo-frame="membres-ville">{{ icones.icone('chevron-gauche', 14) }}{{ 'membres_association.pagination.precedente'|trans }}</a>{% endif %}
+                        <span class="pagination__position">{{ 'membres_association.pagination.position'|trans({page: pagination.page, pages: pagination.pages}) }}</span>
+                        {% if pagination.page < pagination.pages %}<a class="bouton bouton--secondaire bouton--petit" href="{{ path('association_membres', params|merge({page: pagination.page + 1})) }}" data-turbo-frame="membres-ville">{{ 'membres_association.pagination.suivante'|trans }}{{ icones.icone('chevron', 14) }}</a>{% endif %}
+                    </span>
+                {% endif %}
+            </nav>
+        {% endif %}
+
+        {# La barre de sélection (JavaScript) : relancer, enregistrer un paiement, exporter les membres cochés. #}
+        <div class="selection-barre" data-selection-target="barre" hidden>
+            <span class="selection-barre__resume"><strong data-selection-target="nombre">0</strong> <span data-selection-target="texte"></span></span>
+            <div class="selection-barre__actions">
+                {% if peutSaisir %}
+                    <form method="post" action="{{ path('association_impayes_relancer', {slug: association.slug}) }}" data-selection-target="formRelancer">
+                        <input type="hidden" name="_token" value="{{ csrf_token('impayes-relancer') }}">
+                        <button type="submit" class="bouton bouton--secondaire bouton--petit">{{ icones.icone('envoyer', 14) }}{{ 'membres_association.ville.barre.relancer'|trans }}</button>
+                    </form>
+                    {# Sous 48 rem, le libellé se raccourcit en « Paiement » pour tenir sur une rangée. #}
+                    <a class="bouton bouton--secondaire bouton--petit" href="{{ path('association_paiement_nouveau', {slug: association.slug}) }}" data-selection-target="lienPaiement">{{ icones.icone('paiement', 14) }}<span class="selection-barre__long">{{ 'membres_association.ville.barre.paiement'|trans }}</span><span class="selection-barre__court">{{ 'membres_association.ville.barre.paiement_court'|trans }}</span></a>
+                {% endif %}
+                {% if peutGerer %}
+                    {# Invitation à leur espace (décision de Rama du 29 septembre 2026 : pas d'inscription libre, un membre entre
+                       par l'invitation de sa ville) : seuls les membres avec adresse et sans compte comptent (data-invitable). #}
+                    <form method="post" action="{{ path('association_membres_inviter', {slug: association.slug}) }}" data-selection-target="formInviter">
+                        <input type="hidden" name="_token" value="{{ csrf_token('inviter-membres') }}">
+                        <input type="hidden" name="retour" value="{{ path('association_membres', {slug: association.slug}) }}">
+                        <button type="submit" class="bouton bouton--secondaire bouton--petit" data-selection-target="boutonInviter" title="{{ 'membres_association.ville.barre.inviter_aide'|trans }}">{{ icones.icone('envoyer', 14) }}<span class="selection-barre__long">{{ 'membres_association.ville.barre.inviter'|trans }}</span><span class="selection-barre__court">{{ 'membres_association.ville.barre.inviter_court'|trans }}</span> <span data-selection-target="nombreInviter"></span></button>
+                    </form>
+                {% endif %}
+                <a class="bouton bouton--secondaire bouton--petit" href="{{ path('association_membres_export', {slug: association.slug, ville: ville.id, annee: 'toutes', format: 'csv'}) }}" data-selection-target="lienExport">{{ icones.icone('export', 14) }}{{ 'membres_association.ville.barre.exporter'|trans }}</a>
+            </div>
+            <button type="button" class="bouton bouton--discret bouton--icone selection-barre__fermer" aria-label="{{ 'membres_association.ville.barre.fermer'|trans }}" data-action="selection#vider">{{ icones.icone('croix', 15) }}</button>
+        </div>
+    </section>
+    </turbo-frame>
+{% endblock %}

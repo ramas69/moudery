@@ -1,0 +1,152 @@
+{# Les cotisations d'une ville pour une année : la grille du classeur, une ligne par adhérent avec les douze mois, le
+   rapatriement, le projet, le total et le reste dû ; les chiffres de l'année au-dessus. Le nom ouvre la fiche du membre.
+   Variables : association, ville, annee, anneeCourante, parAnnee (année => adhérents, décroissant), q, adhesions, total,
+   synthese (adherents, avecHistorique, collecte, reste, aJour), pagination (page, pages, de, a), cotisation (la
+   cotisation périodique de l'année, ou null), syntheseCotisation (dues, payees, enRetard, montantEnRetard, membres),
+   peutOuvrir. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'cotisations' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'composants/selecteur.html.twig' as selecteur %}
+{% import 'association/membres/_grille.html.twig' as grille %}
+
+{% set params = {slug: association.slug, annee: annee}|merge(q != '' ? {q: q} : {}) %}
+
+{% block title %}{{ 'cotisations_association.titre'|trans }} · {{ ville.nom }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}{{ 'cotisations_association.titre'|trans }} <span class="compteur">{{ total }}</span>{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'cotisations_association.sous_titre'|trans({ville: ville.nom, annee: annee, nombre: total}) }}</p>{% endblock %}
+
+{% block actions %}
+    <a class="bouton bouton--primaire" href="{{ path('association_membres_export', {slug: association.slug, ville: ville.id, annee: annee, format: 'csv'}) }}">{{ icones.icone('export', 15) }}{{ 'cotisations_association.exporter'|trans }}</a>
+    <a class="bouton bouton--secondaire" href="{{ path('association_membres_export', {slug: association.slug, ville: ville.id, annee: annee}|merge({format: 'xlsx'})) }}">{{ icones.icone('export', 15) }}{{ 'cotisations_association.exporter_xlsx'|trans }}</a>
+{% endblock %}
+
+{% block contenu %}
+    <form method="get" action="{{ path('association_cotisations', {slug: association.slug}) }}" class="barre-outils" role="search">
+        <label class="recherche">
+            <span class="visuellement-cache">{{ 'cotisations_association.rechercher'|trans }}</span>
+            {{ icones.icone('recherche', 15) }}
+            <input class="recherche__saisie" type="search" name="q" value="{{ q }}" placeholder="{{ 'cotisations_association.recherche_placeholder'|trans }}" autocomplete="off">
+        </label>
+        <input type="hidden" name="annee" value="{{ annee }}">
+        <button type="submit" class="visuellement-cache">{{ 'cotisations_association.rechercher'|trans }}</button>
+        {% if q != '' %}
+            <a class="bouton bouton--discret" href="{{ path('association_cotisations', {slug: association.slug, annee: annee}) }}">{{ icones.icone('croix', 15) }}{{ 'cotisations_association.effacer'|trans }}</a>
+        {% endif %}
+    </form>
+
+    <div class="filtres" role="group" aria-label="{{ 'cotisations_association.filtre_annee'|trans }}">
+        {% set optionsAnnee = [] %}
+        {% for a, nombre in parAnnee %}
+            {% set optionsAnnee = optionsAnnee|merge([{valeur: a, libelle: a ~ ' · ' ~ nombre, href: path('association_cotisations', {slug: association.slug, annee: a}|merge(q != '' ? {q: q} : {}))}]) %}
+        {% endfor %}
+        {{ selecteur.annee('cotisations_association.filtre_annee'|trans, optionsAnnee, annee, 'selecteur-annee') }}
+    </div>
+
+    <div class="kpis">
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'cotisations_association.kpi.adherents'|trans }}</span>
+            <span class="kpi__valeur">{{ synthese.adherents }}</span>
+            <span class="kpi__detail">{{ 'cotisations_association.kpi.adherents_detail'|trans({nombre: synthese.avecHistorique}) }}</span>
+        </div>
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'cotisations_association.kpi.collecte'|trans }}</span>
+            <span class="kpi__valeur">{{ (synthese.collecte / 100)|format_currency('EUR') }}</span>
+            <span class="kpi__detail">{{ 'cotisations_association.kpi.collecte_detail'|trans }}</span>
+        </div>
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'cotisations_association.kpi.reste'|trans }}</span>
+            <span class="kpi__valeur{{ synthese.reste > 0 ? ' kpi__valeur--erreur' }}">{{ (synthese.reste / 100)|format_currency('EUR') }}</span>
+            <span class="kpi__detail">{{ 'cotisations_association.kpi.reste_detail'|trans }}</span>
+        </div>
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'cotisations_association.kpi.a_jour'|trans }}</span>
+            <span class="kpi__valeur">{{ synthese.aJour }}</span>
+            <span class="kpi__detail">{{ 'cotisations_association.kpi.a_jour_detail'|trans({nombre: synthese.avecHistorique}) }}</span>
+        </div>
+    </div>
+
+    {# La cotisation périodique de l'année (F-12) : à ouvrir, ou son tarif, ses mensualités et ses actions. #}
+    {% if cotisation %}
+        <section class="section cotisation-panneau" aria-labelledby="cotisation-titre">
+            <div class="section__entete">
+                <h2 id="cotisation-titre">{{ 'cotisations_association.ouverture.titre'|trans({annee: annee}) }} <span class="pastille pastille--succes">{{ 'cotisations_association.ouverture.tarif'|trans({montant: (cotisation.montantMensuel / 100)|format_currency('EUR'), jour: cotisation.jourEcheance}) }}</span></h2>
+                <span class="section__lien">{{ 'cotisations_association.ouverture.type_libelle'|trans({type: cotisation.type.nom, unite: ('cotisations_association.ouverture.unite.' ~ cotisation.type.unite.value)|trans}) }}</span>
+            </div>
+            <div class="cotisation-panneau__corps">
+                <p class="cotisation-panneau__chiffres">
+                    <span>{{ 'cotisations_association.ouverture.membres'|trans({nombre: syntheseCotisation.membres}) }}</span>
+                    <span>{{ 'cotisations_association.ouverture.mensualites'|trans({payees: syntheseCotisation.payees, total: syntheseCotisation.payees + syntheseCotisation.dues}) }}</span>
+                    <span{% if syntheseCotisation.enRetard > 0 %} class="cotisation-panneau__retard"{% endif %}>{{ 'cotisations_association.ouverture.en_retard'|trans({nombre: syntheseCotisation.enRetard, montant: (syntheseCotisation.montantEnRetard / 100)|format_currency('EUR')}) }}</span>
+                </p>
+                {% if peutSaisir %}
+                <div class="cotisation-panneau__actions">
+                    <a class="bouton bouton--primaire bouton--petit" href="{{ path('association_paiement_nouveau', {slug: association.slug}) }}">{{ icones.icone('paiement', 15) }}{{ 'cotisations_association.ouverture.enregistrer_paiement'|trans }}</a>
+                    <a class="bouton bouton--secondaire bouton--petit" href="{{ path('association_cotisation_tarif', {slug: association.slug, id: cotisation.id}) }}">{{ icones.icone('modifier', 15) }}{{ 'cotisations_association.ouverture.modifier'|trans }}</a>
+                    <form method="post" action="{{ path('association_cotisation_generer', {slug: association.slug, id: cotisation.id}) }}" title="{{ 'cotisations_association.ouverture.generer_aide'|trans }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('cotisation-generer-' ~ cotisation.id) }}">
+                        <button type="submit" class="bouton bouton--discret bouton--petit">{{ 'cotisations_association.ouverture.generer'|trans }}</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+    {% elseif peutOuvrir %}
+        <section class="section cotisation-panneau cotisation-panneau--a-ouvrir" aria-labelledby="cotisation-titre">
+            <div class="section__entete"><h2 id="cotisation-titre">{{ 'cotisations_association.ouverture.a_ouvrir_courte'|trans({annee: annee}) }}</h2></div>
+            <div class="cotisation-panneau__corps">
+                <p class="cotisation-panneau__texte">{{ 'cotisations_association.ouverture.a_ouvrir'|trans({annee: annee, ville: ville.nom}) }}</p>
+                <div class="cotisation-panneau__actions">
+                    <a class="bouton bouton--primaire bouton--petit" href="{{ path('association_cotisation_ouvrir', {slug: association.slug, annee: annee}) }}">{{ icones.icone('plus', 15) }}{{ 'cotisations_association.ouverture.ouvrir'|trans({annee: annee}) }}</a>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+    <section class="section" aria-labelledby="cotisations-liste">
+        <div class="section__entete"><h2 id="cotisations-liste">{{ ville.nom }} · {{ annee }}</h2></div>
+        {% if adhesions is empty %}
+            <p class="section__vide">{{ (q != '' ? 'cotisations_association.vide_recherche' : 'cotisations_association.vide')|trans({annee: annee}) }}</p>
+        {% else %}
+            <div class="tableau tableau--grille">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col" class="grille__numero">{{ 'membres_association.tableau.numero'|trans }}</th>
+                            <th scope="col" class="grille__membre">{{ 'membres_association.tableau.membre'|trans }}</th>
+                            {{ grille.entetes(association.debutExerciceMois, annee) }}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for adhesion in adhesions %}
+                            {% set membre = adhesion.membre %}
+                            <tr>
+                                <td class="grille__numero">{{ pagination.de + loop.index0 }}</td>
+                                <td class="grille__membre">
+                                    <a class="grille__nom" href="{{ path('association_membre', {slug: association.slug, id: membre.id}) }}">{{ membre.nomComplet }}</a>
+                                    {% if membre.localite or membre.age %}<span class="grille__detail">{{ membre.localite }}{% if membre.localite and membre.age %} · {% endif %}{% if membre.age %}{{ 'membres_association.tableau.age'|trans({age: membre.age}) }}{% endif %}</span>{% endif %}
+                                </td>
+                                {{ grille.cellules(adhesion, association.debutExerciceMois) }}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <p class="section__aide">{{ 'membres_association.tableau.grille_aide'|trans }}</p>
+            {% if pagination.pages > 1 %}
+                <nav class="pagination" aria-label="{{ 'membres_association.pagination.titre'|trans }}">
+                    <span class="pagination__resume">{{ 'membres_association.pagination.resume'|trans({de: pagination.de, a: pagination.a, total: total}) }}</span>
+                    <span class="pagination__pages">
+                        {% if pagination.page > 1 %}
+                            <a class="bouton bouton--secondaire bouton--petit" href="{{ path('association_cotisations', params|merge({page: pagination.page - 1})) }}">{{ icones.icone('chevron-gauche', 14) }}{{ 'membres_association.pagination.precedente'|trans }}</a>
+                        {% endif %}
+                        <span class="pagination__position">{{ 'membres_association.pagination.position'|trans({page: pagination.page, pages: pagination.pages}) }}</span>
+                        {% if pagination.page < pagination.pages %}
+                            <a class="bouton bouton--secondaire bouton--petit" href="{{ path('association_cotisations', params|merge({page: pagination.page + 1})) }}">{{ 'membres_association.pagination.suivante'|trans }}{{ icones.icone('chevron', 14) }}</a>
+                        {% endif %}
+                    </span>
+                </nav>
+            {% endif %}
+        {% endif %}
+    </section>
+{% endblock %}

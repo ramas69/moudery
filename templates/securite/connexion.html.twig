@@ -1,0 +1,45 @@
+{# Connexion par email et mot de passe (F-03). Le pare-feu traite la soumission (form_login). #}
+{% extends 'securite/_layout.html.twig' %}
+
+{% block title %}{{ 'connexion.titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block contenu %}
+    <div class="securite__entete">
+        <span class="surtitre">{{ 'connexion.surtitre'|trans }}</span>
+        <h1 class="securite__titre">{{ 'connexion.titre'|trans }}</h1>
+        <p class="securite__intro">{{ 'connexion.intro'|trans }}</p>
+    </div>
+
+    {% if erreur %}
+        <div class="alerte alerte--erreur" role="alert">{{ erreur.messageKey|trans(erreur.messageData, 'security') }}</div>
+    {% endif %}
+
+    <form method="post" action="{{ path('connexion') }}" class="securite__formulaire" novalidate>
+        <div class="champ">
+            <label class="champ__label" for="email">{{ 'connexion.email'|trans }}</label>
+            <input class="champ__saisie" type="email" id="email" name="email" value="{{ dernierEmail }}" autocomplete="email" inputmode="email" required autofocus>
+        </div>
+        <div class="champ" data-controller="mot-de-passe" data-mot-de-passe-afficher-value="{{ 'connexion.afficher'|trans }}" data-mot-de-passe-masquer-value="{{ 'connexion.masquer'|trans }}">
+            <span class="champ__label champ__label--ligne">
+                <label for="mot_de_passe">{{ 'connexion.mot_de_passe'|trans }}</label>
+                <button type="button" class="lien-discret" data-mot-de-passe-target="bouton" data-action="mot-de-passe#basculer" aria-pressed="false">{{ 'connexion.afficher'|trans }}</button>
+            </span>
+            <input class="champ__saisie" type="password" id="mot_de_passe" name="mot_de_passe" autocomplete="current-password" required data-mot-de-passe-target="champ">
+        </div>
+        <div class="securite__options">
+            <label class="case">
+                <input type="checkbox" name="rester_connecte" value="1">
+                {{ 'connexion.rester_connecte'|trans }}
+            </label>
+            <a class="securite__oubli" href="{{ path('mot_de_passe_oublie') }}">{{ 'connexion.mot_de_passe_oublie'|trans }}</a>
+        </div>
+        {# data-controller charge le contrôleur Stimulus qui double le jeton par un cookie, comme sur les formulaires Symfony. #}
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}" data-controller="csrf-protection">
+        <button type="submit" class="bouton bouton--primaire bouton--large">{{ 'connexion.bouton'|trans }}</button>
+    </form>
+
+    <p class="securite__lien">
+        <strong>{{ 'connexion.sans_compte'|trans }}</strong>
+        {{ 'connexion.sans_compte_aide'|trans }}
+    </p>
+{% endblock %}

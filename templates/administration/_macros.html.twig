@@ -1,0 +1,44 @@
+{# Macros de l'administration : pastilles de statut, rôles d'un compte, initiales. #}
+
+{% macro statut_ville(ville) %}
+    <span class="pastille pastille--{{ ville.statut.value }}">{{ ('assistant_ville.statut.' ~ ville.statut.value)|trans }}</span>
+{% endmacro %}
+
+{% macro statut_association(association) %}
+    {% set classe = {'active': 'pastille--succes', 'suspendue': 'pastille--attente', 'archivee': 'pastille--archivee'}[association.statut.value] %}
+    <span class="pastille {{ classe }}">{{ ('statut_association.' ~ association.statut.value)|trans }}</span>
+{% endmacro %}
+
+{# L'état réel de l'abonnement : le retard est constaté ou déduit de l'échéance dépassée. #}
+{% macro statut_abonnement(abonnement, aujourdhui) %}
+    {% if abonnement.estEnRetard(aujourdhui) %}
+        <span class="pastille pastille--erreur">{{ 'statut_abonnement.en-retard'|trans }}</span>
+    {% else %}
+        {% set classe = {'a-souscrire': 'pastille--attente', 'offert': 'pastille--info', 'actif': 'pastille--succes', 'en-retard': 'pastille--erreur', 'resilie': 'pastille--archivee'}[abonnement.statut.value] %}
+        <span class="pastille {{ classe }}">{{ ('statut_abonnement.' ~ abonnement.statut.value)|trans }}</span>
+    {% endif %}
+{% endmacro %}
+
+{% macro statut_compte(compte) %}
+    {% set classe = {'actif': 'pastille--succes', 'en-attente': 'pastille--attente', 'desactive': 'pastille--archivee'}[compte.statut.value] %}
+    <span class="pastille {{ classe }}">{{ ('statut_compte.' ~ compte.statut.value)|trans }}</span>
+{% endmacro %}
+
+{# Le rôle et son périmètre : « Trésorier ou trésorière · Lyon », « Bureau central », « Super-admin plateforme ». #}
+{% macro affectation(affectation) %}
+    {{- ('role.' ~ affectation.role.value)|trans }}{% if affectation.ville %} · {{ affectation.ville.nom }}{% endif -%}
+{% endmacro %}
+
+{% macro roles(compte) %}
+    {% if compte.affectations|length > 0 %}
+        <span class="chips">
+            {% for affectation in compte.affectations %}
+                <span class="chip">{{ _self.affectation(affectation) }}</span>
+            {% endfor %}
+        </span>
+    {% else %}
+        <span class="tableau__precision tableau__precision--neutre">{{ 'administration.comptes.aucun_role'|trans }}</span>
+    {% endif %}
+{% endmacro %}
+
+{% macro initiales(prenom, nom) %}{{ prenom|slice(0, 1)|upper }}{{ nom|slice(0, 1)|upper }}{% endmacro %}

@@ -1,0 +1,31 @@
+{# Attestation annuelle de paiements d'un membre, imprimable (même feuille que le reçu, styles .recu). Les paiements
+   annulés n'y figurent pas. Variables : membre, association, aujourdhui, annee, paiements, total. #}
+{% extends 'base.html.twig' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block title %}{{ 'mon_espace.attestation.titre'|trans({annee: annee}) }} · {{ association.nom }}{% endblock %}
+{% block stylesheets %}{{ parent() }}<link rel="stylesheet" href="{{ asset('styles/console.css') }}">{% endblock %}
+
+{% block body %}
+    <main class="recu">
+        <header class="recu__entete">
+            <div class="recu__association"><strong>{{ association.nom }}</strong>{% if association.adresseSiege %}<br>{{ association.adresseSiege|nl2br }}{% endif %}{% if association.numeroRna %}<br>{{ 'mon_espace.attestation.rna'|trans({rna: association.numeroRna}) }}{% endif %}{% if association.siren %}<br>{{ 'mon_espace.attestation.siren'|trans({siren: association.siren}) }}{% endif %}</div>
+            <div class="recu__actions">
+                <a class="bouton bouton--secondaire bouton--petit" href="{{ path('mon_espace_historique', {annee: annee}) }}">{{ icones.icone('chevron-gauche', 14) }}{{ 'mon_espace.attestation.retour'|trans }}</a>
+                <button type="button" class="bouton bouton--primaire bouton--petit" onclick="window.print()">{{ icones.icone('recu', 15) }}{{ 'paiements_association.recu.imprimer'|trans }}</button>
+            </div>
+        </header>
+        <h1 class="recu__titre">{{ 'mon_espace.attestation.titre'|trans({annee: annee}) }}</h1>
+        <p class="recu__sous-titre">{{ 'mon_espace.attestation.texte'|trans({association: association.nom, membre: membre.nomComplet, ville: membre.ville.nom, annee: annee}) }}</p>
+        <table class="recu__table">
+            <caption>{{ 'mon_espace.attestation.detail'|trans }}</caption>
+            <tbody>
+                {% for p in paiements|filter(p => not p.estAnnule) %}
+                    <tr><td>{{ p.recuLe|format_date('medium') }} · {% for e in p.echeances %}{% if e.appel %}{{ e.appel.objet }}{% else %}{{ 'mon_espace.echeances.cotisation'|trans({mois: ('membres_association.mois.' ~ e.mois)|trans|lower, annee: e.annee}) }}{% endif %}{% if not loop.last %}, {% endif %}{% else %}{{ 'mon_espace.historique.paiement'|trans }}{% endfor %}</td><td class="numerique">{{ (p.montant / 100)|format_currency('EUR') }}</td></tr>
+                {% endfor %}
+            </tbody>
+            <tfoot><tr><th scope="row">{{ 'mon_espace.attestation.total'|trans({annee: annee}) }}</th><td class="numerique"><strong>{{ (total / 100)|format_currency('EUR') }}</strong></td></tr></tfoot>
+        </table>
+        <p class="recu__mention">{{ 'mon_espace.attestation.fait_le'|trans({date: aujourdhui|format_date('long')}) }}</p>
+    </main>
+{% endblock %}

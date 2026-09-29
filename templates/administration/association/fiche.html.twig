@@ -1,0 +1,221 @@
+{# Fiche d'une association : ses villes, ses comptes, sa suppression si elle est vide.
+   Variables : association, abonnement, aujourdhui, bureauCentral, invitationBureauCentral, villes, comptes, suppressionPossible. #}
+{% extends 'administration/_layout.html.twig' %}
+{% set page = 'associations' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'administration/_macros.html.twig' as macros %}
+
+{% block title %}{{ association.nom }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block titre_page %}{{ association.nom }} {{ macros.statut_association(association) }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">/associations/{{ association.slug }}{% if association.village %} · {{ association.village }}{% endif %} · {{ 'administration.association.fiche.creee_le'|trans({date: association.creeLe|format_date('medium')}) }}</p>{% endblock %}
+
+{% block actions %}
+    <a class="bouton bouton--primaire" href="{{ path('administration_association_modifier', {id: association.id}) }}">{{ icones.icone('modifier', 15) }}{{ 'administration.association.modifier'|trans }}</a>
+{% endblock %}
+
+{% block contenu %}
+    {% if not association.estActive() %}
+        <p class="alerte alerte--attention" role="status">{{ (association.estArchivee() ? 'administration.association.archivee_info' : 'administration.association.suspendue_info')|trans }}</p>
+    {% endif %}
+
+    <section class="section" aria-labelledby="identite-titre">
+        <div class="section__entete">
+            <h2 id="identite-titre">{{ 'administration.association.fiche.identite'|trans }}</h2>
+            <a class="section__lien" href="{{ path('administration_association_modifier', {id: association.id}) }}">{{ 'administration.association.modifier'|trans }}</a>
+        </div>
+        {% set nonRenseigne = 'administration.association.fiche.non_renseigne'|trans %}
+        <dl class="proprietes">
+            <dt>{{ 'administration.association.village.label'|trans }}</dt><dd>{{ association.village ?? nonRenseigne }}</dd>
+            <dt>{{ 'administration.association.email_contact.label'|trans }}</dt><dd>{% if association.emailContact %}<a href="mailto:{{ association.emailContact }}">{{ association.emailContact }}</a>{% else %}{{ nonRenseigne }}{% endif %}</dd>
+            <dt>{{ 'administration.association.telephone.label'|trans }}</dt><dd>{{ association.telephoneContact ?? nonRenseigne }}</dd>
+            <dt>{{ 'administration.association.adresse.label'|trans }}</dt><dd>{{ association.adresseSiege ?? nonRenseigne }}</dd>
+            <dt>{{ 'administration.association.rna.label'|trans }}</dt><dd>{{ association.numeroRna ?? nonRenseigne }}</dd>
+            <dt>{{ 'administration.association.siren.label'|trans }}</dt><dd>{{ association.siren ?? nonRenseigne }}</dd>
+            <dt>{{ 'administration.association.exercice.label'|trans }}</dt><dd>{{ 'administration.association.fiche.exercice'|trans({mois: ('mois.' ~ association.debutExerciceMois)|trans}) }}</dd>
+            <dt>{{ 'administration.association.premier_exercice.label'|trans }}</dt><dd>{{ association.premierExercice }}</dd>
+            <dt>{{ 'administration.association.taux.label'|trans }}</dt><dd>{{ association.tauxReversementDefaut }} %</dd>
+            <dt>{{ 'administration.association.relances.label'|trans }}</dt><dd>{{ 'administration.association.fiche.relances'|trans({jours: association.calendrierRelances|join(', ')}) }}</dd>
+            <dt>{{ 'administration.association.stripe.label'|trans }}</dt><dd>{{ association.compteStripe ?? 'administration.association.fiche.stripe_absent'|trans }}</dd>
+        </dl>
+    </section>
+
+    <section class="section" aria-labelledby="villes-titre">
+        <div class="section__entete">
+            <h2 id="villes-titre">{{ 'administration.association.fiche.villes'|trans }} <span class="compteur">{{ villes|length }}</span></h2>
+            <a class="section__lien" href="{{ path('administration_villes', {association: association.slug}) }}">{{ 'administration.association.fiche.toutes_les_villes'|trans }}</a>
+        </div>
+        {% if villes|length > 0 %}
+            <div class="tableau">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ 'administration.villes.colonne.ville'|trans }}</th>
+                            <th scope="col">{{ 'administration.villes.colonne.statut'|trans }}</th>
+                            <th scope="col" class="tableau__tertiaire">{{ 'administration.villes.colonne.etape'|trans }}</th>
+                            <th scope="col" class="numerique tableau__tertiaire">{{ 'administration.villes.colonne.responsables'|trans }}</th>
+                            <th scope="col"><span class="visuellement-cache">{{ 'administration.villes.colonne.actions'|trans }}</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ville in villes %}
+                            <tr>
+                                <td>
+                                    <span class="entite">
+                                        <span class="entite__initiales" aria-hidden="true">{{ ville.nom|slice(0, 2)|upper }}</span>
+                                        <span class="entite__texte">
+                                            <a class="entite__nom" href="{{ path('administration_ville_modifier', {id: ville.id}) }}">{{ ville.nom }}</a>
+                                            <span class="entite__detail">{{ 'administration.villes.creee_le'|trans({date: ville.creeLe|format_date('medium')}) }}</span>
+                                        </span>
+                                    </span>
+                                </td>
+                                <td>{{ macros.statut_ville(ville) }}</td>
+                                <td class="tableau__tertiaire">{{ 'administration.villes.etape'|trans({numero: ville.etapeAssistant.numero, libelle: ('assistant_ville.etapes.' ~ ville.etapeAssistant.value)|trans}) }}</td>
+                                <td class="numerique tableau__tertiaire">{{ ville.invitations|length }}</td>
+                                <td>
+                                    <div class="tableau__actions">
+                                        {% if ville.estBrouillon() %}
+                                            <a class="bouton bouton--secondaire bouton--petit" href="{{ path('ville_assistant_reprendre', {slug: association.slug, id: ville.id}) }}">{{ 'administration.villes.assistant'|trans }}</a>
+                                        {% endif %}
+                                        <a class="bouton bouton--secondaire bouton--petit" href="{{ path('administration_ville_modifier', {id: ville.id}) }}">{{ 'administration.villes.modifier'|trans }}</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="section__vide">{{ 'administration.association.fiche.aucune_ville'|trans }}</p>
+        {% endif %}
+    </section>
+
+    <section class="section" aria-labelledby="comptes-titre">
+        <div class="section__entete">
+            <h2 id="comptes-titre">{{ 'administration.association.fiche.comptes'|trans }} <span class="compteur">{{ comptes|length }}</span></h2>
+            <a class="section__lien" href="{{ path('administration_compte_inviter', {association: association.slug}) }}">{{ 'administration.comptes.inviter'|trans }}</a>
+        </div>
+        {% if bureauCentral|length == 0 %}
+            {% set invitationExpiree = invitationBureauCentral ? invitationBureauCentral.estExpiree(aujourdhui) : false %}
+            <div class="section__ligne section__ligne--action">
+                <span class="section__icone section__icone--{{ invitationExpiree ? 'erreur' : 'attente' }}" aria-hidden="true">{{ icones.icone(invitationBureauCentral ? 'horloge' : 'personne-plus') }}</span>
+                <span class="section__texte">
+                    <span class="section__principal">{{ 'administration.association.fiche.sans_bureau_central'|trans }}</span>
+                    <span class="section__secondaire">
+                        {% if invitationBureauCentral %}
+                            {{ (invitationExpiree ? 'administration.association.fiche.invitation_expiree' : 'administration.association.fiche.invitation_en_attente')|trans({email: invitationBureauCentral.email, date: invitationBureauCentral.expireLe|format_datetime('medium', 'short')}) }}
+                        {% else %}
+                            {{ 'administration.association.fiche.aucune_invitation'|trans }}
+                        {% endif %}
+                    </span>
+                </span>
+                {% if invitationBureauCentral %}
+                    {{ include('administration/_renvoi.html.twig', {invitation: invitationBureauCentral, retour: path('administration_association_fiche', {id: association.id})}) }}
+                {% else %}
+                    <a class="bouton bouton--secondaire" href="{{ path('administration_compte_inviter', {association: association.slug}) }}">{{ icones.icone('envoyer', 15) }}{{ 'administration.associations.action.inviter'|trans }}</a>
+                {% endif %}
+            </div>
+        {% endif %}
+        {% if comptes|length > 0 %}
+            <div class="tableau">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ 'administration.comptes.colonne.personne'|trans }}</th>
+                            <th scope="col" class="tableau__tertiaire">{{ 'administration.comptes.colonne.roles'|trans }}</th>
+                            <th scope="col">{{ 'administration.comptes.colonne.statut'|trans }}</th>
+                            <th scope="col" class="tableau__secondaire">{{ 'administration.comptes.colonne.derniere_connexion'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for compte in comptes %}
+                            <tr>
+                                <td>
+                                    <span class="entite">
+                                        <span class="entite__initiales entite__initiales--rond" aria-hidden="true">{{ macros.initiales(compte.prenom, compte.nom) }}</span>
+                                        <span class="entite__texte">
+                                            <a class="entite__nom" href="{{ path('administration_compte_fiche', {id: compte.id}) }}">{{ compte.nomComplet }}</a>
+                                            <span class="entite__detail">{{ compte.email }}</span>
+                                        </span>
+                                    </span>
+                                </td>
+                                <td class="tableau__tertiaire">{{ macros.roles(compte) }}</td>
+                                <td>{{ macros.statut_compte(compte) }}</td>
+                                <td class="tableau__secondaire">{{ compte.derniereConnexionLe ? compte.derniereConnexionLe|format_datetime('medium', 'short') : 'administration.comptes.jamais_connecte'|trans }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="section__vide">{{ 'administration.association.fiche.aucun_compte'|trans }}</p>
+        {% endif %}
+    </section>
+
+    <section class="section" id="abonnement" aria-labelledby="abonnement-titre">
+        <div class="section__entete">
+            <h2 id="abonnement-titre">{{ 'administration.abonnement.titre'|trans }} {{ macros.statut_abonnement(abonnement, aujourdhui) }}</h2>
+            <a class="section__lien" href="{{ path('administration_association_abonnement', {id: association.id}) }}">{{ 'administration.abonnement.modifier'|trans }}</a>
+        </div>
+        <dl class="proprietes">
+            <dt>{{ 'administration.abonnement.formule.label'|trans }}</dt><dd>{{ abonnement.formule }}</dd>
+            <dt>{{ 'administration.abonnements.colonne.montant'|trans }}</dt><dd>{% if abonnement.montant > 0 %}{{ (abonnement.montant / 100)|format_currency('EUR') }} {{ ('periodicite.par.' ~ abonnement.periodicite.value)|trans }}{% else %}{{ 'administration.abonnement.gratuit'|trans }}{% endif %}</dd>
+            <dt>{{ 'administration.abonnement.debut.label'|trans }}</dt><dd>{{ abonnement.debutLe|format_date('medium') }}</dd>
+            <dt>{{ 'administration.abonnement.echeance.label'|trans }}</dt><dd>{% if abonnement.prochaineEcheanceLe %}{{ abonnement.prochaineEcheanceLe|format_date('medium') }}{% if abonnement.echeanceProche(aujourdhui) %} <span class="kpi__chip kpi__chip--attente">{{ 'administration.abonnement.bientot'|trans }}</span>{% endif %}{% else %}{{ 'administration.abonnement.sans_echeance'|trans }}{% endif %}</dd>
+            <dt>{{ 'administration.abonnement.dernier_paiement.label'|trans }}</dt><dd>{{ abonnement.dernierPaiementLe ? abonnement.dernierPaiementLe|format_date('medium') : 'administration.abonnement.aucun_paiement'|trans }}</dd>
+            {% if abonnement.notes %}<dt>{{ 'administration.abonnement.notes.label'|trans }}</dt><dd>{{ abonnement.notes|nl2br }}</dd>{% endif %}
+        </dl>
+        <div class="section__actions">
+            {% if abonnement.estFacturable() %}
+                <form method="post" action="{{ path('administration_association_abonnement_paye', {id: association.id}) }}" data-turbo-confirm="{{ 'administration.abonnement.paye_confirmation'|trans({nom: association.nom}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('abonnement-paye-' ~ association.id) }}">
+                    <button type="submit" class="bouton bouton--primaire">{{ icones.icone('coche', 15) }}{{ 'administration.abonnement.marquer_paye'|trans }}</button>
+                </form>
+            {% endif %}
+            <a class="bouton bouton--secondaire" href="{{ path('administration_association_abonnement', {id: association.id}) }}">{{ icones.icone('modifier', 15) }}{{ 'administration.abonnement.modifier'|trans }}</a>
+            <p class="note">{{ 'administration.abonnement.aide'|trans }}</p>
+        </div>
+    </section>
+
+    <section class="section" aria-labelledby="statut-titre">
+        <div class="section__entete">
+            <h2 id="statut-titre">{{ 'administration.association.statut.titre'|trans }} {{ macros.statut_association(association) }}</h2>
+        </div>
+        <p class="section__aide">{{ 'administration.association.statut.aide'|trans }}</p>
+        <div class="section__actions">
+            {% if association.estActive() %}
+                <form method="post" action="{{ path('administration_association_statut', {id: association.id, action: 'suspendre'}) }}" data-turbo-confirm="{{ 'administration.association.suspendre_confirmation'|trans({nom: association.nom}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('statut-association-' ~ association.id) }}">
+                    <button type="submit" class="bouton bouton--secondaire">{{ icones.icone('pause', 15) }}{{ 'administration.associations.action.suspendre'|trans }}</button>
+                </form>
+            {% else %}
+                <form method="post" action="{{ path('administration_association_statut', {id: association.id, action: 'reactiver'}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('statut-association-' ~ association.id) }}">
+                    <button type="submit" class="bouton bouton--primaire">{{ icones.icone('lecture', 15) }}{{ 'administration.associations.action.reactiver'|trans }}</button>
+                </form>
+            {% endif %}
+            {% if not association.estArchivee() %}
+                <form method="post" action="{{ path('administration_association_statut', {id: association.id, action: 'archiver'}) }}" data-turbo-confirm="{{ 'administration.association.archiver_confirmation'|trans({nom: association.nom}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('statut-association-' ~ association.id) }}">
+                    <button type="submit" class="bouton bouton--secondaire">{{ icones.icone('archiver', 15) }}{{ 'administration.associations.action.archiver'|trans }}</button>
+                </form>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="section" aria-labelledby="suppression-titre">
+        <div class="section__entete">
+            <h2 id="suppression-titre">{{ 'administration.association.supprimer'|trans }}</h2>
+        </div>
+        <p class="section__aide">{{ 'administration.association.suppression_aide'|trans }}</p>
+        <div class="section__actions">
+            <form method="post" action="{{ path('administration_association_supprimer', {id: association.id}) }}" data-turbo-confirm="{{ 'administration.association.supprimer_confirmation'|trans({nom: association.nom}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('supprimer-association-' ~ association.id) }}">
+                <button type="submit" class="bouton bouton--danger"{% if not suppressionPossible %} disabled aria-describedby="suppression-impossible"{% endif %}>{{ icones.icone('supprimer', 15) }}{{ 'administration.association.supprimer'|trans }}</button>
+            </form>
+            {% if not suppressionPossible %}
+                <p class="note" id="suppression-impossible">{{ 'administration.association.suppression_impossible_aide'|trans }}</p>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

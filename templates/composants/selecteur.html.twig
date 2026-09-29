@@ -1,0 +1,21 @@
+{# Sélecteur en chip-menu (details/summary : fonctionne sans JavaScript, le contrôleur Stimulus « menu » ferme au clic
+   ailleurs et à Échap) : un libellé, le choix courant dans une chip, la liste des choix. Même forme que le sélecteur
+   d'exercice du tableau de bord (demande de Rama du 28 septembre 2026 : « ici aussi ça devrait être un sélecteur »).
+   Paramètres : libelle, options (liste de {valeur, libelle, href, detail facultatif}), actif (valeur courante),
+   classe (facultative, ajoutée à la racine), aide (facultative, infobulle du bouton). #}
+{% macro annee(libelle, options, actif, classe = '', aide = '') %}
+    {% import 'composants/icones.html.twig' as icones %}
+    {% set courant = null %}
+    {% for o in options %}{% if o.valeur == actif %}{% set courant = o %}{% endif %}{% endfor %}
+    <div class="selecteur{{ classe ? ' ' ~ classe }}">
+        <span class="filtres__libelle">{{ libelle }}</span>
+        <details class="menu selecteur__menu" data-controller="menu" data-action="toggle->menu#ouvrir">
+            <summary class="selecteur__bouton"{% if aide %} title="{{ aide }}"{% endif %}>{{ icones.icone('calendrier', 15) }}<span>{{ courant ? courant.libelle : libelle }}</span>{{ icones.icone('chevron', 14) }}</summary>
+            <div class="menu__liste">
+                {% for o in options %}
+                    <a class="menu__item{{ o.valeur == actif ? ' menu__item--actif' }}" href="{{ o.href }}"{% if o.valeur == actif %} aria-current="true"{% endif %}>{{ o.libelle }}{% if o.detail is defined and o.detail %}<span class="menu__note">{{ o.detail }}</span>{% endif %}</a>
+                {% endfor %}
+            </div>
+        </details>
+    </div>
+{% endmacro %}

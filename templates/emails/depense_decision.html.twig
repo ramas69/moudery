@@ -1,0 +1,9 @@
+<p>Bonjour {{ destinataire.prenom }},</p>
+{% if depense.statut.value == 'refusee' %}
+<p>Votre dépense « {{ depense.libelle }} » ({{ (depense.montant / 100)|format_currency('EUR') }}) a été refusée par {{ depense.decisionPar ? depense.decisionPar.nomComplet : 'le bureau central' }}.</p>
+<p>Motif : {{ depense.motifRefus }}</p>
+<p>Vous pouvez la corriger et la soumettre à nouveau.</p>
+{% else %}
+<p>Votre dépense « {{ depense.libelle }} » ({{ (depense.montant / 100)|format_currency('EUR') }}) a été validée par {{ depense.decisionPar ? depense.decisionPar.nomComplet : 'le bureau central' }}. Elle peut maintenant être payée.</p>
+{% endif %}
+<p><a href="{{ lien }}">Voir la dépense n° {{ depense.numero }}</a></p>

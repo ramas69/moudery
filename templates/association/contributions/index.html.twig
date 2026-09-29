@@ -1,0 +1,68 @@
+{# Onglet « Types de contribution » des Paramètres (F-11) : chaque type avec son unité, son mode et son montant par
+   défaut, sa part au central, le nombre d'appels qui s'en servent ; ajout, modification, archivage, réactivation.
+   Variables : association, types, appelsParType. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'parametres' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% macro euros(centimes) %}{{ (centimes / 100)|format_currency('EUR') }}{% endmacro %}
+
+{% block title %}{{ 'contributions_association.titre'|trans }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}{{ 'parametres.titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'contributions_association.sous_titre'|trans }}</p>{% endblock %}
+
+{% block actions %}
+    <a class="bouton bouton--primaire" href="{{ path('association_contribution_nouveau', {slug: association.slug}) }}">{{ icones.icone('plus', 15) }}{{ 'contributions_association.ajouter'|trans }}</a>
+{% endblock %}
+
+{% block contenu %}
+    {{ include('parametres/_onglets.html.twig', {actif: 'contributions'}) }}
+    <section class="section" aria-labelledby="contributions-titre">
+        <div class="section__entete"><h2 id="contributions-titre">{{ 'contributions_association.titre'|trans }} <span class="compteur">{{ types|length }}</span></h2></div>
+        {% if types is empty %}
+            <p class="section__vide">{{ 'contributions_association.vide'|trans }}</p>
+        {% else %}
+            <div class="tableau tableau--menus tableau--serre tableau--contributions">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ 'contributions_association.colonne.type'|trans }}</th>
+                            <th scope="col" class="tableau__tertiaire">{{ 'contributions_association.colonne.unite'|trans }}</th>
+                            <th scope="col">{{ 'contributions_association.colonne.montant'|trans }}</th>
+                            <th scope="col" class="tableau__tertiaire">{{ 'contributions_association.colonne.reversement'|trans }}</th>
+                            <th scope="col" class="numerique tableau__secondaire">{{ 'contributions_association.colonne.appels'|trans }}</th>
+                            <th scope="col">{{ 'contributions_association.colonne.statut'|trans }}</th>
+                            <th scope="col"><span class="visuellement-cache">{{ 'contributions_association.colonne.actions'|trans }}</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for type in types %}
+                            <tr{% if not type.estActif %} class="contributions__ligne--archive"{% endif %}>
+                                <td><strong>{{ type.nom }}</strong><span class="tableau__precision tableau__precision--neutre">{{ type.code }}</span></td>
+                                <td class="tableau__tertiaire">{{ ('contributions_association.unite.' ~ type.unite.value)|trans }}</td>
+                                <td>{{ ('appels_association.mode.' ~ type.mode.value)|trans }}{% if type.montantDefaut is not null %}<span class="tableau__precision tableau__precision--neutre">{{ (type.mode.value == 'fixe' ? 'contributions_association.montant_fixe' : 'contributions_association.montant_suggere')|trans({montant: _self.euros(type.montantDefaut)}) }}</span>{% endif %}</td>
+                                <td class="tableau__tertiaire">{% if type.tauxReversement is null %}<span class="tableau__precision tableau__precision--neutre">{{ 'contributions_association.taux_a_preciser'|trans }}</span>{% else %}{{ 'contributions_association.taux'|trans({taux: type.tauxReversement}) }}{% endif %}</td>
+                                <td class="numerique tableau__secondaire">{{ appelsParType[type.id] ?? 0 }}</td>
+                                <td><span class="pastille pastille--{{ type.estActif ? 'succes' : 'brouillon' }}">{{ (type.estActif ? 'contributions_association.statut.actif' : 'contributions_association.statut.archive')|trans }}</span></td>
+                                <td class="tableau__menu">
+                                    <details class="menu" data-controller="menu" data-action="toggle->menu#ouvrir">
+                                        <summary class="bouton bouton--discret bouton--icone" aria-label="{{ 'contributions_association.actions_de'|trans({nom: type.nom}) }}">{{ icones.icone('menu', 16) }}</summary>
+                                        <div class="menu__liste">
+                                            <a class="menu__item" href="{{ path('association_contribution_modifier', {slug: association.slug, id: type.id}) }}">{{ icones.icone('modifier', 15) }}{{ 'contributions_association.modifier'|trans }}</a>
+                                            {% if type.estActif %}
+                                                <form method="post" action="{{ path('association_contribution_archiver', {slug: association.slug, id: type.id}) }}" class="menu__form"><input type="hidden" name="_token" value="{{ csrf_token('contribution-archiver-' ~ type.id) }}"><button type="submit" class="menu__item">{{ icones.icone('archiver', 15) }}{{ 'contributions_association.archiver'|trans }}</button></form>
+                                            {% else %}
+                                                <form method="post" action="{{ path('association_contribution_reactiver', {slug: association.slug, id: type.id}) }}" class="menu__form"><input type="hidden" name="_token" value="{{ csrf_token('contribution-reactiver-' ~ type.id) }}"><button type="submit" class="menu__item">{{ icones.icone('coche', 15) }}{{ 'contributions_association.reactiver'|trans }}</button></form>
+                                            {% endif %}
+                                        </div>
+                                    </details>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+        <p class="section__aide">{{ 'contributions_association.aide'|trans }}</p>
+    </section>
+{% endblock %}

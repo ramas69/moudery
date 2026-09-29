@@ -1,0 +1,252 @@
+{# « Paramètres › Responsables et rôles » (F-07), d'après l'artboard 03 du canevas Console : onglets Responsables / Rôles et
+   droits / Journal ; recherche, filtres de périmètre et de rôle, tableau des affectations et invitations ; à droite, ce que
+   chaque rôle peut faire et le journal des rôles. Variables : association, aujourdhui, onglet, filtres (q, perimetre, role),
+   villeFiltre, villes, roles, lignes, compte (affectations, personnes), total, journal, peutInviter. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'parametres' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import _self as vue %}
+
+{% set params = filtres|filter(valeur => valeur != '' and valeur != 'tous') %}
+
+{# Une phrase du journal, d'après le type de l'événement et ses détails. #}
+{% macro phrase(evenement) %}
+    {%- set d = evenement.details -%}
+    {%- set variables = {
+        acteur: evenement.acteur ? evenement.acteur.nomComplet : 'responsables_association.journal.plateforme'|trans,
+        cible: evenement.cible ?? '',
+        role: d.role is defined and d.role ? ('role.' ~ d.role)|trans : 'aucun',
+        ville: d.ville is defined and d.ville ? d.ville : 'aucune',
+        renvoi: d.renvoi is defined and d.renvoi ? 'oui' : 'non',
+        statut: d.statut is defined and d.statut ? ('statut_compte.' ~ d.statut)|trans : '',
+    } -%}
+    {%- set cle = 'responsables_association.journal.phrases.' ~ evenement.type.value -%}
+    {%- set phrase = cle|trans(variables) -%}
+    {{ phrase != cle ? phrase : (variables.acteur ~ ' · ' ~ ('journal.type.' ~ evenement.type.value)|trans ~ (evenement.cible ? ' · ' ~ evenement.cible : '')) }}
+{% endmacro %}
+
+{% block title %}{{ 'responsables_association.titre'|trans }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}{{ 'parametres.titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'responsables_association.sous_titre_onglet'|trans }}</p>{% endblock %}
+
+{% block actions %}
+    {% if peutInviter %}
+        <a class="bouton bouton--primaire" href="{{ path('association_responsables_inviter', {slug: association.slug}) }}">{{ icones.icone('envoyer', 15) }}{{ 'responsables_association.inviter.bouton'|trans }}</a>
+    {% endif %}
+{% endblock %}
+
+{% block contenu %}
+    {{ include('parametres/_onglets.html.twig', {actif: 'responsables'}) }}
+    <nav class="onglets" aria-label="{{ 'responsables_association.onglets.aria'|trans }}">
+        <a class="onglet" href="{{ path('association_responsables', {slug: association.slug}) }}"{% if onglet == 'responsables' %} aria-current="page"{% endif %}>{{ 'responsables_association.onglets.responsables'|trans }} <span class="compteur">{{ total }}</span></a>
+        <a class="onglet" href="{{ path('association_responsables', {slug: association.slug, onglet: 'roles'}) }}"{% if onglet == 'roles' %} aria-current="page"{% endif %}>{{ 'responsables_association.onglets.roles'|trans }}</a>
+        <a class="onglet" href="{{ path('association_responsables', {slug: association.slug, onglet: 'journal'}) }}"{% if onglet == 'journal' %} aria-current="page"{% endif %}>{{ 'responsables_association.onglets.journal'|trans }}</a>
+    </nav>
+
+    <div class="colonnes colonnes--2-1 responsables">
+        <div class="responsables__principal">
+            {% if onglet == 'responsables' %}
+                <p class="responsables__intro">{{ 'responsables_association.intro'|trans }}</p>
+
+                <form method="get" action="{{ path('association_responsables', {slug: association.slug}) }}" class="barre-outils responsables__outils" role="search">
+                    <label class="recherche">
+                        <span class="visuellement-cache">{{ 'responsables_association.rechercher'|trans }}</span>
+                        {{ icones.icone('recherche', 15) }}
+                        <input class="recherche__saisie" type="search" name="q" value="{{ filtres.q }}" placeholder="{{ 'responsables_association.rechercher'|trans }}" autocomplete="off">
+                    </label>
+                    {% if filtres.perimetre != 'tous' %}<input type="hidden" name="perimetre" value="{{ filtres.perimetre }}">{% endif %}
+                    {% if filtres.role != 'tous' %}<input type="hidden" name="role" value="{{ filtres.role }}">{% endif %}
+                    <button type="submit" class="visuellement-cache">{{ 'responsables_association.rechercher'|trans }}</button>
+
+                    {% set libellePerimetre = filtres.perimetre == 'tous' ? 'responsables_association.filtres.tous'|trans : (filtres.perimetre == 'association' ? 'responsables_association.perimetre.association'|trans : villeFiltre.nom) %}
+                    <details class="menu menu--selecteur" data-controller="menu" data-action="toggle->menu#ouvrir">
+                        <summary class="bouton bouton--secondaire">{{ 'responsables_association.filtres.perimetre'|trans({valeur: libellePerimetre}) }}{{ icones.icone('chevron', 14) }}</summary>
+                        <div class="menu__liste">
+                            <a class="menu__item{{ filtres.perimetre == 'tous' ? ' menu__item--actif' }}" href="{{ path('association_responsables', {slug: association.slug}|merge(params|filter((v, k) => k != 'perimetre'))) }}">{{ 'responsables_association.filtres.tous'|trans }}</a>
+                            <a class="menu__item{{ filtres.perimetre == 'association' ? ' menu__item--actif' }}" href="{{ path('association_responsables', {slug: association.slug}|merge(params)|merge({perimetre: 'association'})) }}">{{ 'responsables_association.perimetre.association'|trans }}</a>
+                            {% for v in villes %}
+                                <a class="menu__item{{ filtres.perimetre == v.id ? ' menu__item--actif' }}" href="{{ path('association_responsables', {slug: association.slug}|merge(params)|merge({perimetre: v.id})) }}">{{ v.nom }}</a>
+                            {% endfor %}
+                        </div>
+                    </details>
+                    <details class="menu menu--selecteur" data-controller="menu" data-action="toggle->menu#ouvrir">
+                        <summary class="bouton bouton--secondaire">{{ 'responsables_association.filtres.role'|trans({valeur: filtres.role == 'tous' ? 'responsables_association.filtres.tous'|trans : ('role.' ~ filtres.role)|trans}) }}{{ icones.icone('chevron', 14) }}</summary>
+                        <div class="menu__liste">
+                            <a class="menu__item{{ filtres.role == 'tous' ? ' menu__item--actif' }}" href="{{ path('association_responsables', {slug: association.slug}|merge(params|filter((v, k) => k != 'role'))) }}">{{ 'responsables_association.filtres.tous'|trans }}</a>
+                            {% for r in roles %}
+                                <a class="menu__item{{ filtres.role == r.value ? ' menu__item--actif' }}" href="{{ path('association_responsables', {slug: association.slug}|merge(params)|merge({role: r.value})) }}">{{ ('role.' ~ r.value)|trans }}</a>
+                            {% endfor %}
+                        </div>
+                    </details>
+                    <span class="responsables__compte">{{ 'responsables_association.compte'|trans({affectations: compte.affectations, personnes: compte.personnes}) }}</span>
+                </form>
+
+                <section class="section" aria-labelledby="responsables-liste">
+                    <h2 class="visuellement-cache" id="responsables-liste">{{ 'responsables_association.onglets.responsables'|trans }}</h2>
+                    {% if lignes is empty %}
+                        <p class="section__vide">{{ (total == 0 ? 'responsables_association.vide' : 'responsables_association.aucun_resultat')|trans }}</p>
+                    {% else %}
+                        <div class="tableau tableau--menus tableau--serre tableau--responsables">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">{{ 'responsables_association.colonne.personne'|trans }}</th>
+                                        <th scope="col">{{ 'responsables_association.colonne.role'|trans }}</th>
+                                        <th scope="col" class="tableau__tertiaire">{{ 'responsables_association.colonne.perimetre'|trans }}</th>
+                                        <th scope="col" class="tableau__large">{{ 'responsables_association.colonne.depuis'|trans }}</th>
+                                        <th scope="col">{{ 'responsables_association.colonne.statut'|trans }}</th>
+                                        <th scope="col"><span class="visuellement-cache">{{ 'responsables_association.colonne.actions'|trans }}</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ligne in lignes %}
+                                        <tr>
+                                            <td>
+                                                <span class="entite">
+                                                    <span class="entite__initiales entite__initiales--rond{{ ligne.type != 'affectation' ? ' entite__initiales--eteinte' }}" aria-hidden="true">{{ ligne.initiales }}</span>
+                                                    <span class="entite__texte">
+                                                        <span class="entite__nom">{{ ligne.nom ?? ligne.email }}</span>
+                                                        {% if ligne.nom %}<span class="entite__detail">{{ ligne.email }}</span>{% endif %}
+                                                    </span>
+                                                </span>
+                                            </td>
+                                            <td><span class="chip" title="{{ ('role.' ~ ligne.role)|trans }}">{{ ('responsables_association.role_court.' ~ ligne.role)|trans }}</span></td>
+                                            <td class="tableau__tertiaire">
+                                                <span class="entite__texte">
+                                                    <span class="entite__nom">{{ ligne.perimetre == 'association' ? 'responsables_association.perimetre.association'|trans : ligne.ville.nom }}</span>
+                                                    <span class="entite__detail">
+                                                        {%- if ligne.perimetre == 'association' %}{{ 'responsables_association.perimetre.toutes_villes'|trans }}
+                                                        {%- elseif ligne.detail == 'brouillon' %}{{ 'responsables_association.perimetre.brouillon'|trans }}
+                                                        {%- else %}{{ 'responsables_association.perimetre.membres'|trans({nombre: ligne.detail}) }}
+                                                        {%- endif -%}
+                                                    </span>
+                                                </span>
+                                            </td>
+                                            <td class="tableau__large responsables__depuis">{{ ligne.depuis ? ligne.depuis|format_date(pattern: 'MMM y') : '—' }}</td>
+                                            <td>
+                                                {% if ligne.statut == 'actif' %}
+                                                    <span class="pastille pastille--succes">{{ 'responsables_association.statut.actif'|trans }}</span>
+                                                    {% if ligne.cumul > 1 %}<span class="tableau__precision tableau__precision--neutre">{{ 'responsables_association.statut.cumul'|trans({nombre: ligne.cumul}) }}</span>{% endif %}
+                                                {% elseif ligne.statut == 'en-attente' %}
+                                                    <span class="pastille pastille--attente">{{ 'responsables_association.statut.en_attente'|trans }}</span>
+                                                {% elseif ligne.statut == 'desactive' %}
+                                                    <span class="pastille pastille--archivee">{{ 'responsables_association.statut.desactive'|trans }}</span>
+                                                {% elseif ligne.statut == 'invitation-envoyee' %}
+                                                    <span class="pastille pastille--attente">{{ 'responsables_association.statut.invitation_envoyee'|trans }}</span>
+                                                    <span class="tableau__precision tableau__precision--neutre">{{ 'responsables_association.statut.invitation_dates'|trans({envoyee: ligne.invitation.envoyeeLe|format_date(pattern: 'd MMM'), expire: ligne.expireLe|format_date(pattern: 'd MMM')}) }}</span>
+                                                {% elseif ligne.statut == 'invitation-expiree' %}
+                                                    <span class="pastille pastille--erreur">{{ 'responsables_association.statut.invitation_expiree'|trans }}</span>
+                                                    <span class="tableau__precision tableau__precision--neutre">{{ 'responsables_association.statut.expiree_le'|trans({date: ligne.expireLe|format_date(pattern: 'd MMM')}) }}</span>
+                                                {% else %}
+                                                    <span class="pastille pastille--brouillon">{{ 'responsables_association.statut.a_envoyer'|trans }}</span>
+                                                    <span class="tableau__precision tableau__precision--neutre">{{ 'responsables_association.statut.a_envoyer_aide'|trans }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="tableau__menu">
+                                                {% if ligne.peutRetirer or ligne.peutRenvoyer or ligne.type == 'a_envoyer' %}
+                                                    <details class="menu" data-controller="menu" data-action="toggle->menu#ouvrir">
+                                                        <summary class="bouton bouton--discret bouton--icone" aria-label="{{ 'responsables_association.actions_de'|trans({nom: ligne.nom ?? ligne.email}) }}">{{ icones.icone('menu', 16) }}</summary>
+                                                        <div class="menu__liste">
+                                                            {% if ligne.peutRetirer %}
+                                                                <form method="post" action="{{ path('association_responsables_retirer', {slug: association.slug, id: ligne.affectation.id}) }}" class="menu__form" data-turbo-confirm="{{ 'responsables_association.retirer_confirmation'|trans({nom: ligne.nom ?? ligne.email, role: ('role.' ~ ligne.role)|trans}) }}">
+                                                                    <input type="hidden" name="_token" value="{{ csrf_token('retirer-affectation-' ~ ligne.affectation.id) }}">
+                                                                    <button type="submit" class="menu__item menu__item--danger">{{ icones.icone('retirer', 15) }}{{ 'responsables_association.retirer'|trans }}</button>
+                                                                </form>
+                                                            {% endif %}
+                                                            {% if ligne.peutRenvoyer %}
+                                                                <form method="post" action="{{ path('association_responsables_renvoyer', {slug: association.slug, id: ligne.invitation.id}) }}" class="menu__form">
+                                                                    <input type="hidden" name="_token" value="{{ csrf_token('renvoyer-invitation-' ~ ligne.invitation.id) }}">
+                                                                    <button type="submit" class="menu__item">{{ icones.icone('renvoyer', 15) }}{{ 'responsables_association.renvoyer'|trans }}</button>
+                                                                </form>
+                                                            {% endif %}
+                                                            {% if ligne.type == 'a_envoyer' %}
+                                                                <a class="menu__item" href="{{ path('ville_assistant_identite', {slug: association.slug, id: ligne.ville.id}) }}">{{ icones.icone('modifier', 15) }}{{ 'responsables_association.ouvrir_assistant'|trans }}</a>
+                                                            {% endif %}
+                                                        </div>
+                                                    </details>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </section>
+            {% elseif onglet == 'roles' %}
+                <p class="responsables__intro">{{ 'responsables_association.roles_intro'|trans }}</p>
+                <section class="section" aria-labelledby="roles-titre">
+                    <div class="section__entete"><h2 id="roles-titre">{{ 'responsables_association.onglets.roles'|trans }}</h2></div>
+                    <dl class="roles">
+                        {% for r in roles %}
+                            <div class="roles__item">
+                                <dt>{{ ('role.' ~ r.value)|trans }}</dt>
+                                <dd>
+                                    <p>{{ ('responsables_association.roles.' ~ r.value)|trans }}</p>
+                                    {% if r.permissions is not empty %}
+                                        <ul class="roles__droits">
+                                            {% for permission in r.permissions %}<li><span class="chip">{{ ('responsables_association.permissions.' ~ permission)|trans }}</span></li>{% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p class="roles__note">{{ 'responsables_association.roles_sans_droit'|trans }}</p>
+                                    {% endif %}
+                                </dd>
+                            </div>
+                        {% endfor %}
+                    </dl>
+                    <p class="section__aide">{{ 'responsables_association.roles_note'|trans }}</p>
+                </section>
+            {% else %}
+                <section class="section" aria-labelledby="journal-titre">
+                    <div class="section__entete"><h2 id="journal-titre">{{ 'responsables_association.onglets.journal'|trans }}</h2></div>
+                    {% if journal is empty %}
+                        <p class="section__vide">{{ 'responsables_association.journal.vide'|trans }}</p>
+                    {% else %}
+                        <ol class="journal-roles">
+                            {% for evenement in journal %}
+                                <li class="journal-roles__item">
+                                    <span class="journal-roles__phrase">{{ vue.phrase(evenement) }}</span>
+                                    <time class="journal-roles__date" datetime="{{ evenement.quand|date('c') }}">{{ evenement.quand|format_datetime('medium', 'short') }}</time>
+                                </li>
+                            {% endfor %}
+                        </ol>
+                    {% endif %}
+                </section>
+            {% endif %}
+        </div>
+
+        <aside class="responsables__aside">
+            <section class="section" aria-labelledby="roles-aide-titre">
+                <div class="section__entete"><h2 id="roles-aide-titre">{{ 'responsables_association.roles_titre'|trans }}</h2></div>
+                <dl class="roles roles--compact">
+                    {% for r in roles %}
+                        <div class="roles__item">
+                            <dt>{{ ('role.' ~ r.value)|trans }}</dt>
+                            <dd>{{ ('responsables_association.roles.' ~ r.value)|trans }}</dd>
+                        </div>
+                    {% endfor %}
+                </dl>
+            </section>
+            {% if onglet != 'journal' %}
+                <section class="section" aria-labelledby="journal-aside-titre">
+                    <div class="section__entete">
+                        <h2 id="journal-aside-titre">{{ 'responsables_association.onglets.journal'|trans }}</h2>
+                        <a class="section__lien" href="{{ path('association_responsables', {slug: association.slug, onglet: 'journal'}) }}">{{ 'responsables_association.journal.tout'|trans }}</a>
+                    </div>
+                    {% if journal is empty %}
+                        <p class="section__vide">{{ 'responsables_association.journal.vide'|trans }}</p>
+                    {% else %}
+                        <ol class="journal-roles">
+                            {% for evenement in journal %}
+                                <li class="journal-roles__item">
+                                    <span class="journal-roles__phrase">{{ vue.phrase(evenement) }}</span>
+                                    <time class="journal-roles__date" datetime="{{ evenement.quand|date('c') }}">{{ evenement.quand|format_datetime('medium', 'short') }}</time>
+                                </li>
+                            {% endfor %}
+                        </ol>
+                    {% endif %}
+                </section>
+            {% endif %}
+        </aside>
+    </div>
+{% endblock %}

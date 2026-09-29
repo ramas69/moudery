@@ -1,0 +1,5 @@
+<p>Bonjour {{ prenom }},</p>
+<p>{{ appel.association.nom }} lance un appel à contribution{% if appel.mode.value == 'fixe' %} de {{ (appel.montant / 100)|format_currency('EUR') }}{% else %} (montant libre{% if appel.montant %}, {{ (appel.montant / 100)|format_currency('EUR') }} suggérés{% endif %}){% endif %}, à régler avant le {{ appel.dateLimite|format_date('long') }}.</p>
+{% if appel.message %}<p>{{ appel.message|nl2br }}</p>{% endif %}
+<p><a href="{{ lien }}" style="display:inline-block;padding:10px 16px;border-radius:8px;background:#21705b;color:#ffffff;font-weight:600;text-decoration:none">{% if appel.mode.value == 'fixe' %}Payer {{ (appel.montant / 100)|format_currency('EUR') }} en ligne{% else %}Contribuer en ligne{% endif %}</a></p>
+<p>Vous pouvez aussi régler auprès du trésorier de votre ville.</p>

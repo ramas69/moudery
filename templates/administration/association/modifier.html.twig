@@ -1,0 +1,48 @@
+{# Modification d'une association : nom et identifiant, village, contact, existence juridique, paramètres de gestion. Variables : association, form. #}
+{% extends 'administration/_layout.html.twig' %}
+{% set page = 'associations' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+
+{% block title %}{{ 'administration.association.modifier_titre'|trans }} · {{ association.nom }}{% endblock %}
+
+{% block titre_page %}{{ 'administration.association.modifier_titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ association.nom }} · {{ 'administration.association.modifier_sous_titre'|trans }}</p>{% endblock %}
+
+{% block contenu %}
+    {{ form_start(form, {attr: {class: 'formulaire formulaire--etroit', novalidate: 'novalidate'}}) }}
+        {% if form.vars.submitted and not form.vars.valid %}
+            <div class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</div>
+        {% endif %}
+        {{ form_errors(form) }}
+        {{ formulaire.champ(form.nom, 'administration.association.nom.aide'|trans) }}
+        {{ formulaire.champ(form.slug, 'administration.association.slug.aide_modification'|trans) }}
+        {{ formulaire.champ(form.village, 'administration.association.village.aide'|trans) }}
+
+        <div class="formulaire__section">
+            <h2 class="formulaire__sous-titre">{{ 'administration.association.contact.titre'|trans }}</h2>
+            {{ formulaire.champ(form.emailContact, 'administration.association.email_contact.aide'|trans) }}
+            {{ formulaire.champ(form.telephoneContact, null) }}
+            {{ formulaire.champ(form.adresseSiege, null) }}
+        </div>
+
+        <div class="formulaire__section">
+            <h2 class="formulaire__sous-titre">{{ 'administration.association.juridique.titre'|trans }}</h2>
+            <p class="note">{{ 'administration.association.juridique.intro'|trans }}</p>
+            {{ formulaire.champ(form.numeroRna, 'administration.association.rna.aide'|trans) }}
+            {{ formulaire.champ(form.siren, 'administration.association.siren.aide'|trans) }}
+        </div>
+
+        <div class="formulaire__section">
+            <h2 class="formulaire__sous-titre">{{ 'administration.association.gestion.titre'|trans }}</h2>
+            {{ formulaire.champ(form.debutExerciceMois, 'administration.association.exercice.aide'|trans) }}
+            {{ formulaire.champ(form.premierExercice, 'administration.association.premier_exercice.aide'|trans) }}
+            {{ formulaire.champ(form.tauxReversementDefaut, 'administration.association.taux.aide'|trans) }}
+            {{ formulaire.champ(form.calendrierRelances, 'administration.association.relances.aide'|trans) }}
+        </div>
+
+        <div class="formulaire__actions">
+            <a class="bouton bouton--secondaire" href="{{ path('administration_association_fiche', {id: association.id}) }}">{{ 'administration.association.annuler'|trans }}</a>
+            <button type="submit" class="bouton bouton--primaire">{{ 'administration.association.enregistrer_modifications'|trans }}</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

@@ -1,0 +1,103 @@
+{# Aperçu d'un import d'association (F-31) : un bilan par ville avant d'enregistrer, les premières lignes en erreur.
+   Variables : association, fichier, mode, analyses (par cible), totaux (valides, adhesions, invalides, ignorees, creations). #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'import' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block title %}{{ 'import_association.apercu.titre'|trans }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}{{ 'import_association.apercu.titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'import_association.apercu.sous_titre'|trans({fichier: fichier}) }}</p>{% endblock %}
+
+{% block contenu %}
+    <div class="kpis">
+        <div class="kpi"><span class="kpi__libelle">{{ 'import_association.apercu.membres'|trans }}</span><span class="kpi__valeur">{{ totaux.valides }}</span></div>
+        <div class="kpi"><span class="kpi__libelle">{{ 'import_association.apercu.adhesions'|trans }}</span><span class="kpi__valeur">{{ totaux.adhesions }}</span></div>
+        <div class="kpi"><span class="kpi__libelle">{{ 'import_association.apercu.villes_a_creer'|trans }}</span><span class="kpi__valeur">{{ totaux.creations }}</span></div>
+        <div class="kpi"><span class="kpi__libelle">{{ 'import_association.apercu.erreurs'|trans }}</span><span class="kpi__valeur{{ totaux.invalides > 0 ? ' import__kpi--attention' }}">{{ totaux.invalides }}</span></div>
+        <div class="kpi"><span class="kpi__libelle">{{ 'import_association.apercu.ignorees'|trans }}</span><span class="kpi__valeur">{{ totaux.ignorees }}</span></div>
+    </div>
+
+    <section class="section" aria-labelledby="import-par-ville">
+        <div class="section__entete"><h2 id="import-par-ville">{{ 'import_association.apercu.par_ville'|trans }}</h2></div>
+        <div class="tableau">
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">{{ (mode == 'colonne' ? 'import_association.rattachement.valeur' : 'import_association.rattachement.onglet')|trans }}</th>
+                        <th scope="col">{{ 'import_association.rattachement.ville'|trans }}</th>
+                        <th scope="col" class="numerique">{{ 'import_association.apercu.membres'|trans }}</th>
+                        <th scope="col" class="numerique tableau__tertiaire">{{ 'import_association.apercu.adhesions'|trans }}</th>
+                        <th scope="col" class="numerique">{{ 'import_association.apercu.erreurs'|trans }}</th>
+                        <th scope="col" class="numerique tableau__secondaire">{{ 'import_association.apercu.ignorees'|trans }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for analyse in analyses %}
+                        <tr>
+                            <td><span class="entite__nom">{{ analyse.libelle }}</span></td>
+                            <td>{{ analyse.ville }} {% if analyse.creer %}<span class="pastille pastille--brouillon">{{ 'import_association.apercu.a_creer'|trans }}</span>{% endif %}</td>
+                            <td class="numerique">{{ analyse.valides }}</td>
+                            <td class="numerique tableau__tertiaire">{{ analyse.adhesions }}</td>
+                            <td class="numerique">
+                                {{ analyse.invalides }}
+                                {% if analyse.erreur %}<span class="tableau__precision">{{ ('membre.import.' ~ analyse.erreur)|trans({'{{ maximum }}': 5000}, 'validators') }}</span>{% endif %}
+                            </td>
+                            <td class="numerique tableau__secondaire">{{ analyse.ignorees }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th scope="row">{{ 'import_association.apercu.total'|trans }}</th>
+                        <td></td>
+                        <td class="numerique">{{ totaux.valides }}</td>
+                        <td class="numerique tableau__tertiaire">{{ totaux.adhesions }}</td>
+                        <td class="numerique">{{ totaux.invalides }}</td>
+                        <td class="numerique tableau__secondaire">{{ totaux.ignorees }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </section>
+
+    {% for analyse in analyses|filter(a => a.erreurs is not empty) %}
+        <details class="section import__erreurs-bloc">
+            <summary class="section__entete import__erreurs-resume"><h2>{{ 'import_association.apercu.erreurs_de'|trans({libelle: analyse.libelle, nombre: analyse.invalides}) }}</h2></summary>
+            <div class="tableau">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col" class="numerique">{{ 'assistant_ville.membres.apercu.ligne'|trans }}</th>
+                            <th scope="col">{{ 'assistant_ville.membres.tableau.membre'|trans }}</th>
+                            <th scope="col">{{ 'assistant_ville.membres.apercu.etat'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for erreur in analyse.erreurs %}
+                            <tr class="import__ligne--erreur">
+                                <td class="numerique">{{ erreur.numero }}</td>
+                                <td>{{ (erreur.prenom ~ ' ' ~ erreur.nom)|trim ?: 'assistant_ville.membres.apercu.sans_nom'|trans }}</td>
+                                <td>{% for code in erreur.erreurs %}{{ ('assistant_ville.membres.apercu.erreurs.' ~ code)|trans({ligne: erreur.reference ?? 0}) }}{% if not loop.last %} · {% endif %}{% endfor %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if analyse.invalides > analyse.erreurs|length %}
+                <p class="section__aide">{{ 'import_association.apercu.erreurs_suite'|trans({nombre: analyse.invalides - analyse.erreurs|length}) }}</p>
+            {% endif %}
+        </details>
+    {% endfor %}
+{% endblock %}
+
+{% block actions %}
+    <form method="post" action="{{ path('association_import_annuler', {slug: association.slug}) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('import-association-' ~ association.id) }}">
+        <button type="submit" class="bouton bouton--secondaire">{{ 'import_association.annuler'|trans }}</button>
+    </form>
+    <a class="bouton bouton--secondaire" href="{{ path('association_import_rattachement', {slug: association.slug}) }}">{{ 'import_association.apercu.modifier'|trans }}</a>
+    <form method="post" action="{{ path('association_import_confirmer', {slug: association.slug}) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('import-association-' ~ association.id) }}">
+        <button type="submit" class="bouton bouton--primaire"{{ totaux.valides + totaux.adhesions == 0 ? ' disabled' }}>{{ 'import_association.apercu.confirmer'|trans({membres: totaux.valides, villes: analyses|length}) }}</button>
+    </form>
+{% endblock %}

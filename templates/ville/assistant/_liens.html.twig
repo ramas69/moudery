@@ -1,0 +1,10 @@
+{# Adresse d'une étape de l'assistant : chacune des trois étapes a sa route. #}
+{% macro etape(association, ville, e) -%}
+    {%- if e.value == 'identite' -%}
+        {{- path('ville_assistant_identite', {slug: association.slug, id: ville.id}) -}}
+    {%- elseif e.value == 'membres' -%}
+        {{- path('ville_assistant_membres', {slug: association.slug, id: ville.id}) -}}
+    {%- else -%}
+        {{- path('ville_assistant_activation', {slug: association.slug, id: ville.id}) -}}
+    {%- endif -%}
+{%- endmacro %}

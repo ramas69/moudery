@@ -1,0 +1,87 @@
+{# Saisie d'une dépense de la caisse du bureau central (F-21), d'après « 08a Saisie d'une dépense » en direction Console :
+   libellé et montant, date, catégorie, appel lié, bénéficiaire, moyen de paiement, justificatif (obligatoire pour
+   soumettre), commentaire pour le valideur ; « Soumettre pour validation » ou « Enregistrer en brouillon ». À droite,
+   la caisse du central et le circuit de validation. Variables : association, depense, nouvelle, form, synthese, valideurs. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'depenses' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'association/depenses/_macros.html.twig' as d %}
+
+{% set titre = nouvelle ? 'depenses_association.nouvelle.titre'|trans : 'depenses_association.modifier.titre'|trans({numero: depense.numero}) %}
+{% block title %}{{ titre }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}<span class="console__fil"><a href="{{ path('association_depenses', {slug: association.slug}) }}">{{ 'depenses_association.titre'|trans }}</a> <span aria-hidden="true">›</span> </span>{{ titre }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ (depense.ville ? 'depenses_association.nouvelle.sous_titre_ville' : 'depenses_association.nouvelle.sous_titre')|trans({numero: depense.numero, ville: depense.ville ? depense.ville.nom : ''}) }}</p>{% endblock %}
+
+{% block contenu %}
+    <div class="depense-saisie">
+        {{ form_start(form, {attr: {class: 'section depense-saisie__formulaire', novalidate: 'novalidate'}}) }}
+            {% if form.vars.submitted and not form.vars.valid %}<p class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</p>{% endif %}
+            {% if depense.statut.value == 'refusee' %}<p class="alerte alerte--erreur" role="status">{{ 'depenses_association.modifier.refusee'|trans({motif: depense.motifRefus}) }}</p>{% endif %}
+            <div class="depense-saisie__grille depense-saisie__grille--libelle">
+                {{ formulaire.champ(form.libelle, null) }}
+                <div class="champ{{ form.montant.vars.errors|length ? ' champ--erreur' }}">
+                    {{ form_label(form.montant, null, {label_attr: {class: 'champ__label'}}) }}
+                    <span class="appel__euro">{{ form_widget(form.montant, {attr: {class: 'champ__saisie depense-saisie__montant'}}) }}<span class="appel__euro-signe" aria-hidden="true">€</span></span>
+                    {% for e in form.montant.vars.errors %}<p class="champ__erreur">{{ e.message }}</p>{% endfor %}
+                </div>
+            </div>
+            <div class="depense-saisie__grille depense-saisie__grille--3">
+                {{ formulaire.champ(form.date, null) }}
+                {{ formulaire.champ(form.categorie, null) }}
+                {{ formulaire.champ(form.appel, 'depenses_association.formulaire.appel_aide'|trans) }}
+            </div>
+            <div class="depense-saisie__grille depense-saisie__grille--2">
+                {{ formulaire.champ(form.beneficiaire, null) }}
+                {{ formulaire.champ(form.moyen, null) }}
+            </div>
+
+            <div class="champ depense-justificatif{{ form.justificatif.vars.errors|length ? ' champ--erreur' }}">
+                <span class="champ__label" id="justificatif-libelle">{{ 'depenses_association.formulaire.justificatif'|trans }}</span>
+                <div class="depense-justificatif__zone" aria-labelledby="justificatif-libelle">
+                    <div class="depense-justificatif__texte">
+                        <span class="depense-justificatif__titre">{{ depense.justificatifNom ? 'depenses_association.formulaire.justificatif_joint'|trans({nom: depense.justificatifNom}) : 'depenses_association.formulaire.justificatif_titre'|trans }}</span>
+                        <span class="champ__aide">{{ 'depenses_association.formulaire.justificatif_aide'|trans }}</span>
+                    </div>
+                    {{ form_widget(form.justificatif, {attr: {class: 'depense-justificatif__fichier', 'aria-describedby': 'justificatif-libelle'}}) }}
+                </div>
+                {% for e in form.justificatif.vars.errors %}<p class="champ__erreur" role="alert">{{ e.message }}</p>{% endfor %}
+            </div>
+
+            {{ formulaire.champ(form.commentaire, 'depenses_association.formulaire.commentaire_aide'|trans) }}
+
+            <div class="depense-saisie__actions">
+                <button type="submit" name="action" value="soumettre" class="bouton bouton--primaire">{{ icones.icone('envoyer', 15) }}{{ 'depenses_association.formulaire.soumettre'|trans }}</button>
+                <button type="submit" name="action" value="brouillon" class="bouton bouton--secondaire">{{ 'depenses_association.formulaire.brouillon'|trans }}</button>
+            </div>
+        {{ form_end(form) }}
+
+        <aside class="depense-saisie__cote">
+            <section class="section" aria-labelledby="caisse-titre">
+                <div class="section__entete"><h2 id="caisse-titre">{{ depense.ville ? 'depenses_association.caisse.titre_ville'|trans({ville: depense.ville.nom}) : 'depenses_association.caisse.titre'|trans }}</h2></div>
+                <dl class="appel__chiffres">
+                    <div><dt>{{ 'depenses_association.caisse.en_attente'|trans }}</dt><dd>{{ d.euros(synthese.aValiderMontant) }}</dd></div>
+                    <div><dt>{{ 'depenses_association.caisse.a_payer'|trans }}</dt><dd>{{ d.euros(synthese.aPayerMontant) }}</dd></div>
+                    <div><dt>{{ 'depenses_association.caisse.payees'|trans }}</dt><dd>{{ d.euros(synthese.payeesMontant) }}</dd></div>
+                </dl>
+            </section>
+            <section class="section" aria-labelledby="circuit-titre">
+                <div class="section__entete"><h2 id="circuit-titre">{{ 'depenses_association.circuit.titre'|trans }}</h2></div>
+                <ol class="depense-circuit">
+                    <li><span class="depense-circuit__numero" aria-hidden="true">1</span><span>{{ 'depenses_association.circuit.saisie'|trans|raw }}</span></li>
+                    <li><span class="depense-circuit__numero" aria-hidden="true">2</span><span>
+                        {% set suffixe = depense.ville ? '_ville' : '' %}
+                        {% if valideurs is empty %}
+                            {{ ('depenses_association.circuit.validation_personne' ~ suffixe)|trans|raw }}
+                        {% else %}
+                            {{ ('depenses_association.circuit.validation' ~ suffixe)|trans({noms: valideurs|map(v => v.nomComplet)|join(', ', ' ou ')})|raw }}
+                        {% endif %}
+                    </span></li>
+                    <li><span class="depense-circuit__numero" aria-hidden="true">3</span><span>{{ 'depenses_association.circuit.paiement'|trans|raw }}</span></li>
+                </ol>
+                {% if valideurs is empty and depense.ville %}<p class="alerte alerte--attention depense-circuit__alerte">{{ 'depenses_association.circuit.aucun_valideur_ville'|trans({ville: depense.ville.nom}) }}</p>
+                {% elseif valideurs is empty %}<p class="alerte alerte--attention depense-circuit__alerte">{{ 'depenses_association.circuit.aucun_valideur'|trans }} <a href="{{ path('association_responsables_inviter', {slug: association.slug}) }}">{{ 'responsables_association.inviter.bouton'|trans }}</a></p>{% endif %}
+            </section>
+        </aside>
+    </div>
+{% endblock %}

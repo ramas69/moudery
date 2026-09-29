@@ -1,0 +1,166 @@
+{# Toutes les villes de la plateforme : recherche, sélecteur d'association, statuts avec compteurs, tri, regroupement,
+   pagination, export. Variables : pagination, total, filtres, association, associations, compteurs, aujourdhui, parPage.
+   Colonnes par palier : toujours ville, statut et menu ; dès 48 rem étape et responsables ; dès 80 rem association ; dès 96 rem date de création. #}
+{% extends 'administration/_layout.html.twig' %}
+{% set page = 'villes' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'administration/_macros.html.twig' as macros %}
+
+{# En-tête de colonne triable : le lien inverse le sens quand la colonne est déjà le critère. #}
+{% macro entete(cle, libelle, filtres, classe) %}
+    {% set actif = filtres.tri == cle %}
+    {% set sens = actif and filtres.sens == 'asc' ? 'desc' : 'asc' %}
+    <th scope="col"{% if classe %} class="{{ classe }}"{% endif %}{% if actif %} aria-sort="{{ filtres.sens == 'asc' ? 'ascending' : 'descending' }}"{% endif %}>
+        <a class="tri{{ actif ? ' tri--actif' }}" href="{{ path('administration_villes', filtres|filter(valeur => valeur != '')|merge({tri: cle, sens: sens})) }}">{{ libelle }}<span class="tri__sens" aria-hidden="true">{{ actif ? (filtres.sens == 'asc' ? '↑' : '↓') : '↕' }}</span></a>
+    </th>
+{% endmacro %}
+{% import _self as tableau %}
+
+{% set filtre = filtres.q != '' or filtres.association != '' or filtres.statut != 'tous' %}
+{% set params = filtres|filter(valeur => valeur != '') %}
+{% set villes = pagination.villes %}
+
+{% block title %}{{ 'administration.villes.titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block titre_page %}{{ 'administration.villes.titre'|trans }} <span class="compteur">{{ pagination.total }}</span>{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ (filtre ? 'administration.villes.sous_titre_filtre' : 'administration.villes.sous_titre')|trans({nombre: pagination.total, total: total}) }}</p>{% endblock %}
+
+{% block actions %}
+    <a class="bouton bouton--primaire" href="{{ path('administration_villes_export', params) }}">{{ icones.icone('export', 15) }}{{ 'administration.villes.exporter'|trans }}</a>
+{% endblock %}
+
+{% block contenu %}
+    <form method="get" action="{{ path('administration_villes') }}" class="barre-outils" role="search">
+        <label class="recherche">
+            <span class="visuellement-cache">{{ 'administration.villes.rechercher'|trans }}</span>
+            {{ icones.icone('recherche', 15) }}
+            <input class="recherche__saisie" type="search" name="q" value="{{ filtres.q }}" placeholder="{{ 'administration.villes.recherche_placeholder'|trans }}" autocomplete="off">
+        </label>
+        <div class="combobox" data-controller="combobox">
+            <label class="visuellement-cache" for="filtre-association">{{ 'administration.villes.filtre_association'|trans }}</label>
+            <input class="combobox__saisie" id="filtre-association" type="text" name="association" value="{{ association ? association.nom : filtres.association }}" placeholder="{{ 'administration.villes.association_placeholder'|trans }}" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="filtre-association-liste" data-combobox-target="saisie" data-action="focus->combobox#ouvrir input->combobox#filtrer keydown->combobox#clavier blur->combobox#fermerBientot">
+            {% if association %}
+                <button type="button" class="combobox__effacer" aria-label="{{ 'administration.villes.association_effacer'|trans }}" data-action="combobox#effacer">{{ icones.icone('croix', 14) }}</button>
+            {% endif %}
+            <ul class="combobox__liste" id="filtre-association-liste" role="listbox" data-combobox-target="liste" hidden>
+                {% for candidate in associations %}
+                    <li class="combobox__option" id="filtre-association-{{ candidate.id }}" role="option" aria-selected="false" data-combobox-target="option" data-valeur="{{ candidate.nom }}" data-libelle="{{ candidate.nom }} {{ candidate.slug }} {{ candidate.nomVillage }}" data-action="mousedown->combobox#selectionner">
+                        <span class="combobox__nom">{{ candidate.nom }}</span>
+                        {% if candidate.village %}<span class="combobox__detail">{{ candidate.village }}</span>{% endif %}
+                    </li>
+                {% endfor %}
+                <li class="combobox__vide" role="presentation" data-combobox-target="vide" hidden>{{ 'administration.villes.association_aucune'|trans }}</li>
+            </ul>
+        </div>
+        <input type="hidden" name="statut" value="{{ filtres.statut }}">
+        <input type="hidden" name="tri" value="{{ filtres.tri }}">
+        <input type="hidden" name="sens" value="{{ filtres.sens }}">
+        {% if filtres.groupe %}<input type="hidden" name="groupe" value="1">{% endif %}
+        <input type="hidden" name="par" value="{{ pagination.parPage }}">
+        <button type="submit" class="bouton bouton--secondaire">{{ 'administration.villes.rechercher'|trans }}</button>
+        {% if filtre %}
+            <a class="bouton bouton--discret" href="{{ path('administration_villes', {tri: filtres.tri, sens: filtres.sens, groupe: filtres.groupe ?: null, par: pagination.parPage}) }}">{{ icones.icone('croix', 15) }}{{ 'administration.villes.effacer_filtres'|trans }}</a>
+        {% endif %}
+    </form>
+
+    <div class="filtres filtres--ligne">
+        <nav class="filtres" aria-label="{{ 'administration.villes.filtre_statut'|trans }}">
+            <span class="filtres__libelle">{{ 'administration.villes.filtre_statut'|trans }}</span>
+            {% for statut in ['tous', 'brouillon', 'active', 'archivee', 'bloquees'] %}
+                <a class="filtre" href="{{ path('administration_villes', params|merge({statut: statut, par: pagination.parPage})) }}"{% if filtres.statut == statut %} aria-current="true"{% endif %}>{{ ('administration.villes.filtres.' ~ statut)|trans }} · {{ compteurs[statut] }}</a>
+            {% endfor %}
+        </nav>
+        <a class="filtre filtre--bascule" href="{{ path('administration_villes', params|merge({groupe: filtres.groupe ? null : '1', par: pagination.parPage})) }}" aria-pressed="{{ filtres.groupe ? 'true' : 'false' }}">{{ icones.icone('associations', 14) }}{{ 'administration.villes.grouper'|trans }}</a>
+    </div>
+
+    <section class="section" aria-label="{{ 'administration.villes.titre'|trans }}">
+        <div class="tableau tableau--menus">
+            <table>
+                <thead>
+                    <tr>
+                        {{ tableau.entete('ville', 'administration.villes.colonne.ville'|trans, filtres) }}
+                        {{ tableau.entete('association', 'administration.villes.colonne.association'|trans, filtres, 'tableau__large') }}
+                        {{ tableau.entete('statut', 'administration.villes.colonne.statut'|trans, filtres) }}
+                        {{ tableau.entete('etape', 'administration.villes.colonne.etape'|trans, filtres, 'tableau__tertiaire') }}
+                        {{ tableau.entete('responsables', 'administration.villes.colonne.responsables'|trans, filtres, 'numerique tableau__tertiaire') }}
+                        {{ tableau.entete('creation', 'administration.villes.colonne.creee_le'|trans, filtres, 'tableau__tres-large') }}
+                        <th scope="col" class="tableau__menu"><span class="visuellement-cache">{{ 'administration.villes.colonne.actions'|trans }}</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ville in villes %}
+                        {% set associationDeLaVille = ville.association %}
+                        {% if filtres.groupe and (loop.first or villes[loop.index0 - 1].association.id != associationDeLaVille.id) %}
+                            {% set nombre = villes|filter(v => v.association.id == associationDeLaVille.id)|length %}
+                            <tr class="tableau__groupe">
+                                <th scope="colgroup" colspan="7">
+                                    <a href="{{ path('administration_association_fiche', {id: associationDeLaVille.id}) }}">{{ associationDeLaVille.nom }}</a>
+                                    <span class="tableau__precision tableau__precision--neutre">{{ 'administration.villes.groupe_villes'|trans({nombre: nombre}) }}</span>
+                                </th>
+                            </tr>
+                        {% endif %}
+                        {% set bloquee = ville.estBrouillon and ville.modifieLe < aujourdhui|date_modify('-30 days') %}
+                        <tr>
+                            <td>
+                                <span class="entite">
+                                    <span class="entite__initiales" aria-hidden="true">{{ ville.nom|slice(0, 2)|upper }}</span>
+                                    <span class="entite__texte">
+                                        <a class="entite__nom" href="{{ path('administration_ville_modifier', {id: ville.id}) }}">{{ ville.nom }}</a>
+                                        <span class="entite__detail">{{ associationDeLaVille.nom }}</span>
+                                    </span>
+                                </span>
+                            </td>
+                            <td class="tableau__large"><a href="{{ path('administration_association_fiche', {id: associationDeLaVille.id}) }}">{{ associationDeLaVille.nom }}</a></td>
+                            <td>
+                                {{ macros.statut_ville(ville) }}
+                                {% if bloquee %}<span class="tableau__precision">{{ 'administration.villes.bloquee_depuis'|trans({jours: date(aujourdhui).diff(date(ville.modifieLe)).days}) }}</span>{% endif %}
+                            </td>
+                            <td class="tableau__tertiaire">
+                                <span class="progression" aria-hidden="true"><span class="progression__barre" style="width: {{ ville.etapeAssistant.avancement }}%"></span></span>
+                                {{ 'administration.villes.etape'|trans({numero: ville.etapeAssistant.numero, libelle: ('assistant_ville.etapes.' ~ ville.etapeAssistant.value)|trans}) }}
+                            </td>
+                            <td class="numerique tableau__tertiaire">{{ ville.invitations|length }}</td>
+                            <td class="tableau__tres-large"><time datetime="{{ ville.creeLe|date('Y-m-d') }}">{{ ville.creeLe|format_date('medium') }}</time></td>
+                            <td class="tableau__menu">
+                                <details class="menu" data-controller="menu" data-action="toggle->menu#ouvrir">
+                                    <summary class="bouton bouton--icone" aria-label="{{ 'administration.villes.actions_pour'|trans({nom: ville.nom}) }}" title="{{ 'administration.villes.actions_pour'|trans({nom: ville.nom}) }}">{{ icones.icone('menu') }}</summary>
+                                    <div class="menu__liste">
+                                        {% if ville.estBrouillon() %}
+                                            <a class="menu__item" href="{{ path('ville_assistant_reprendre', {slug: associationDeLaVille.slug, id: ville.id}) }}">{{ icones.icone('lecture', 15) }}{{ 'administration.villes.action.assistant'|trans }}</a>
+                                        {% endif %}
+                                        <a class="menu__item" href="{{ path('administration_ville_modifier', {id: ville.id}) }}">{{ icones.icone('modifier', 15) }}{{ 'administration.villes.action.modifier'|trans }}</a>
+                                        <a class="menu__item" href="{{ path('administration_association_fiche', {id: associationDeLaVille.id}) }}">{{ icones.icone('externe', 15) }}{{ 'administration.villes.action.association'|trans }}</a>
+                                    </div>
+                                </details>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="7" class="tableau__vide">{{ 'administration.villes.aucune'|trans }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if pagination.total > 0 %}
+            <nav class="pagination" aria-label="{{ 'administration.villes.pagination.titre'|trans }}">
+                <span class="pagination__resume">{{ 'administration.villes.pagination.resume'|trans({de: pagination.de, a: pagination.a, total: pagination.total}) }}</span>
+                <span class="pagination__par">
+                    <span class="pagination__libelle">{{ 'administration.villes.pagination.par_page'|trans }}</span>
+                    {% for taille in parPage %}
+                        <a class="pagination__lien" href="{{ path('administration_villes', params|merge({par: taille})) }}"{% if taille == pagination.parPage %} aria-current="true"{% endif %}>{{ taille }}</a>
+                    {% endfor %}
+                </span>
+                {% if pagination.pages > 1 %}
+                    <span class="pagination__pages">
+                        {% if pagination.page > 1 %}
+                            <a class="bouton bouton--secondaire bouton--petit" href="{{ path('administration_villes', params|merge({par: pagination.parPage, page: pagination.page - 1})) }}">{{ icones.icone('chevron-gauche', 14) }}{{ 'administration.villes.pagination.precedente'|trans }}</a>
+                        {% endif %}
+                        <span class="pagination__position">{{ 'administration.villes.pagination.position'|trans({page: pagination.page, pages: pagination.pages}) }}</span>
+                        {% if pagination.page < pagination.pages %}
+                            <a class="bouton bouton--secondaire bouton--petit" href="{{ path('administration_villes', params|merge({par: pagination.parPage, page: pagination.page + 1})) }}">{{ 'administration.villes.pagination.suivante'|trans }}{{ icones.icone('chevron', 14) }}</a>
+                        {% endif %}
+                    </span>
+                {% endif %}
+            </nav>
+        {% endif %}
+    </section>
+{% endblock %}

@@ -1,0 +1,133 @@
+{# Une dépense (F-22, F-23), d'après l'artboard « Décision sur une dépense » du canevas Console en version bureau :
+   statut, libellé, montant, détails, justificatif, suivi du circuit ; à droite, la décision. Le bouton « Valider »
+   n'apparaît jamais sur sa propre dépense : un encart explique qui peut valider. Variables : association, depense,
+   moi, decideur (dépense de la caisse du central), valideurs (autres personnes du bureau central). #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'depenses' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'association/depenses/_macros.html.twig' as d %}
+
+{% set statut = depense.statut.value %}
+{% set mienne = depense.aEteSaisiePar(moi) %}
+{% block title %}{{ 'depenses_association.fiche.titre'|trans({numero: depense.numero}) }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}<span class="console__fil"><a href="{{ path('association_depenses', {slug: association.slug}) }}">{{ 'depenses_association.titre'|trans }}</a> <span aria-hidden="true">›</span> </span>{{ 'depenses_association.fiche.titre'|trans({numero: depense.numero}) }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ d.caisse(depense) }}</p>{% endblock %}
+
+{% block actions %}
+    {% if peutModifier and depense.estModifiable %}
+        <a class="bouton bouton--secondaire" href="{{ path('association_depense_modifier', {slug: association.slug, id: depense.id}) }}">{{ icones.icone('modifier', 15) }}{{ 'depenses_association.fiche.modifier'|trans }}</a>
+    {% endif %}
+{% endblock %}
+
+{% block contenu %}
+    <div class="depense-fiche">
+        <div class="depense-fiche__principal">
+            <section class="section depense-fiche__carte" aria-labelledby="depense-libelle">
+                {% if decideur and statut == 'soumise' and not mienne %}<span class="pastille pastille--attente">{{ 'depenses_association.fiche.a_decider'|trans }}</span>{% else %}{{ d.statut(depense) }}{% endif %}
+                <h2 class="depense-fiche__libelle" id="depense-libelle">{{ depense.libelle ?: 'depenses_association.sans_libelle'|trans }}</h2>
+                <p class="depense-fiche__montant">{{ d.euros(depense.montant) }}</p>
+                <dl class="depense-fiche__details">
+                    <dt>{{ 'depenses_association.formulaire.categorie'|trans }}</dt><dd>{{ ('depenses_association.categorie.' ~ depense.categorie.value)|trans }}{% if depense.appel %} · <a href="{{ path('association_appel', {slug: association.slug, id: depense.appel.id}) }}">{{ depense.appel.objet }}</a>{% endif %}</dd>
+                    <dt>{{ 'depenses_association.formulaire.beneficiaire'|trans }}</dt><dd>{{ depense.beneficiaire ?: '—' }}</dd>
+                    <dt>{{ 'depenses_association.formulaire.date'|trans }}</dt><dd>{{ depense.dateDepense|format_date('long') }}</dd>
+                    <dt>{{ 'depenses_association.formulaire.moyen'|trans }}</dt><dd>{{ ('depenses_association.moyen.' ~ depense.moyen.value)|trans }}</dd>
+                    <dt>{{ 'depenses_association.fiche.saisie_par'|trans }}</dt><dd>{{ d.personne(depense.saisiePar, moi) }}, {{ depense.saisieLe|format_date('medium') }}</dd>
+                    {% if depense.commentaire %}<dt>{{ 'depenses_association.fiche.commentaire'|trans }}</dt><dd>{{ depense.commentaire }}</dd>{% endif %}
+                    {% if depense.motifRefus and statut == 'refusee' %}<dt>{{ 'depenses_association.fiche.motif'|trans }}</dt><dd class="depense-fiche__motif">{{ depense.motifRefus }}</dd>{% endif %}
+                </dl>
+            </section>
+
+            {% if depense.justificatif %}
+                <a class="section depense-fiche__justificatif" href="{{ path('association_depense_justificatif', {slug: association.slug, id: depense.id}) }}" target="_blank" rel="noopener">
+                    <span class="depense-fiche__vignette" aria-hidden="true">{{ icones.icone('export', 18) }}</span>
+                    <span class="depense-fiche__fichier"><span class="depense-fiche__fichier-nom">{{ depense.justificatifNom }}</span><span class="entite__detail">{{ 'depenses_association.fiche.justificatif'|trans({type: depense.justificatifType == 'application/pdf' ? 'PDF' : 'photo', taille: (depense.justificatifTaille / 1048576)|number_format(1, ',', ' ')}) }}</span></span>
+                    <span class="bouton bouton--secondaire bouton--petit">{{ 'depenses_association.fiche.ouvrir'|trans }}</span>
+                </a>
+            {% else %}
+                <p class="alerte alerte--attention">{{ 'depenses_association.fiche.sans_justificatif'|trans }}</p>
+            {% endif %}
+        </div>
+
+        <aside class="depense-fiche__cote">
+            {# L'auteur voit toujours le verrou (jamais de « Valider » sur sa propre dépense) ; le décideur, le feu vert et la décision. #}
+            {% if statut == 'soumise' and mienne %}
+                {% if true %}
+                    <div class="depense-verrou" role="note">
+                        <span class="depense-verrou__icone" aria-hidden="true">{{ icones.icone('cle', 14) }}</span>
+                        <p><strong>{{ 'depenses_association.fiche.verrou_titre'|trans }}</strong> {{ 'depenses_association.fiche.verrou_texte'|trans }}
+                            {% if valideurs is empty and depense.ville %}{{ 'depenses_association.fiche.verrou_aucun_ville'|trans({ville: depense.ville.nom}) }}
+                            {% elseif valideurs is empty %}{{ 'depenses_association.fiche.verrou_aucun'|trans }} <a href="{{ path('association_responsables_inviter', {slug: association.slug}) }}">{{ 'responsables_association.inviter.bouton'|trans }}</a>{% else %}{{ 'depenses_association.fiche.verrou_qui'|trans({noms: valideurs|map(v => v.nomComplet)|join(', ', ' ou ')}) }}{% endif %}</p>
+                        {% if valideurs is empty and depense.ville and peutPrevenir %}
+                            <form method="post" action="{{ path('association_depense_prevenir', {slug: association.slug, id: depense.id}) }}" class="depense-verrou__action">
+                                <input type="hidden" name="_token" value="{{ csrf_token('prevenir-depense-' ~ depense.id) }}">
+                                <button type="submit" class="bouton bouton--primaire bouton--petit">{{ icones.icone('envoyer', 15) }}{{ 'depenses_association.fiche.prevenir'|trans }}</button>
+                            </form>
+                        {% endif %}
+                        <p class="depense-verrou__note">{{ 'depenses_association.fiche.verrou_note'|trans }}</p>
+                    </div>
+                {% endif %}
+            {% elseif decideur and statut == 'soumise' %}
+                {% if true %}
+                    <p class="depense-feu-vert" role="note">
+                        <span class="depense-feu-vert__icone" aria-hidden="true">{{ icones.icone('coche', 12) }}</span>
+                        <span><strong>{{ 'depenses_association.fiche.feu_vert_titre'|trans }}</strong> {{ (depense.ville ? 'depenses_association.fiche.feu_vert_ville' : 'depenses_association.fiche.feu_vert')|trans({qui: depense.saisiePar ? depense.saisiePar.nomComplet : ''}) }}</span>
+                    </p>
+                    <section class="section depense-decision" aria-labelledby="decision-titre">
+                        <div class="section__entete"><h2 id="decision-titre">{{ 'depenses_association.fiche.decision'|trans }}</h2></div>
+                        <div class="depense-decision__corps">
+                            <form method="post" action="{{ path('association_depense_valider', {slug: association.slug, id: depense.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('valider-depense-' ~ depense.id) }}">
+                                <button type="submit" class="bouton bouton--primaire depense-decision__bouton">{{ icones.icone('coche', 15) }}{{ 'depenses_association.fiche.valider'|trans }}</button>
+                            </form>
+                            <details class="depense-decision__refus"{% if app.request.query.get('refus') %} open{% endif %}>
+                                <summary class="bouton bouton--secondaire depense-decision__bouton">{{ 'depenses_association.fiche.refuser'|trans }}</summary>
+                                <form method="post" action="{{ path('association_depense_refuser', {slug: association.slug, id: depense.id}) }}" class="depense-decision__motif">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('refuser-depense-' ~ depense.id) }}">
+                                    <label class="champ__label" for="motif">{{ 'depenses_association.fiche.motif_libelle'|trans }}</label>
+                                    <textarea class="champ__saisie" id="motif" name="motif" rows="3" required maxlength="2000" aria-describedby="motif-aide"></textarea>
+                                    <p class="champ__aide" id="motif-aide">{{ 'depenses_association.fiche.motif_aide'|trans({nom: depense.saisiePar ? depense.saisiePar.nomComplet : ''}) }}</p>
+                                    <button type="submit" class="bouton bouton--danger">{{ 'depenses_association.fiche.confirmer_refus'|trans }}</button>
+                                </form>
+                            </details>
+                            <p class="depense-decision__note">{{ 'depenses_association.fiche.refus_note'|trans }}</p>
+                        </div>
+                    </section>
+                {% endif %}
+            {% elseif peutPayer and statut == 'validee' %}
+                <section class="section depense-decision" aria-labelledby="paiement-titre">
+                    <div class="section__entete"><h2 id="paiement-titre">{{ 'depenses_association.fiche.paiement'|trans }}</h2></div>
+                    <div class="depense-decision__corps">
+                        <p class="section__texte">{{ 'depenses_association.fiche.paiement_texte'|trans }}</p>
+                        <form method="post" action="{{ path('association_depense_payer', {slug: association.slug, id: depense.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('payer-depense-' ~ depense.id) }}">
+                            <button type="submit" class="bouton bouton--primaire depense-decision__bouton">{{ icones.icone('euro', 15) }}{{ 'depenses_association.fiche.marquer_payee'|trans }}</button>
+                        </form>
+                    </div>
+                </section>
+            {% elseif not decideur and statut == 'soumise' and depense.ville %}
+                <p class="alerte alerte--info">{{ 'depenses_association.fiche.ville'|trans({ville: depense.ville.nom}) }}</p>
+            {% endif %}
+
+            <section class="section" aria-labelledby="suivi-titre">
+                <div class="section__entete"><h2 id="suivi-titre">{{ 'depenses_association.fiche.suivi'|trans }}</h2></div>
+                <ol class="depense-suivi">
+                    <li class="depense-suivi__etape{{ depense.soumiseLe ? ' depense-suivi__etape--faite' : ' depense-suivi__etape--courante' }}">
+                        <span class="depense-suivi__point" aria-hidden="true"></span>
+                        <span>{{ depense.soumiseLe ? 'depenses_association.suivi.soumise'|trans({qui: d.personne(depense.saisiePar, moi)|trim}) : 'depenses_association.suivi.brouillon'|trans }}</span>
+                        <span class="depense-suivi__date">{{ (depense.soumiseLe ?? depense.saisieLe)|format_date('none', 'd MMM') }}</span>
+                    </li>
+                    <li class="depense-suivi__etape{{ statut in ['validee', 'payee'] ? ' depense-suivi__etape--faite' : (statut == 'refusee' ? ' depense-suivi__etape--refusee' : (statut == 'soumise' ? ' depense-suivi__etape--courante' : '')) }}">
+                        <span class="depense-suivi__point" aria-hidden="true"></span>
+                        <span>{% if statut in ['validee', 'payee'] %}{{ 'depenses_association.suivi.validee'|trans({qui: d.personne(depense.decisionPar, moi)|trim}) }}{% elseif statut == 'refusee' %}{{ 'depenses_association.suivi.refusee'|trans({qui: d.personne(depense.decisionPar, moi)|trim}) }}{% else %}{{ (depense.ville ? 'depenses_association.suivi.validation_ville' : 'depenses_association.suivi.validation')|trans }}{% endif %}</span>
+                        <span class="depense-suivi__date">{% if depense.decisionLe %}{{ depense.decisionLe|format_date('none', 'd MMM') }}{% elseif statut == 'soumise' and mienne and valideurs is empty %}<span class="depense-suivi__bloquee">{{ 'depenses_association.suivi.bloquee'|trans }}</span>{% endif %}</span>
+                    </li>
+                    <li class="depense-suivi__etape{{ statut == 'payee' ? ' depense-suivi__etape--faite' : (statut == 'validee' ? ' depense-suivi__etape--courante' : '') }}">
+                        <span class="depense-suivi__point" aria-hidden="true"></span>
+                        <span>{{ statut == 'payee' ? 'depenses_association.suivi.payee_par'|trans({qui: d.personne(depense.payeePar, moi)|trim}) : 'depenses_association.suivi.payee'|trans }}</span>
+                        <span class="depense-suivi__date">{{ depense.payeeLe ? depense.payeeLe|format_date('none', 'd MMM') }}</span>
+                    </li>
+                </ol>
+            </section>
+        </aside>
+    </div>
+{% endblock %}

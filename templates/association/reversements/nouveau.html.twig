@@ -1,0 +1,55 @@
+{# Enregistrement d'un reversement reçu par le bureau central (F-20) : ville, exercice, montant, date du virement,
+   référence, note ; à droite, le restant dû par ville sur l'exercice. Variables : association, ville (périmètre),
+   form, lignes, libelle, taux. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'reversements' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% macro euros(centimes) %}{{ (centimes / 100)|format_currency('EUR') }}{% endmacro %}
+
+{% set prefixe = declaration|default(false) ? 'reversements_association.declaration' : 'reversements_association.nouveau' %}
+{% block title %}{{ (prefixe ~ '.titre')|trans }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}<span class="console__fil"><a href="{{ path('association_reversements', {slug: association.slug}) }}">{{ 'reversements_association.titre'|trans }}</a> <span aria-hidden="true">›</span> </span>{{ (prefixe ~ '.titre')|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ (prefixe ~ '.sous_titre')|trans({ville: ville ? ville.nom : ''}) }}</p>{% endblock %}
+
+{% block contenu %}
+    <div class="depense-saisie reversement-saisie">
+        {{ form_start(form, {attr: {class: 'section depense-saisie__formulaire', novalidate: 'novalidate'}}) }}
+            {% if form.vars.submitted and not form.vars.valid %}<p class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</p>{% endif %}
+            <div class="depense-saisie__grille depense-saisie__grille--2">
+                {{ formulaire.champ(form.ville, null) }}
+                {{ formulaire.champ(form.exercice, null) }}
+            </div>
+            <div class="depense-saisie__grille depense-saisie__grille--2">
+                <div class="champ{{ form.montant.vars.errors|length ? ' champ--erreur' }}">
+                    {{ form_label(form.montant, null, {label_attr: {class: 'champ__label'}}) }}
+                    <span class="appel__euro">{{ form_widget(form.montant, {attr: {class: 'champ__saisie depense-saisie__montant'}}) }}<span class="appel__euro-signe" aria-hidden="true">€</span></span>
+                    {% for e in form.montant.vars.errors %}<p class="champ__erreur">{{ e.message }}</p>{% endfor %}
+                </div>
+                {{ formulaire.champ(form.recuLe, null) }}
+            </div>
+            {{ formulaire.champ(form.reference, 'reversements_association.formulaire.reference_aide'|trans) }}
+            {{ formulaire.champ(form.note, 'reversements_association.formulaire.note_aide'|trans) }}
+            <div class="depense-saisie__actions">
+                <button type="submit" class="bouton bouton--primaire">{{ icones.icone('coche', 15) }}{{ (prefixe ~ '.valider')|trans }}</button>
+                <a class="bouton bouton--discret" href="{{ path('association_reversements', {slug: association.slug}) }}">{{ 'reversements_association.nouveau.annuler'|trans }}</a>
+            </div>
+        {{ form_end(form) }}
+
+        <aside class="depense-saisie__cote">
+            <section class="section" aria-labelledby="restant-titre">
+                <div class="section__entete"><h2 id="restant-titre">{{ 'reversements_association.nouveau.cote_titre'|trans({exercice: libelle}) }}</h2></div>
+                {% set avecRestant = lignes|filter(l => l.restant > 0) %}
+                {% if avecRestant is empty %}
+                    <p class="section__vide">{{ 'reversements_association.nouveau.cote_vide'|trans }}</p>
+                {% else %}
+                    <dl class="appel__chiffres">
+                        {% for l in avecRestant %}<div{% if l.statut == 'en_retard' %} class="appel__alerte"{% endif %}><dt>{{ l.ville.nom }}</dt><dd>{{ _self.euros(l.restant) }}</dd></div>{% endfor %}
+                    </dl>
+                {% endif %}
+                <p class="section__aide">{{ 'reversements_association.nouveau.cote_aide'|trans({taux: taux}) }}</p>
+            </section>
+        </aside>
+    </div>
+{% endblock %}

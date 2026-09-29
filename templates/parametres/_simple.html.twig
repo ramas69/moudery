@@ -1,0 +1,32 @@
+{# Coquille simple des paramètres, pour un compte sans espace (ni administration, ni association, en attendant
+   l'espace membre F-26) : l'en-tête de l'accueil, puis le contenu en sections de la coquille Console. #}
+{% extends 'base.html.twig' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/accueil.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/console.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="accueil">
+        <header class="accueil__entete">
+            {{ include('composants/logo.html.twig', {taille: 36, permanent: true, lien: path('accueil')}) }}
+            <div class="accueil__compte">
+                <span class="accueil__utilisateur">{{ app.user.nomComplet }}</span>
+                {{ formulaire.deconnexion() }}
+            </div>
+        </header>
+        <main class="accueil__contenu" id="contenu">
+            <h1 class="accueil__titre">{% block titre_page %}{% endblock %}</h1>
+            {% block sous_titre %}{% endblock %}
+            {% for message in app.flashes('succes') %}
+                <p class="alerte alerte--succes" role="status">{{ message }}</p>
+            {% endfor %}
+            {% for message in app.flashes('erreur') %}
+                <p class="alerte alerte--erreur" role="alert">{{ message }}</p>
+            {% endfor %}
+            {% block contenu %}{% endblock %}
+        </main>
+    </div>
+{% endblock %}

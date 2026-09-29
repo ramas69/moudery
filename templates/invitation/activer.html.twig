@@ -1,0 +1,43 @@
+{# Activation d'un compte invité (F-02), à l'identique de l'artboard « Activation de compte » du canevas Console : à gauche
+   le surtitre, le titre, qui invite à quoi, la fiche de l'invitation et la suite ; à droite le formulaire (adresse
+   fixée par l'invitation, prénom et nom, téléphone facultatif, mot de passe avec sa robustesse, accord pour les
+   e-mails), le bouton « Activer mon compte et ouvrir la caisse de … » et « Pas vous ? Signaler une erreur ».
+   Variables : invitation, form, membresDeLaVille. #}
+{% extends 'invitation/_layout.html.twig' %}
+{% import 'invitation/_fiche.html.twig' as fiche %}
+
+{% block title %}{{ 'invitation.titre'|trans }} · {{ invitation.association.nom }}{% endblock %}
+
+{% block contenu %}
+    {# Les clés d'un « select » ICU n'acceptent pas le tiret : « bureau-central » devient « bureau_central ». #}
+    {% set role = invitation.role.value|replace({'-': '_'}) %}
+    {% set lieu = invitation.ville ? invitation.ville.nom : invitation.association.nom %}
+    {% set inviteur = invitation.inviteePar %}
+    {% set origine = inviteur is null ? 'plateforme' : (inviteur.aLeRole(constant('App\\Security\\Role::BureauCentral')) ? 'central' : (inviteur.aLeRole(constant('App\\Security\\Role::SuperAdmin')) ? 'plateforme' : 'ville')) %}
+    <div class="invitation__presentation">
+        <div class="invitation__entete-texte">
+            <span class="invitation__surtitre">{{ ('invitation.surtitre_' ~ origine)|trans({ville: lieu}) }}</span>
+            <h1 class="invitation__titre">{{ 'invitation.titre'|trans }}</h1>
+            <p class="invitation__intro">{{ (inviteur ? 'invitation.intro_role_par' : 'invitation.intro_role')|trans({personne: inviteur ? inviteur.nomComplet : '', role: role, lieu: lieu, association: invitation.association.nom}) }}</p>
+        </div>
+        {{ fiche.fiche(invitation, false, membresDeLaVille) }}
+        <p class="invitation__note">{{ 'invitation.suite_role'|trans({role: role, lieu: lieu, association: invitation.association.nom}) }}</p>
+    </div>
+
+    {{ form_start(form, {attr: {class: 'invitation__formulaire bloc', novalidate: 'novalidate'}}) }}
+        {% if form.vars.submitted and not form.vars.valid %}
+            <div class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</div>
+        {% endif %}
+        {{ form_errors(form) }}
+
+        {{ include('invitation/_champs_compte.html.twig') }}
+
+        <div class="invitation__actions invitation__actions--ligne">
+            <button type="submit" class="bouton bouton--primaire">{{ 'invitation.activer_role'|trans({role: role, lieu: lieu, association: invitation.association.nom}) }}</button>
+            {% set contact = inviteur ? inviteur.email : invitation.association.emailContact %}
+            {% if contact %}
+                <span class="invitation__erreur-lien">{{ 'invitation.pas_vous'|trans }} <a href="mailto:{{ contact }}?subject={{ 'invitation.erreur_objet'|trans({association: invitation.association.nom})|url_encode }}&amp;body={{ 'invitation.erreur_corps'|trans({email: invitation.email})|url_encode }}">{{ 'invitation.signaler'|trans }}</a></span>
+            {% endif %}
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

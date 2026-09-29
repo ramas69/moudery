@@ -1,0 +1,390 @@
+/*
+ * Rapport d'assemblée générale (F-30) : trois feuilles A4 sur fond gris à l'écran, seules à l'impression (enregistrer
+ * en PDF depuis le navigateur). Direction Console : Manrope, chiffres tabulaires, une seule couleur d'action pour les
+ * barres, filets légers ; tokens de app.css uniquement.
+ */
+.rapport__aide {
+    margin: 0 0 1rem;
+    font-size: var(--taille-petit);
+    color: var(--texte-3);
+}
+
+.rapport {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.rapport__page {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 210mm;
+    min-height: 297mm;
+    padding: 14mm 15mm 12mm;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+    box-shadow: var(--ombre);
+    font-size: 0.8125rem;
+}
+
+.rapport__entete {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--texte);
+}
+
+.rapport__entete--suite {
+    align-items: baseline;
+}
+
+.rapport__meta {
+    font-size: 0.75rem;
+    color: var(--texte-3);
+    text-align: right;
+}
+
+.rapport__section {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--texte-3);
+}
+
+.rapport__titre {
+    margin: -0.5rem 0 0;
+    font-size: 1.625rem;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+}
+
+.rapport__sous-titre {
+    margin: 0.25rem 0 0;
+    font-size: 0.9375rem;
+}
+
+.rapport__kpis {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 0;
+    border-top: 2px solid var(--texte);
+}
+
+.rapport__kpis > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    padding: 0.625rem 0.75rem;
+    border-bottom: 1px solid var(--bordure);
+}
+
+.rapport__kpis > div:not(:nth-child(3n + 1)) {
+    border-left: 1px solid var(--bordure);
+}
+
+.rapport__kpis dt {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--texte-2);
+}
+
+.rapport__kpis dd {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.rapport__kpis dd.rapport__kpi-detail {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--texte-3);
+}
+
+.rapport__texte {
+    margin: 0;
+    line-height: 1.55;
+    text-wrap: pretty;
+}
+
+.rapport__deux {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+.rapport__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+}
+
+.rapport__table caption {
+    padding-bottom: 0.375rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    text-align: left;
+}
+
+.rapport__table th,
+.rapport__table td {
+    padding: 0.4375rem 0.375rem;
+    border-bottom: 1px solid var(--bordure);
+    text-align: left;
+    font-weight: 400;
+}
+
+.rapport__table thead th {
+    border-bottom: 1.5px solid var(--texte);
+    font-size: 0.71875rem;
+    font-weight: 600;
+    color: var(--texte-3);
+}
+
+.rapport__table tbody th {
+    font-weight: 600;
+}
+
+.rapport__table tfoot th,
+.rapport__table tfoot td {
+    border-top: 1.5px solid var(--texte);
+    border-bottom: 0;
+    font-weight: 700;
+}
+
+.rapport__table .numerique {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.rapport__detail,
+.rapport__note,
+.rapport__vide {
+    color: var(--texte-3);
+}
+
+.rapport__note {
+    margin: -0.5rem 0 0;
+    font-size: 0.75rem;
+}
+
+.rapport__faits {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin: 0;
+    padding-left: 1.125rem;
+    line-height: 1.45;
+}
+
+.rapport__barres {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 0.375rem;
+    align-items: end;
+    height: 11rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid var(--bordure-forte);
+}
+
+.rapport__colonne {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.25rem;
+    height: 100%;
+}
+
+.rapport__barre {
+    display: block;
+    width: 70%;
+    min-height: 1px;
+    border-radius: 3px 3px 0 0;
+    background: var(--accent);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.rapport__valeur {
+    font-size: 0.625rem;
+    color: var(--texte-3);
+    white-space: nowrap;
+}
+
+.rapport__mois {
+    font-size: 0.6875rem;
+    color: var(--texte-3);
+}
+
+.rapport__horizontales {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.rapport__horizontales li {
+    display: grid;
+    grid-template-columns: minmax(0, 8rem) minmax(0, 1fr) 4.5rem;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rapport__libelle {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rapport__piste {
+    display: block;
+    height: 0.5rem;
+    border-radius: 0.25rem;
+    background: var(--surface-2);
+    overflow: hidden;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.rapport__piste > span {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+}
+
+.rapport__horizontales .numerique {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.rapport__signatures {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+    margin-top: auto;
+}
+
+.rapport__signatures > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2.25rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--texte);
+    font-size: 0.75rem;
+    color: var(--texte-3);
+}
+
+.rapport__pied {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: auto;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--bordure);
+    font-size: 0.75rem;
+    color: var(--texte-3);
+}
+
+.rapport__signatures + .rapport__pied {
+    margin-top: 0;
+}
+
+/* Sur téléphone, la feuille garde ses proportions en se resserrant (à l'écran seulement : l'impression reste en A4). */
+@media screen and (max-width: 47.99rem) {
+    .rapport__page {
+        min-height: 0;
+        padding: 1rem;
+    }
+
+    .rapport__kpis,
+    .rapport__deux {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .rapport__kpis > div:not(:nth-child(3n + 1)) {
+        border-left: 0;
+    }
+
+    .rapport__table--large {
+        font-size: 0.75rem;
+    }
+}
+
+@page {
+    size: A4;
+    margin: 0;
+}
+
+@media print {
+    /* Les contenus entrent en fondu à l'écran : à l'impression, tout doit être visible d'emblée. */
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    html,
+    body {
+        margin: 0;
+        height: auto;
+        background: #ffffff;
+    }
+
+    .console__barre,
+    .console__entete,
+    .rapport__aide,
+    .alerte,
+    .emprunt,
+    [data-turbo-progress-bar] {
+        display: none !important;
+    }
+
+    .console,
+    .console__principal,
+    .console__contenu {
+        display: block;
+        min-height: 0;
+        height: auto;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: #ffffff;
+    }
+
+    .rapport {
+        display: block;
+    }
+
+    .rapport__page {
+        max-width: none;
+        width: 210mm;
+        height: 296mm;
+        min-height: 0;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        break-after: page;
+        overflow: hidden;
+    }
+
+    .rapport__page:last-child {
+        break-after: auto;
+    }
+}
+
+/* G-02 dans le rapport (29 septembre 2026) : le flux de l'argent, sous les graphiques de la page 2. */
+.rapport__flux .flux__svg {
+    max-height: 62mm;
+}

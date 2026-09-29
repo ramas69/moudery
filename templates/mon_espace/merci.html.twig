@@ -1,0 +1,35 @@
+{# Confirmation d'un paiement en ligne (maquette « Paiement reçu ») : merci, reçu résumé, part qui reste à la ville et
+   part reversée au bureau central. Variables : membre, onglet, paiement, repartition. #}
+{% extends 'mon_espace/_layout.html.twig' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% macro euros(centimes) %}{{ (centimes / 100)|format_currency('EUR') }}{% endmacro %}
+{% import _self as r %}
+
+{% block title %}{{ 'mon_espace.merci.titre'|trans({prenom: membre.prenom}) }}{% endblock %}
+
+{% block contenu %}
+    <div class="merci">
+        <span class="merci__coche" aria-hidden="true">{{ icones.icone('coche', 24) }}</span>
+        <h1 class="espace-membre__titre">{{ 'mon_espace.merci.titre'|trans({prenom: membre.prenom}) }}</h1>
+        <p class="espace-membre__intro">{{ membre.email and membre.aConsentiEmail ? 'mon_espace.merci.recu_envoye'|trans({email: membre.email}) : 'mon_espace.merci.recu_espace'|trans }}</p>
+        {% if paiement.estSimule %}<p class="alerte alerte--info">{{ 'mon_espace.merci.simulation'|trans }}</p>{% endif %}
+    </div>
+
+    <dl class="espace-membre__bilan">
+        <div><dt>{{ 'mon_espace.merci.recu'|trans }}</dt><dd>{{ 'mon_espace.merci.numero'|trans({numero: paiement.id}) }}</dd></div>
+        <div><dt>{{ 'mon_espace.merci.date'|trans }}</dt><dd>{{ paiement.enregistreLe|format_datetime('medium', 'short') }}</dd></div>
+        {% for e in paiement.echeances %}
+            <div><dt>{% if e.appel %}{{ e.appel.objet }}{% else %}{{ 'mon_espace.echeances.cotisation'|trans({mois: ('membres_association.mois.' ~ e.mois)|trans|lower, annee: e.annee}) }}{% endif %}</dt><dd>{{ r.euros(e.montant ?? 0) }}</dd></div>
+        {% endfor %}
+        <div class="espace-membre__bilan-total"><dt>{{ 'mon_espace.merci.total'|trans }}</dt><dd>{{ r.euros(paiement.montant) }}</dd></div>
+    </dl>
+    <dl class="espace-membre__bilan">
+        <div><dt>{{ 'mon_espace.merci.reste_ville'|trans({ville: membre.ville.nom}) }}</dt><dd>{{ r.euros(repartition.ville) }}</dd></div>
+        <div class="espace-membre__bilan-total"><dt>{{ 'mon_espace.merci.central'|trans }}</dt><dd>{{ r.euros(repartition.central) }}</dd></div>
+    </dl>
+
+    <div class="merci__actions">
+        <a class="bouton bouton--primaire" href="{{ path('mon_espace_recu', {id: paiement.id}) }}">{{ 'mon_espace.merci.voir_recu'|trans }}</a>
+        <a class="bouton bouton--secondaire" href="{{ path('mon_espace') }}">{{ 'mon_espace.merci.retour'|trans }}</a>
+    </div>
+{% endblock %}

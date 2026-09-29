@@ -1,0 +1,9 @@
+Bonjour,
+
+{% if invitation.inviteePar %}{{ invitation.inviteePar.nomComplet }} vous invite{% else %}Vous êtes invité{% endif %} à rejoindre {{ 'app.nom'|trans }} comme {{ ('role.' ~ invitation.role.value)|trans|lower }} de {{ invitation.ville ? invitation.ville.nom : invitation.association.nom }}.
+
+Pour créer votre compte, choisissez votre mot de passe en ouvrant ce lien, valable jusqu’au {{ invitation.expireLe|format_datetime('long', 'short') }} et une seule fois :
+
+{{ lien }}
+
+Si vous n’attendiez pas cette invitation, ignorez cet e-mail : aucun compte ne sera créé.

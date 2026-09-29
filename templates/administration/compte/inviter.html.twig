@@ -1,0 +1,26 @@
+{# Invitation d'une personne (F-02) : association, rôle, ville éventuelle, adresse. Variable : form. #}
+{% extends 'administration/_layout.html.twig' %}
+{% set page = 'comptes' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+
+{% block title %}{{ 'administration.compte.inviter_titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block titre_page %}{{ 'administration.compte.inviter_titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'administration.compte.inviter_sous_titre'|trans }}</p>{% endblock %}
+
+{% block contenu %}
+    {{ form_start(form, {attr: {class: 'formulaire formulaire--etroit', novalidate: 'novalidate'}}) }}
+        {% if form.vars.submitted and not form.vars.valid %}
+            <div class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</div>
+        {% endif %}
+        {{ form_errors(form) }}
+        {{ formulaire.champ(form.association, null) }}
+        {{ formulaire.champ(form.role, 'administration.compte.role.aide'|trans) }}
+        {{ formulaire.champ(form.ville, 'administration.compte.ville.aide'|trans) }}
+        {{ formulaire.champ(form.email, 'administration.compte.email.aide'|trans) }}
+        <div class="formulaire__actions">
+            <a class="bouton bouton--secondaire" href="{{ path('administration_comptes') }}">{{ 'administration.compte.annuler'|trans }}</a>
+            <button type="submit" class="bouton bouton--primaire">{{ 'administration.compte.envoyer'|trans }}</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

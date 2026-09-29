@@ -1,0 +1,75 @@
+/* Mentions légales et politique de confidentialité (29 septembre 2026) : une colonne de lecture, tokens de app.css. */
+.legal {
+    min-height: 100vh;
+    background: var(--fond);
+}
+
+.legal__entete {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem clamp(1rem, 4vw, 2rem);
+    border-bottom: 1px solid var(--bordure);
+    background: var(--surface);
+}
+
+.legal__liens {
+    display: flex;
+    gap: 1rem;
+    font-size: var(--taille-petit);
+    font-weight: 600;
+}
+
+.legal__liens a {
+    color: var(--texte-2);
+    text-decoration: none;
+}
+
+.legal__liens a[aria-current="page"] {
+    color: var(--texte);
+    text-decoration: underline;
+}
+
+.legal__corps {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 2rem 1rem 3rem;
+    line-height: 1.65;
+}
+
+.legal__corps h1 {
+    font-size: 1.5rem;
+    text-wrap: balance;
+}
+
+.legal__corps h2 {
+    margin-top: 1.75rem;
+    font-size: 1rem;
+}
+
+.legal__corps p,
+.legal__corps li {
+    color: var(--texte-2);
+    text-wrap: pretty;
+}
+
+.legal__maj {
+    margin-top: 2rem;
+    font-size: var(--taille-petit);
+    color: var(--texte-3);
+}
+
+.pied-legal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem 1rem;
+    margin: 0;
+    font-size: var(--taille-petit);
+}
+
+.pied-legal a {
+    color: var(--texte-3);
+}

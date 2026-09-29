@@ -1,0 +1,7 @@
+{# Bouton « Renvoyer l'invitation » : un POST protégé par jeton, qui ramène sur la page d'origine. Variables : invitation, retour. #}
+{% import 'composants/icones.html.twig' as icones %}
+<form method="post" action="{{ path('administration_invitation_renvoyer', {id: invitation.id}) }}" class="renvoi">
+    <input type="hidden" name="_token" value="{{ csrf_token('renvoyer-invitation-' ~ invitation.id) }}">
+    <input type="hidden" name="retour" value="{{ retour }}">
+    <button type="submit" class="bouton bouton--secondaire">{{ icones.icone('renvoyer', 15) }}{{ 'administration.invitation.renvoyer'|trans }}</button>
+</form>

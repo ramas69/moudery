@@ -1,0 +1,4 @@
+<p>Bonjour {{ destinataire.prenom }},</p>
+<p>La dépense n° {{ depense.numero }} « {{ depense.libelle }} » ({{ (depense.montant / 100)|format_currency('EUR') }}) de la caisse de {{ depense.ville.nom }} a été soumise par {{ depense.saisiePar ? depense.saisiePar.nomComplet : 'un responsable' }}, mais aucun président n’a de compte pour la valider.</p>
+<p>Seul le président de la ville valide ses dépenses. Vous pouvez nommer un président depuis Paramètres › Responsables et rôles.</p>
+<p><a href="{{ lien }}" style="display:inline-block;padding:10px 16px;border-radius:8px;background:#21705b;color:#ffffff;font-weight:600;text-decoration:none">Voir la dépense</a></p>

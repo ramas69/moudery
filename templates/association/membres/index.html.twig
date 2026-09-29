@@ -1,0 +1,144 @@
+{# Les membres de l'association vus par le bureau central : une ville et une année d'adhésion au choix (année en cours par
+   défaut), recherche, chiffres de la sélection, tableau paginé, export CSV. Variables : association, villes, ville (ou null),
+   annee (ou null), anneeCourante, perimetreVille (la ville vient de la barre latérale), filtres (ville, annee, q, statut), membres, total, anneesParMembre, parVille, parAnnee,
+   statistiques (nouveaux, sans_contact, villes), pagination (page, pages, de, a). #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'membres' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'composants/selecteur.html.twig' as selecteur %}
+
+{% set params = filtres|filter(valeur => valeur != '') %}
+{% set libelleVille = ville ? ville.nom : 'membres_association.toutes_villes'|trans %}
+{% set libelleAnnee = annee ? 'membres_association.annee'|trans({annee: annee}) : 'membres_association.toutes_annees'|trans %}
+
+{% block title %}{{ 'membres_association.titre'|trans }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}{{ 'membres_association.titre'|trans }} <span class="compteur">{{ total }}</span>{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'membres_association.sous_titre'|trans({ville: libelleVille, annee: libelleAnnee, nombre: total}) }}</p>{% endblock %}
+
+{% block actions %}
+    <a class="bouton bouton--primaire" href="{{ path('association_membres_export', {slug: association.slug, format: 'csv'}|merge(params)) }}">{{ icones.icone('export', 15) }}{{ 'membres_association.exporter'|trans }}</a>
+    <a class="bouton bouton--secondaire" href="{{ path('association_membres_export', {slug: association.slug}|merge(params)|merge({format: 'xlsx'})) }}">{{ icones.icone('export', 15) }}{{ 'membres_association.exporter_xlsx'|trans }}</a>
+{% endblock %}
+
+{% block contenu %}
+    {# Frame Turbo : la recherche instantanée (contrôleur `recherche`) et la pagination ne rechargent que la liste ;
+       les autres liens de la frame conduisent la page entière (target="_top"). #}
+    <turbo-frame id="membres-association" class="frame-liste" target="_top" data-turbo-action="advance">
+    <form method="get" action="{{ path('association_membres', {slug: association.slug}) }}" class="barre-outils" role="search" data-turbo-frame="membres-association" data-controller="recherche" data-recherche-valeur-value="{{ filtres.q }}" data-action="input->recherche#saisir submit->recherche#annuler">
+        <label class="recherche" id="recherche-membres" data-turbo-permanent>
+            <span class="visuellement-cache">{{ 'membres_association.rechercher'|trans }}</span>
+            {{ icones.icone('recherche', 15) }}
+            <input class="recherche__saisie" type="search" name="q" value="{{ filtres.q }}" placeholder="{{ 'membres_association.recherche_placeholder'|trans }}" autocomplete="off">
+        </label>
+        {% if filtres.ville != '' %}<input type="hidden" name="ville" value="{{ filtres.ville }}">{% endif %}
+        <input type="hidden" name="annee" value="{{ filtres.annee }}">
+        {% if filtres.statut != '' %}<input type="hidden" name="statut" value="{{ filtres.statut }}">{% endif %}
+        <button type="submit" class="visuellement-cache">{{ 'membres_association.rechercher'|trans }}</button>
+        {% if filtres.q != '' or filtres.ville != '' or filtres.statut != '' or filtres.annee != anneeCourante %}
+            <a class="bouton bouton--discret" href="{{ path('association_membres', {slug: association.slug}) }}">{{ icones.icone('croix', 15) }}{{ 'membres_association.effacer'|trans }}</a>
+        {% endif %}
+    </form>
+
+    <div class="filtres-groupe">
+        {# Le périmètre de la barre latérale fixe la ville : les chips de ville ne s'affichent qu'à l'échelle de l'association. #}
+        {% if not perimetreVille %}
+            <div class="filtres" role="group" aria-label="{{ 'membres_association.filtre_ville'|trans }}">
+                <span class="filtres__libelle">{{ 'membres_association.filtre_ville'|trans }}</span>
+                <a class="filtre" href="{{ path('association_membres', {slug: association.slug}|merge(params|filter((v, k) => k != 'ville'))|merge({ville: 'toutes'})) }}"{% if filtres.ville == '' %} aria-current="true"{% endif %}>{{ 'membres_association.toutes'|trans }} · {{ parVille|reduce((somme, n) => somme + n, 0) }}</a>
+                {% for v in villes %}
+                    <a class="filtre" href="{{ path('association_membres', {slug: association.slug}|merge(params)|merge({ville: v.id})) }}"{% if filtres.ville == v.id %} aria-current="true"{% endif %}>{{ v.nom }} · {{ parVille[v.id] ?? 0 }}</a>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {# L'année : un sélecteur (toutes les années, puis chaque exercice suivi et chaque année qui a des adhérents). #}
+        {% set optionsAnnee = [{valeur: 'toutes', libelle: 'membres_association.toutes_annees'|trans, href: path('association_membres', {slug: association.slug}|merge(params)|merge({annee: 'toutes'}))}] %}
+        {% for a, nombre in parAnnee %}
+            {% set optionsAnnee = optionsAnnee|merge([{valeur: a, libelle: a ~ ' · ' ~ nombre, href: path('association_membres', {slug: association.slug}|merge(params)|merge({annee: a}))}]) %}
+        {% endfor %}
+        {{ selecteur.annee('membres_association.filtre_annee'|trans, optionsAnnee, filtres.annee, 'selecteur-annee') }}
+    </div>
+
+    <div class="kpis">
+        <div class="kpi"><span class="kpi__libelle">{{ 'membres_association.kpi.membres'|trans }}</span><span class="kpi__valeur">{{ total }}</span><span class="kpi__detail">{{ libelleVille }}</span></div>
+        {% if annee %}
+            <div class="kpi"><span class="kpi__libelle">{{ 'membres_association.kpi.nouveaux'|trans({annee: annee}) }}</span><span class="kpi__valeur">{{ statistiques.nouveaux }}</span><span class="kpi__detail">{{ 'membres_association.kpi.nouveaux_aide'|trans }}</span></div>
+        {% endif %}
+        <div class="kpi"><span class="kpi__libelle">{{ 'membres_association.kpi.sans_contact'|trans }}</span><span class="kpi__valeur{{ statistiques.sans_contact > 0 ? ' import__kpi--attention' }}">{{ statistiques.sans_contact }}</span></div>
+        <div class="kpi"><span class="kpi__libelle">{{ 'membres_association.kpi.villes'|trans }}</span><span class="kpi__valeur">{{ statistiques.villes }}</span></div>
+    </div>
+
+    <section class="section" aria-labelledby="membres-liste">
+        <div class="section__entete"><h2 id="membres-liste">{{ libelleVille }} · {{ libelleAnnee }}{% if annee %} <span class="chip chip--accent">{{ annee }}</span>{% endif %}</h2></div>
+        {% if membres is empty %}
+            <p class="section__vide">{{ (annee and filtres.q == '' ? 'membres_association.vide_annee' : 'membres_association.vide')|trans({annee: annee ?? ''}) }}</p>
+        {% else %}
+            <div class="tableau tableau--membres-association">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ 'membres_association.tableau.membre'|trans }}</th>
+                            {% if not ville %}<th scope="col">{{ 'membres_association.tableau.ville'|trans }}</th>{% endif %}
+                            <th scope="col" class="tableau__tertiaire">{{ 'membres_association.tableau.contact'|trans }}</th>
+                            <th scope="col" class="tableau__secondaire">{{ 'membres_association.tableau.adhesions'|trans }}</th>
+                            <th scope="col">{{ 'membres_association.tableau.statut'|trans }}</th>
+                            <th scope="col" class="tableau__tertiaire"><span class="visuellement-cache">{{ 'membres_association.tableau.actions'|trans }}</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for membre in membres %}
+                            {% set classeStatut = {actif: 'succes', 'en-attente': 'attente', sorti: 'archivee'}[membre.statut.value] %}
+                            {% set annees = anneesParMembre[membre.id] ?? [] %}
+                            <tr>
+                                <td>
+                                    <div class="entite">
+                                        <span class="entite__initiales entite__initiales--rond" aria-hidden="true">{{ membre.initiales }}</span>
+                                        <div class="entite__texte">
+                                            <span class="entite__nom"><a href="{{ path('association_membre', {slug: association.slug, id: membre.id}) }}">{{ membre.nomComplet }}</a></span>
+                                            {% if membre.localite or membre.age %}
+                                                <span class="entite__detail">{{ membre.localite }}{% if membre.localite and membre.age %} · {% endif %}{% if membre.age %}{{ 'membres_association.tableau.age'|trans({age: membre.age}) }}{% endif %}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                {% if not ville %}<td>{{ membre.ville.nom }}</td>{% endif %}
+                                <td class="tableau__tertiaire">
+                                    {% if membre.email %}<a href="mailto:{{ membre.email }}">{{ membre.email }}</a>{% endif %}
+                                    {% if membre.telephoneAffiche %}<span class="tableau__precision tableau__precision--neutre">{{ membre.telephoneAffiche }}</span>{% endif %}
+                                    {% if membre.email is null and membre.telephoneAffiche is null %}<span class="tableau__precision">{{ 'membres_association.tableau.sans_contact'|trans }}</span>{% endif %}
+                                </td>
+                                <td class="tableau__secondaire">
+                                    {% if annees is not empty %}
+                                        {% for a in annees %}<span class="chip{{ a == annee ? ' chip--accent' }}">{{ a }}</span> {% endfor %}
+                                    {% else %}
+                                        <span class="tableau__precision tableau__precision--neutre">{{ 'membres_association.tableau.sans_adhesion'|trans }}</span>
+                                    {% endif %}
+                                </td>
+                                <td><span class="pastille pastille--{{ classeStatut }}">{{ ('membre.statut.' ~ membre.statut.value)|trans }}</span></td>
+                                <td class="tableau__tertiaire">
+                                    <div class="tableau__actions">
+                                        <a class="bouton bouton--discret bouton--petit" href="{{ path('association_membre', {slug: association.slug, id: membre.id}) }}">{{ 'membres_association.tableau.fiche'|trans }}{{ icones.icone('chevron', 14) }}</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if pagination.pages > 1 %}
+                <nav class="pagination" aria-label="{{ 'membres_association.pagination.titre'|trans }}">
+                    <span class="pagination__resume" aria-live="polite">{{ 'membres_association.pagination.resume'|trans({de: pagination.de, a: pagination.a, total: total}) }}</span>
+                    <span class="pagination__pages">
+                        {% if pagination.page > 1 %}
+                            <a class="bouton bouton--secondaire bouton--petit" href="{{ path('association_membres', {slug: association.slug}|merge(params)|merge({page: pagination.page - 1})) }}" data-turbo-frame="membres-association">{{ icones.icone('chevron-gauche', 14) }}{{ 'membres_association.pagination.precedente'|trans }}</a>
+                        {% endif %}
+                        <span class="pagination__position">{{ 'membres_association.pagination.position'|trans({page: pagination.page, pages: pagination.pages}) }}</span>
+                        {% if pagination.page < pagination.pages %}
+                            <a class="bouton bouton--secondaire bouton--petit" href="{{ path('association_membres', {slug: association.slug}|merge(params)|merge({page: pagination.page + 1})) }}" data-turbo-frame="membres-association">{{ 'membres_association.pagination.suivante'|trans }}{{ icones.icone('chevron', 14) }}</a>
+                        {% endif %}
+                    </span>
+                </nav>
+            {% endif %}
+        {% endif %}
+    </section>
+    </turbo-frame>
+{% endblock %}

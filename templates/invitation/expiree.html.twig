@@ -1,0 +1,35 @@
+{# Lien d'invitation expiré ou déjà utilisé (artboard « Invitation expirée » du canevas Console) : rien n'est perdu. Pour
+   un lien expiré : « Demander un nouveau lien » (e-mail à qui a invité, une fois par jour au plus) et « J'ai déjà activé
+   mon compte ». Variables : invitation, jeton, demande (facultatif : envoyee ou deja). #}
+{% extends 'invitation/_layout.html.twig' %}
+{% import 'invitation/_fiche.html.twig' as fiche %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block title %}{{ 'invitation.expiree.titre'|trans }} · {{ invitation.association.nom }}{% endblock %}
+
+{% block contenu %}
+    {% set acceptee = invitation.estAcceptee() %}
+    <div class="invitation__presentation invitation__presentation--seule">
+        <span class="invitation__icone" aria-hidden="true">{{ icones.icone('horloge', 24) }}</span>
+        <div class="invitation__entete-texte">
+            <h1 class="invitation__titre">{{ 'invitation.expiree.titre'|trans }}</h1>
+            <p class="invitation__intro">{{ acceptee ? 'invitation.expiree.deja_utilisee'|trans : 'invitation.expiree.texte'|trans({date: invitation.expireLe|format_date('long')}) }}</p>
+        </div>
+        {% if demande is defined %}
+            <p class="alerte {{ demande == 'envoyee' ? 'alerte--succes' : 'alerte--attention' }}" role="status">{{ ('invitation.expiree.demande_' ~ demande)|trans({email: invitation.email}) }}</p>
+        {% endif %}
+        {{ fiche.fiche(invitation, true) }}
+        <div class="invitation__actions invitation__actions--colonne">
+            {% if not acceptee %}
+                <form method="post" action="{{ path('invitation_nouveau_lien', {jeton: jeton}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('nouveau-lien-' ~ jeton) }}">
+                    <button type="submit" class="bouton bouton--primaire"{% if demande is defined %} disabled{% endif %}>{{ 'invitation.expiree.nouveau_lien'|trans }}</button>
+                </form>
+            {% endif %}
+            <a class="bouton bouton--secondaire" href="{{ path('connexion') }}">{{ (acceptee ? 'invitation.expiree.se_connecter' : 'invitation.expiree.deja_active')|trans }}</a>
+            {% if not acceptee %}
+                <p class="invitation__note invitation__note--centree">{{ 'invitation.expiree.demander_texte'|trans({personne: invitation.inviteePar ? invitation.inviteePar.nomComplet : 'invitation.expiree.le_bureau_central'|trans, email: invitation.email}) }}</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

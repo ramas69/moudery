@@ -1,0 +1,38 @@
+{# Macros de formulaire communes. #}
+
+{# Un champ accessible : libellé, saisie, aide et erreurs, tous reliés par aria-describedby.
+   attributs (facultatif) : attributs HTML ajoutés à la saisie, par exemple des cibles ou actions Stimulus. #}
+{% macro champ(champ, aide, attributs = {}) %}
+    {% set enErreur = champ.vars.errors|length > 0 %}
+    {% set idAide = champ.vars.id ~ '_aide' %}
+    {% set idErreur = champ.vars.id ~ '_erreur' %}
+    {% set decritPar = ((aide ? idAide : '') ~ ' ' ~ (enErreur ? idErreur : ''))|trim %}
+    <div class="champ{{ enErreur ? ' champ--erreur' }}">
+        {{ form_label(champ, null, {label_attr: {class: 'champ__label'}}) }}
+        {{ form_widget(champ, {attr: champ.vars.attr|merge(attributs|default({}))|merge({
+            class: 'champ__saisie',
+            'aria-describedby': decritPar ?: false,
+            'aria-invalid': enErreur ? 'true' : false,
+        })}) }}
+        {% if aide %}<p class="champ__aide" id="{{ idAide }}">{{ aide }}</p>{% endif %}
+        {% if enErreur %}
+            <p class="champ__erreur" id="{{ idErreur }}">
+                {%- for erreur in champ.vars.errors %}{{ erreur.message }}{% if not loop.last %} {% endif %}{% endfor -%}
+            </p>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{# Bouton de déconnexion : un formulaire POST protégé par jeton, jamais un simple lien.
+   compact = true : un bouton icône seul, le libellé reste pour les lecteurs d'écran et l'info-bulle. #}
+{% macro deconnexion(compact) %}
+    {% import 'composants/icones.html.twig' as icones %}
+    <form method="post" action="{{ path('deconnexion') }}" class="deconnexion">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" data-controller="csrf-protection">
+        {% if compact|default(false) %}
+            <button type="submit" class="bouton bouton--discret bouton--icone" aria-label="{{ 'connexion.deconnexion'|trans }}" title="{{ 'connexion.deconnexion'|trans }}">{{ icones.icone('deconnexion') }}</button>
+        {% else %}
+            <button type="submit" class="bouton bouton--discret">{{ 'connexion.deconnexion'|trans }}</button>
+        {% endif %}
+    </form>
+{% endmacro %}

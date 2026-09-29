@@ -1,0 +1,96 @@
+{# L'accueil d'un responsable de ville (trésorière, président, secrétaire), d'après l'artboard « Accueil trésorière
+   mobile » du canevas Console : bonjour, quatre chiffres (collecté, membres à jour, impayés, solde de la caisse), la
+   liste « À faire » selon les droits de la personne, les derniers paiements. Variables : association, ville, aujourdhui,
+   exercices, anneeExercice, exerciceCourant, prenom, finances, membres, impayes (montant, membres), aFaire, paiements,
+   libelleExercice. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'tableau-de-bord' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% macro euros(centimes) %}{{ (centimes / 100)|format_currency('EUR', {fraction_digit: 0}) }}{% endmacro %}
+{% macro euros_precis(centimes) %}{{ (centimes / 100)|format_currency('EUR') }}{% endmacro %}
+
+{% block title %}{{ 'accueil_ville.titre'|trans({ville: ville.nom}) }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}{{ prenom ? 'accueil_ville.bonjour'|trans({prenom: prenom}) : 'accueil_ville.titre'|trans({ville: ville.nom}) }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'accueil_ville.sous_titre'|trans({ville: ville.nom, membres: membres, exercice: libelleExercice}) }}</p>{% endblock %}
+
+{% block actions %}
+    {% if exercices|length > 1 %}
+        <details class="menu exercice-menu" data-controller="menu" data-action="toggle->menu#ouvrir">
+            <summary class="exercice exercice--choix" title="{{ 'espace.tableau_de_bord.exercice_choisir'|trans }}">{{ icones.icone('calendrier', 15) }}{{ 'espace.tableau_de_bord.exercice'|trans({exercice: libelleExercice}) }}{{ icones.icone('chevron', 14) }}</summary>
+            <div class="menu__liste">
+                {% for e in exercices %}
+                    <a class="menu__item{{ e.annee == anneeExercice ? ' menu__item--actif' }}" href="{{ path('association_tableau_de_bord', {slug: association.slug}|merge(loop.first ? {} : {exercice: e.annee})) }}">{{ 'espace.tableau_de_bord.exercice'|trans({exercice: e.libelle}) }}</a>
+                {% endfor %}
+            </div>
+        </details>
+    {% else %}
+        <span class="exercice">{{ icones.icone('calendrier', 15) }}{{ 'espace.tableau_de_bord.exercice'|trans({exercice: libelleExercice}) }}</span>
+    {% endif %}
+{% endblock %}
+
+{% block contenu %}
+    <section class="kpis accueil-ville__kpis" aria-label="{{ 'espace.tableau_de_bord.chiffres'|trans }}">
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'espace.kpi.collecte'|trans }}</span>
+            <span class="kpi__valeur">{{ _self.euros(finances.collecte) }}</span>
+            <span class="kpi__detail">{% if finances.exercicePrecedent is null %}{{ 'espace.kpi.collecte_premier'|trans }}{% else %}<span class="kpi__chip{{ finances.variation > 0 ? ' kpi__chip--succes' : (finances.variation < 0 ? ' kpi__chip--erreur' : '') }}">{{ finances.variation > 0 ? '+' }}{{ finances.variation }} %</span> {{ 'espace.kpi.collecte_vs'|trans({exercice: finances.exercicePrecedent}) }}{% endif %}</span>
+        </div>
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'espace.kpi.membres_a_jour'|trans }}</span>
+            <span class="kpi__valeur">{{ finances.pourcentageAJour }} %</span>
+            <span class="kpi__detail">{{ 'accueil_ville.a_jour_detail'|trans({nombre: finances.aJour, total: finances.adherents}) }}</span>
+        </div>
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'accueil_ville.impayes'|trans }}</span>
+            <span class="kpi__valeur{{ impayes.montant > 0 ? ' kpi__valeur--erreur' }}">{{ _self.euros(impayes.montant) }}</span>
+            <span class="kpi__detail">{{ 'accueil_ville.impayes_detail'|trans({nombre: impayes.membres}) }}</span>
+        </div>
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'accueil_ville.solde'|trans }}</span>
+            <span class="kpi__valeur{{ finances.solde < 0 ? ' kpi__valeur--erreur' }}">{{ _self.euros(finances.solde) }}</span>
+            <span class="kpi__detail">{{ 'accueil_ville.solde_detail'|trans({depense: _self.euros(finances.depense)}) }}</span>
+        </div>
+    </section>
+
+    <div class="colonnes colonnes--2-1 accueil-ville">
+        <section class="section" aria-labelledby="a-faire-titre">
+            <div class="section__entete">
+                <h2 id="a-faire-titre">{{ 'accueil_ville.a_faire.titre'|trans }}{% if aFaire|length > 0 %} <span class="compteur compteur--accent">{{ aFaire|length }}</span>{% endif %}</h2>
+            </div>
+            {% for t in aFaire %}
+                {% set icone = {inscriptions: 'personne-plus', impayes: 'relance', depenses: 'recu', reversement: 'reversement', cotisations: 'euro'}[t.type] %}
+                {% set teinte = {inscriptions: 'attente', impayes: 'erreur', depenses: 'info', reversement: 'neutre', cotisations: 'info'}[t.type] %}
+                <a class="section__ligne section__ligne--action accueil-ville__tache" href="{{ path(t.route, {slug: association.slug}|merge(t.params)) }}">
+                    <span class="section__icone section__icone--{{ teinte }}" aria-hidden="true">{{ icones.icone(icone, 16) }}</span>
+                    <span class="section__texte">
+                        <span class="section__principal">{{ ('accueil_ville.a_faire.' ~ t.type)|trans({nombre: t.nombre, montant: t.montant is not null ? _self.euros_precis(t.montant) : ''}) }}</span>
+                        <span class="section__secondaire">{{ ('accueil_ville.a_faire.' ~ t.type ~ '_detail')|trans({nombre: t.nombre, montant: t.montant is not null ? _self.euros_precis(t.montant) : '', date: t.date ? t.date|format_date('medium') : ''}) }}</span>
+                    </span>
+                    <span class="bouton bouton--petit {{ t.agir ? 'bouton--primaire' : 'bouton--secondaire' }}">{{ ('accueil_ville.a_faire.action_' ~ t.action)|trans }}</span>
+                </a>
+            {% else %}
+                <p class="section__vide">{{ 'accueil_ville.a_faire.rien'|trans }}</p>
+            {% endfor %}
+        </section>
+
+        <section class="section" aria-labelledby="derniers-paiements-titre">
+            <div class="section__entete">
+                <h2 id="derniers-paiements-titre">{{ 'accueil_ville.paiements.titre'|trans }}</h2>
+                <a class="section__lien" href="{{ path('association_paiements', {slug: association.slug}) }}">{{ 'accueil_ville.paiements.tous'|trans }}</a>
+            </div>
+            {% for p in paiements %}
+                <div class="section__ligne accueil-ville__paiement{{ p.estAnnule ? ' accueil-ville__paiement--annule' }}">
+                    <span class="entite__initiales" aria-hidden="true">{{ p.membre.prenom|slice(0, 1)|upper }}{{ p.membre.nom|slice(0, 1)|upper }}</span>
+                    <span class="section__texte">
+                        <span class="section__principal"><a href="{{ path('association_membre', {slug: association.slug, id: p.membre.id}) }}">{{ p.membre.nomComplet }}</a></span>
+                        <span class="section__secondaire">{{ ('paiements_association.moyen.' ~ p.moyen.value)|trans|lower }} · {{ p.recuLe|format_date('medium') }}{% if p.estAnnule %} · {{ 'paiements_association.statut.annule'|trans|lower }}{% endif %}</span>
+                    </span>
+                    <a class="accueil-ville__montant" href="{{ path('association_paiement_recu', {slug: association.slug, id: p.id}) }}">{{ _self.euros_precis(p.montant) }}</a>
+                </div>
+            {% else %}
+                <p class="section__vide">{{ 'accueil_ville.paiements.aucun'|trans }}</p>
+            {% endfor %}
+        </section>
+    </div>
+{% endblock %}

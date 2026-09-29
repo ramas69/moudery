@@ -1,0 +1,12 @@
+{% set membre = paiement.membre %}
+Bonjour {{ prenom }},
+
+{{ membre.association.nom }} a bien reçu votre paiement de {{ (paiement.montant / 100)|format_currency('EUR') }} le {{ paiement.recuLe|format_date('long') }} ({{ ('paiements_association.moyen.' ~ paiement.moyen.value)|trans|lower }}{% if paiement.reference %}, référence {{ paiement.reference }}{% endif %}), pour la caisse de {{ paiement.ville.nom }}.
+
+Ce paiement règle :
+{% for e in paiement.echeances %}
+- {% if e.appel %}{{ e.appel.objet }}{% else %}Cotisation {{ ('membres_association.mois.' ~ e.mois)|trans }} {{ e.annee }}{% endif %} · {{ (e.montant / 100)|format_currency('EUR') }}
+{% endfor %}
+
+Reçu n° {{ paiement.id }}. Conservez ce message : il vaut reçu.
+Votre historique : {{ lien }}

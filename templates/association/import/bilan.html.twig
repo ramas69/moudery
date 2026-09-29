@@ -1,0 +1,63 @@
+{# Bilan d'un import d'association confirmé (F-31). Variables : association, fichier, bilan (par ville), totaux. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'import' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block title %}{{ 'import_association.bilan.titre'|trans }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}{{ 'import_association.bilan.titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'import_association.bilan.sous_titre'|trans({fichier: fichier}) }}</p>{% endblock %}
+
+{% block actions %}
+    <a class="bouton bouton--secondaire" href="{{ path('association_import', {slug: association.slug}) }}">{{ 'import_association.bilan.nouvel_import'|trans }}</a>
+    <a class="bouton bouton--primaire" href="{{ path('association_tableau_de_bord', {slug: association.slug}) }}">{{ 'import_association.bilan.tableau_de_bord'|trans }}</a>
+{% endblock %}
+
+{% block contenu %}
+    <p class="alerte alerte--succes" role="status">{{ 'import_association.bilan.succes'|trans({membres: totaux.membres, adhesions: totaux.adhesions, villes: totaux.creees}) }}</p>
+
+    <div class="kpis">
+        <div class="kpi"><span class="kpi__libelle">{{ 'import_association.bilan.membres'|trans }}</span><span class="kpi__valeur">{{ totaux.membres }}</span></div>
+        <div class="kpi"><span class="kpi__libelle">{{ 'import_association.apercu.adhesions'|trans }}</span><span class="kpi__valeur">{{ totaux.adhesions }}</span></div>
+        <div class="kpi"><span class="kpi__libelle">{{ 'import_association.bilan.villes_creees'|trans }}</span><span class="kpi__valeur">{{ totaux.creees }}</span></div>
+        <div class="kpi"><span class="kpi__libelle">{{ 'import_association.apercu.erreurs'|trans }}</span><span class="kpi__valeur{{ totaux.invalides > 0 ? ' import__kpi--attention' }}">{{ totaux.invalides }}</span></div>
+    </div>
+
+    <section class="section" aria-labelledby="bilan-par-ville">
+        <div class="section__entete"><h2 id="bilan-par-ville">{{ 'import_association.apercu.par_ville'|trans }}</h2></div>
+        <div class="tableau">
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">{{ 'import_association.rattachement.ville'|trans }}</th>
+                        <th scope="col" class="numerique">{{ 'import_association.bilan.membres'|trans }}</th>
+                        <th scope="col" class="numerique tableau__tertiaire">{{ 'import_association.apercu.adhesions'|trans }}</th>
+                        <th scope="col" class="numerique">{{ 'import_association.apercu.erreurs'|trans }}</th>
+                        <th scope="col" class="numerique tableau__secondaire">{{ 'import_association.apercu.ignorees'|trans }}</th>
+                        <th scope="col"><span class="visuellement-cache">{{ 'assistant_ville.membres.tableau.actions'|trans }}</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ligne in bilan %}
+                        <tr>
+                            <td>
+                                <span class="entite__nom">{{ ligne.ville }}</span>
+                                {% if ligne.creee %}<span class="pastille pastille--brouillon">{{ 'import_association.bilan.creee'|trans }}</span>{% endif %}
+                                {% if ligne.libelle != ligne.ville %}<span class="tableau__precision tableau__precision--neutre">{{ ligne.libelle }}</span>{% endif %}
+                            </td>
+                            <td class="numerique">{{ ligne.membres }}</td>
+                            <td class="numerique tableau__tertiaire">{{ ligne.adhesions }}</td>
+                            <td class="numerique">{{ ligne.invalides }}{% if ligne.erreur %}<span class="tableau__precision">{{ ('membre.import.' ~ ligne.erreur)|trans({'{{ maximum }}': 5000}, 'validators') }}</span>{% endif %}</td>
+                            <td class="numerique tableau__secondaire">{{ ligne.ignorees }}</td>
+                            <td class="tableau__actions">
+                                {% if ligne.villeId %}<a class="bouton bouton--discret bouton--petit" href="{{ path('ville_assistant_membres', {slug: association.slug, id: ligne.villeId}) }}">{{ 'import_association.bilan.voir'|trans }}{{ icones.icone('chevron', 14) }}</a>{% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if totaux.creees > 0 %}
+            <p class="section__aide">{{ 'import_association.bilan.villes_aide'|trans }}</p>
+        {% endif %}
+    </section>
+{% endblock %}

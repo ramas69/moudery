@@ -1,0 +1,66 @@
+{# Où va l'argent de ma ville (F-27, maquette 10e) : le bilan de l'exercice, les entrées par type (anonymes), les
+   dépenses par catégorie, les dépenses payées et les dernières entrées, toujours « un membre », jamais un nom.
+   Variables : membre, onglet, et celles de EspaceMembre::maVille(). #}
+{% extends 'mon_espace/_layout.html.twig' %}
+{% macro euros(centimes) %}{{ (centimes / 100)|format_currency('EUR', centimes % 100 == 0 ? {fraction_digit: 0} : {}) }}{% endmacro %}
+{% import _self as r %}
+
+{% block title %}{{ 'mon_espace.ville.titre'|trans }} · {{ ville.nom }}{% endblock %}
+
+{% block contenu %}
+    <p class="espace-membre__surtitre">{{ 'mon_espace.ville.surtitre'|trans({ville: ville.nom, exercice: exercice}) }}</p>
+    <h1 class="espace-membre__titre">{{ 'mon_espace.ville.titre'|trans }}</h1>
+    <p class="espace-membre__intro">{{ 'mon_espace.ville.anonyme'|trans }}</p>
+
+    <dl class="espace-membre__bilan">
+        <div><dt>{{ 'mon_espace.ville.entrees'|trans }}</dt><dd>+ {{ r.euros(entreesTotal) }}</dd></div>
+        <div><dt>{{ 'mon_espace.ville.reverse'|trans }}</dt><dd>− {{ r.euros(reverse) }}</dd></div>
+        <div><dt>{{ 'mon_espace.ville.depenses'|trans }}</dt><dd>− {{ r.euros(depense) }}</dd></div>
+        <div class="espace-membre__bilan-total"><dt>{{ 'mon_espace.ville.solde'|trans({date: fin|format_date('medium')}) }}</dt><dd>{{ r.euros(solde) }}</dd></div>
+    </dl>
+
+    <section class="espace-membre__bloc" aria-labelledby="ville-entrees">
+        <h2 id="ville-entrees">{{ 'mon_espace.ville.par_type'|trans }}</h2>
+        <ul class="espace-membre__barres">
+            {% for libelle, montant in entrees %}
+                <li><span class="espace-membre__barre-libelle">{{ libelle == 'cotisations' ? 'mon_espace.ville.cotisations'|trans : libelle }}</span><span class="espace-membre__piste"><span style="width: {{ totalEntrees > 0 ? (montant / totalEntrees * 100)|round(1) : 0 }}%"></span></span><span class="espace-membre__barre-montant">{{ r.euros(montant) }}</span></li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <section class="espace-membre__bloc" aria-labelledby="ville-categories">
+        <h2 id="ville-categories">{{ 'mon_espace.ville.par_categorie'|trans }}</h2>
+        {% if parCategorie is empty %}
+            <p class="espace-membre__vide">{{ 'mon_espace.ville.aucune_depense'|trans }}</p>
+        {% else %}
+            <ul class="espace-membre__barres">
+                {% for categorie, montant in parCategorie %}
+                    <li><span class="espace-membre__barre-libelle">{{ ('depenses_association.categorie.' ~ categorie)|trans }}</span><span class="espace-membre__piste"><span style="width: {{ (montant / maximumCategorie * 100)|round(1) }}%"></span></span><span class="espace-membre__barre-montant">{{ r.euros(montant) }}</span></li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
+
+    {% if depenses is not empty %}
+        <section class="espace-membre__bloc" aria-labelledby="ville-depenses">
+            <h2 id="ville-depenses">{{ 'mon_espace.ville.depenses_recentes'|trans }}</h2>
+            <ul class="espace-membre__liste">
+                {% for d in depenses %}
+                    <li class="espace-membre__ligne"><span class="espace-membre__ligne-texte"><span class="espace-membre__ligne-titre">{{ d.libelle }}</span><span class="espace-membre__ligne-detail">{{ ('depenses_association.categorie.' ~ d.categorie.value)|trans }} · {{ d.dateDepense|format_date('medium') }}</span></span><span class="espace-membre__montant">{{ (d.montant / 100)|format_currency('EUR') }}</span></li>
+                {% endfor %}
+            </ul>
+            <a class="espace-membre__lien" href="{{ path('mon_espace_ville_depenses') }}">{{ 'mon_espace.ville.voir_depenses'|trans({nombre: nombreDepenses}) }}</a>
+        </section>
+    {% endif %}
+
+    {% if dernieres is not empty %}
+        <section class="espace-membre__bloc" aria-labelledby="ville-dernieres">
+            <h2 id="ville-dernieres">{{ 'mon_espace.ville.dernieres'|trans }}</h2>
+            <ul class="espace-membre__liste">
+                {% for e in dernieres %}
+                    <li class="espace-membre__ligne"><span class="espace-membre__ligne-texte"><span class="espace-membre__ligne-titre">{{ e.types|map(t => t == 'cotisations' ? 'mon_espace.ville.cotisation'|trans : (t == 'contribution' ? 'mon_espace.ville.contribution'|trans : t))|join(' · ') }}</span><span class="espace-membre__ligne-detail">{{ 'mon_espace.ville.un_membre'|trans({date: e.date|format_date('medium')}) }}</span></span><span class="espace-membre__montant">{{ (e.montant / 100)|format_currency('EUR') }}</span></li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,234 @@
+{# Reversements des villes au bureau central (F-20, graphique G-11), d'après l'écran « Reversements » : part du central,
+   sélecteur d'exercice, quatre indicateurs (dû, reçu, restant, date limite), les déclarations des villes à confirmer,
+   le tableau du dû par ville avec son statut, le graphique « Reçus et restant dus » en CSS seul, l'historique.
+   Variables : association, ville (périmètre), aujourdhui, exercice, libelle, exercices, taux, dateLimite, enRetard,
+   lignes, totaux, compteurs, aConfirmer, historique. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'reversements' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% macro euros(centimes) %}{{ (centimes / 100)|format_currency('EUR') }}{% endmacro %}
+{% macro personne(compte) %}{% if compte is null %}{{ 'reversements_association.historique.personne_inconnue'|trans }}{% elseif app.user and compte.id == app.user.id %}{{ 'reversements_association.historique.vous'|trans }}{% else %}{{ compte.nomComplet }}{% endif %}{% endmacro %}
+
+{% set exerciceCourant = (exercices|first).annee == exercice %}
+{% set paramsExercice = exerciceCourant ? {} : {exercice: exercice} %}
+{% set jours = aujourdhui|date('U') > dateLimite|date('U') ? ((aujourdhui|date('U') - dateLimite|date('U')) / 86400)|round(0, 'floor') : ((dateLimite|date('U') - aujourdhui|date('U')) / 86400)|round(0, 'ceil') %}
+
+{% block title %}{{ 'reversements_association.titre'|trans }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}{{ 'reversements_association.titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ (ville ? 'reversements_association.sous_titre_ville' : 'reversements_association.sous_titre')|trans({taux: taux, exercice: libelle, ville: ville ? ville.nom : ''}) }}</p>{% endblock %}
+
+{% block actions %}
+    {% if exercices|length > 1 %}
+        <details class="menu exercice-menu" data-controller="menu" data-action="toggle->menu#ouvrir">
+            <summary class="exercice exercice--choix" title="{{ 'reversements_association.exercice_choisir'|trans }}">{{ icones.icone('calendrier', 15) }}{{ 'reversements_association.exercice'|trans({exercice: libelle}) }}{{ icones.icone('chevron', 14) }}</summary>
+            <div class="menu__liste">
+                {% for e in exercices %}
+                    <a class="menu__item{{ e.annee == exercice ? ' menu__item--actif' }}" href="{{ path('association_reversements', {slug: association.slug}|merge(loop.first ? {} : {exercice: e.annee})) }}">{{ 'reversements_association.exercice'|trans({exercice: e.libelle}) }}{% if loop.last %}<span class="menu__note">{{ 'espace.tableau_de_bord.exercice_premier'|trans }}</span>{% endif %}</a>
+                {% endfor %}
+            </div>
+        </details>
+    {% else %}
+        <span class="exercice" title="{{ 'espace.tableau_de_bord.exercice_aide'|trans({mois: association.debutExerciceMois}) }}">{{ icones.icone('calendrier', 15) }}{{ 'reversements_association.exercice'|trans({exercice: libelle}) }}</span>
+    {% endif %}
+    <a class="bouton bouton--secondaire" href="{{ path('association_reversements_export', {slug: association.slug}|merge(paramsExercice)) }}">{{ icones.icone('export', 15) }}{{ 'reversements_association.exporter'|trans }}</a>
+    {% if peutDeclarer %}
+        <a class="bouton {{ pilote ? 'bouton--secondaire' : 'bouton--primaire' }}" href="{{ path('association_reversement_declarer', {slug: association.slug}|merge(paramsExercice)) }}">{{ icones.icone('reversement', 15) }}{{ 'reversements_association.declarer'|trans }}</a>
+    {% endif %}
+    {% if pilote %}
+        <a class="bouton bouton--primaire" href="{{ path('association_reversement_nouveau', {slug: association.slug}|merge(paramsExercice)) }}">{{ icones.icone('plus', 15) }}{{ 'reversements_association.enregistrer'|trans }}</a>
+    {% endif %}
+{% endblock %}
+
+{% block contenu %}
+    <div class="kpis reversements__kpis">
+        <div class="kpi">
+            <span class="kpi__libelle">{{ (ville ? 'reversements_association.kpi.du_ville' : 'reversements_association.kpi.du')|trans }}</span>
+            <span class="kpi__valeur">{{ _self.euros(totaux.du) }}</span>
+            <span class="kpi__detail">{{ 'reversements_association.kpi.du_detail'|trans({taux: taux, collecte: _self.euros(totaux.collecte)}) }}</span>
+        </div>
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'reversements_association.kpi.recu'|trans }}</span>
+            <span class="kpi__valeur">{{ _self.euros(totaux.recu) }}</span>
+            <span class="kpi__detail">{{ 'reversements_association.kpi.recu_detail'|trans({nombre: historique|filter(r => r.estConfirme)|length}) }}</span>
+        </div>
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'reversements_association.kpi.restant'|trans }}</span>
+            <span class="kpi__valeur{{ totaux.restant > 0 and enRetard ? ' kpi__valeur--erreur' : (totaux.restant > 0 ? ' kpi__valeur--attention') }}">{{ _self.euros(totaux.restant) }}</span>
+            <span class="kpi__detail">
+                {% if totaux.declare > 0 %}<span class="kpi__chip kpi__chip--attente">{{ 'reversements_association.kpi.restant_detail'|trans({montant: _self.euros(totaux.declare)}) }}</span>{% else %}{{ 'reversements_association.kpi.restant_rien'|trans }}{% endif %}
+            </span>
+        </div>
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'reversements_association.kpi.date_limite'|trans }}</span>
+            <span class="kpi__valeur kpi__valeur--texte">{{ dateLimite|format_date('medium') }}</span>
+            <span class="kpi__detail" title="{{ 'reversements_association.kpi.date_limite_detail'|trans }}">
+                {% if enRetard %}<span class="kpi__chip{{ totaux.restant > 0 ? ' kpi__chip--erreur' }}">{{ 'reversements_association.kpi.date_limite_depassee'|trans({jours: jours}) }}</span>{% else %}{{ 'reversements_association.kpi.date_limite_dans'|trans({jours: jours}) }}{% endif %}
+            </span>
+        </div>
+    </div>
+
+    {% if aConfirmer is not empty %}
+        <section class="section reversements__a-confirmer" aria-labelledby="reversements-a-confirmer-titre">
+            <div class="section__entete">
+                <h2 id="reversements-a-confirmer-titre">{{ icones.icone('reversement', 16) }}{{ 'reversements_association.a_confirmer.titre'|trans }} <span class="compteur">{{ aConfirmer|length }}</span></h2>
+            </div>
+            <p class="section__aide">{{ (pilote ? 'reversements_association.a_confirmer.aide' : 'reversements_association.a_confirmer.aide_ville')|trans }}</p>
+            {% for r in aConfirmer %}
+                <form method="post" action="{{ path('association_reversement_confirmer', {slug: association.slug, id: r.id}) }}" class="section__ligne section__ligne--action reversements__declaration">
+                    <span class="section__icone section__icone--attente" aria-hidden="true">{{ icones.icone('reversement', 16) }}</span>
+                    <span class="section__texte">
+                        <span class="section__principal">{{ r.ville.nom }} · {{ _self.euros(r.montant) }} · {{ r.recuLe|format_date('medium') }}</span>
+                        <span class="section__secondaire">{{ 'reversements_association.a_confirmer.declare_par'|trans({personne: _self.personne(r.declarePar), date: r.creeLe|format_date('medium')}) }}{% if r.reference %} · {{ 'reversements_association.a_confirmer.reference'|trans({reference: r.reference}) }}{% endif %}{% if r.note %} · {{ r.note }}{% endif %}</span>
+                    </span>
+                    {% if pilote %}
+                    <span class="reversements__confirmation">
+                        <input type="hidden" name="_token" value="{{ csrf_token('reversement-confirmer-' ~ r.id) }}">
+                        <label class="reversements__montant-recu">
+                            <span class="visuellement-cache">{{ 'reversements_association.a_confirmer.montant'|trans }}</span>
+                            <span class="appel__euro"><input class="champ__saisie" type="text" name="montant" inputmode="decimal" value="{{ (r.montant / 100)|number_format(2, ',', '') }}" aria-label="{{ 'reversements_association.a_confirmer.montant'|trans }}"><span class="appel__euro-signe" aria-hidden="true">€</span></span>
+                        </label>
+                        <button type="submit" class="bouton bouton--primaire bouton--petit" aria-label="{{ 'reversements_association.a_confirmer.confirmer_de'|trans({ville: r.ville.nom}) }}">{{ icones.icone('coche', 15) }}{{ 'reversements_association.a_confirmer.confirmer'|trans }}</button>
+                    </span>
+                    {% else %}
+                    <span class="pastille pastille--attente">{{ 'reversements_association.a_confirmer.en_attente'|trans }}</span>
+                    {% endif %}
+                </form>
+            {% endfor %}
+        </section>
+    {% endif %}
+
+    <div class="colonnes reversements">
+        <section class="section" aria-labelledby="reversements-tableau-titre">
+            <div class="section__entete">
+                <h2 id="reversements-tableau-titre">{{ 'reversements_association.tableau.titre'|trans }}</h2>
+                <span class="section__lien reversements__compteurs">
+                    {% for statut in ['en_retard', 'a_reverser', 'partiel', 'solde'] %}{% if compteurs[statut] > 0 %}<span class="pastille pastille--{{ {en_retard: 'erreur', a_reverser: 'attente', partiel: 'info', solde: 'succes'}[statut] }}">{{ compteurs[statut] }} {{ ('reversements_association.statut.' ~ statut)|trans|lower }}</span>{% endif %}{% endfor %}
+                </span>
+            </div>
+            {% if lignes is empty %}
+                <p class="section__vide">{{ (ville ? 'reversements_association.tableau.vide_ville' : 'reversements_association.tableau.vide')|trans }}</p>
+            {% else %}
+                <div class="tableau tableau--serre tableau--reversements">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">{{ 'reversements_association.colonne.ville'|trans }}</th>
+                                <th scope="col" class="numerique tableau__tertiaire">{{ 'reversements_association.colonne.collecte'|trans({exercice: libelle}) }}</th>
+                                <th scope="col" class="numerique">{{ 'reversements_association.colonne.du'|trans }}</th>
+                                <th scope="col" class="numerique tableau__tertiaire">{{ 'reversements_association.colonne.recu'|trans }}</th>
+                                <th scope="col" class="numerique">{{ 'reversements_association.colonne.restant'|trans }}</th>
+                                <th scope="col">{{ 'reversements_association.colonne.statut'|trans }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ligne in lignes %}
+                                <tr class="reversements__ligne reversements__ligne--{{ ligne.statut }}">
+                                    <td>
+                                        <span class="entite">
+                                            <span class="entite__initiales{{ ligne.ville.estArchivee ? ' entite__initiales--eteinte' }}" aria-hidden="true">{{ ligne.ville.nom|slice(0, 2)|upper }}</span>
+                                            <span class="entite__texte">
+                                                <a class="entite__nom" href="{{ path('association_perimetre', {slug: association.slug, ville: ligne.ville.id, retour: path('association_reversements', {slug: association.slug}|merge(paramsExercice))}) }}">{{ ligne.ville.nom }}</a>
+                                                <span class="entite__detail">{{ ligne.dernier ? 'reversements_association.tableau.dernier'|trans({date: ligne.dernier.recuLe|format_date('medium')}) : 'reversements_association.tableau.aucun_reversement'|trans }}</span>
+                                            </span>
+                                        </span>
+                                    </td>
+                                    <td class="numerique tableau__tertiaire">{{ _self.euros(ligne.collecte) }}</td>
+                                    <td class="numerique"><strong>{{ _self.euros(ligne.du) }}</strong>{% if ligne.appels > 0 %}<span class="tableau__precision tableau__precision--neutre">{{ 'reversements_association.tableau.appels'|trans({montant: _self.euros(ligne.appels)}) }}</span>{% endif %}</td>
+                                    <td class="numerique tableau__tertiaire">{{ _self.euros(ligne.recu) }}{% if ligne.declare > 0 %}<span class="tableau__precision">+ {{ _self.euros(ligne.declare) }}</span>{% endif %}</td>
+                                    <td class="numerique"><strong>{{ _self.euros(ligne.restant) }}</strong></td>
+                                    <td><span class="pastille pastille--{{ {rien: 'brouillon', a_reverser: 'attente', partiel: 'info', solde: 'succes', en_retard: 'erreur'}[ligne.statut] }}">{{ ('reversements_association.statut.' ~ ligne.statut)|trans }}</span></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th scope="row">{{ 'reversements_association.tableau.total'|trans }}</th>
+                                <td class="numerique tableau__tertiaire">{{ _self.euros(totaux.collecte) }}</td>
+                                <td class="numerique"><strong>{{ _self.euros(totaux.du) }}</strong></td>
+                                <td class="numerique tableau__tertiaire">{{ _self.euros(totaux.recu) }}</td>
+                                <td class="numerique"><strong>{{ _self.euros(totaux.restant) }}</strong></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            {% endif %}
+            <p class="section__aide">{{ 'reversements_association.tableau.aide'|trans }}</p>
+        </section>
+
+        {# G-11 « Reversements dus et reçus par ville » : une barre par ville, reçu puis restant, à l'échelle du plus gros dû. #}
+        <section class="section reversements__graphique" aria-labelledby="reversements-graphique-titre">
+            <div class="section__entete">
+                <h2 id="reversements-graphique-titre">{{ 'reversements_association.graphique.titre'|trans }}</h2>
+                <span class="section__lien">{{ 'reversements_association.graphique.aide'|trans }}</span>
+            </div>
+            {% set avecDu = lignes|filter(l => l.du > 0 or l.recu > 0) %}
+            {% if avecDu is empty %}
+                <p class="section__vide">{{ 'reversements_association.graphique.vide'|trans }}</p>
+            {% else %}
+                {% set maximum = 1 %}
+                {% for l in avecDu %}{% set maximum = max(maximum, l.recu + l.restant) %}{% endfor %}
+                <ul class="reversements__barres" aria-hidden="true">
+                    {% for l in avecDu %}
+                        <li class="reversements__barre">
+                            <span class="reversements__barre-nom">{{ l.ville.nom }}</span>
+                            <span class="reversements__barre-piste">
+                                {% if l.recu > 0 %}<span class="reversements__barre-segment reversements__barre-segment--recu" style="width: {{ (l.recu / maximum * 100)|round(1) }}%"></span>{% endif %}
+                                {% if l.restant > 0 %}<span class="reversements__barre-segment reversements__barre-segment--restant" style="width: {{ (l.restant / maximum * 100)|round(1) }}%"></span>{% endif %}
+                            </span>
+                            <span class="reversements__barre-valeur">{{ _self.euros(l.restant) }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <div class="graphique__legende reversements__legende">
+                    <span class="graphique__cle"><span class="graphique__pastille" aria-hidden="true"></span>{{ 'reversements_association.graphique.recu'|trans }}</span>
+                    <span class="graphique__cle"><span class="graphique__pastille graphique__pastille--retard" aria-hidden="true"></span>{{ 'reversements_association.graphique.restant'|trans }}</span>
+                    <details class="graphique__donnees">
+                        <summary>{{ 'reversements_association.graphique.donnees'|trans }}</summary>
+                        <table>
+                            <thead><tr><th scope="col">{{ 'reversements_association.colonne.ville'|trans }}</th><th scope="col" class="numerique">{{ 'reversements_association.graphique.recu'|trans }}</th><th scope="col" class="numerique">{{ 'reversements_association.graphique.restant'|trans }}</th></tr></thead>
+                            <tbody>
+                                {% for l in avecDu %}<tr><th scope="row">{{ l.ville.nom }}</th><td class="numerique">{{ _self.euros(l.recu) }}</td><td class="numerique">{{ _self.euros(l.restant) }}</td></tr>{% endfor %}
+                            </tbody>
+                        </table>
+                    </details>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+
+    <section class="section" aria-labelledby="reversements-historique-titre">
+        <div class="section__entete"><h2 id="reversements-historique-titre">{{ 'reversements_association.historique.titre'|trans }}</h2></div>
+        {% if historique is empty %}
+            <p class="section__vide">{{ 'reversements_association.historique.vide'|trans }}</p>
+        {% else %}
+            <div class="tableau tableau--serre tableau--historique-reversements">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ 'reversements_association.historique.date'|trans }}</th>
+                            <th scope="col">{{ 'reversements_association.historique.ville'|trans }}</th>
+                            <th scope="col" class="tableau__secondaire">{{ 'reversements_association.historique.reference'|trans }}</th>
+                            <th scope="col" class="tableau__tertiaire">{{ 'reversements_association.historique.declare_par'|trans }}</th>
+                            <th scope="col" class="tableau__tertiaire">{{ 'reversements_association.historique.confirme_par'|trans }}</th>
+                            <th scope="col" class="numerique">{{ 'reversements_association.historique.montant'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in historique %}
+                            <tr>
+                                <td>{{ r.recuLe|format_date('medium') }}</td>
+                                <td><strong>{{ r.ville.nom }}</strong>{% if r.note %}<span class="tableau__precision tableau__precision--neutre">{{ r.note }}</span>{% endif %}</td>
+                                <td class="tableau__secondaire">{{ r.reference ?: '—' }}</td>
+                                <td class="tableau__tertiaire">{{ _self.personne(r.declarePar) }}</td>
+                                <td class="tableau__tertiaire">{% if r.estConfirme %}{{ _self.personne(r.confirmePar) }}<span class="tableau__precision tableau__precision--neutre">{{ r.confirmeLe|format_date('medium') }}</span>{% else %}<span class="pastille pastille--attente">{{ 'reversements_association.historique.en_attente'|trans }}</span>{% endif %}</td>
+                                <td class="numerique"><strong>{{ _self.euros(r.montant) }}</strong>{% if r.ecart != 0 %}<span class="tableau__precision">{{ 'reversements_association.historique.ecart'|trans({montant: _self.euros(r.montantDeclare)}) }}</span>{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

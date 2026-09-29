@@ -1,0 +1,102 @@
+{# Fiche d'un compte : identité et statut, rôles et périmètres, actions (activer, désactiver, lien de mot de passe).
+   Ouverte depuis l'équipe (depuis = 'equipe'), elle garde ce contexte : navigation, fil d'Ariane, retour après action.
+   Variables : compte, formAffectation, depuis. #}
+{% extends 'administration/_layout.html.twig' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'administration/_macros.html.twig' as macros %}
+
+{% set depuisEquipe = depuis == 'equipe' %}
+{% set page = depuisEquipe ? 'equipe' : 'comptes' %}
+{% set parametresFiche = depuisEquipe ? {id: compte.id, depuis: 'equipe'} : {id: compte.id} %}
+
+{% block title %}{{ compte.nomComplet }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block fil_ariane %}
+    <a class="fil-ariane" href="{{ depuisEquipe ? path('administration_equipe') : path('administration_comptes') }}">{{ icones.icone('chevron-gauche', 14) }}{{ (depuisEquipe ? 'administration.equipe.titre' : 'administration.comptes.titre')|trans }}</a>
+{% endblock %}
+
+{% block titre_page %}{{ compte.nomComplet }} {{ macros.statut_compte(compte) }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ compte.email }} · {{ compte.association ? compte.association.nom : 'administration.comptes.plateforme'|trans }}</p>{% endblock %}
+
+{% block actions %}
+    {% if compte.estActif() and app.user and app.user.id != compte.id %}
+        <a class="bouton bouton--secondaire" href="{{ path('accueil', {'_voir_comme': compte.email}) }}" title="{{ 'administration.compte.fiche.voir_comme_aide'|trans }}">{{ icones.icone('externe', 15) }}{{ 'administration.compte.fiche.voir_comme'|trans }}</a>
+    {% endif %}
+    <a class="bouton bouton--primaire" href="{{ path('administration_compte_modifier', parametresFiche) }}">{{ icones.icone('modifier', 15) }}{{ 'administration.compte.modifier'|trans }}</a>
+{% endblock %}
+
+{% block contenu %}
+    <div class="fiche-grille">
+        <section class="section" aria-labelledby="identite-titre">
+            <div class="section__entete">
+                <h2 id="identite-titre">{{ 'administration.compte.fiche.identite'|trans }}</h2>
+            </div>
+            <dl class="proprietes">
+                <dt>{{ 'administration.compte.fiche.email'|trans }}</dt>
+                <dd>{{ compte.email }}</dd>
+                <dt>{{ 'administration.compte.fiche.association'|trans }}</dt>
+                <dd>{% if compte.association %}<a href="{{ path('administration_association_fiche', {id: compte.association.id}) }}">{{ compte.association.nom }}</a>{% else %}{{ 'administration.comptes.plateforme'|trans }}{% endif %}</dd>
+                <dt>{{ 'administration.compte.fiche.statut'|trans }}</dt>
+                <dd>{{ macros.statut_compte(compte) }}</dd>
+                <dt>{{ 'administration.compte.fiche.cree_le'|trans }}</dt>
+                <dd>{{ compte.creeLe|format_datetime('medium', 'short') }}</dd>
+                <dt>{{ 'administration.compte.fiche.derniere_connexion'|trans }}</dt>
+                <dd>{{ compte.derniereConnexionLe ? compte.derniereConnexionLe|format_datetime('medium', 'short') : 'administration.comptes.jamais_connecte'|trans }}</dd>
+            </dl>
+            <div class="section__actions">
+                {% set action = compte.estActif() ? 'desactiver' : 'activer' %}
+                <form method="post" action="{{ path('administration_compte_statut', {id: compte.id, action: action}) }}" class="statut">
+                    <input type="hidden" name="_token" value="{{ csrf_token('statut-compte-' ~ compte.id) }}">
+                    {% if depuisEquipe %}<input type="hidden" name="depuis" value="equipe">{% endif %}
+                    <button type="submit" class="bouton {{ compte.estActif() ? 'bouton--danger' : 'bouton--primaire' }}">{{ ('administration.compte.fiche.' ~ action)|trans }}</button>
+                </form>
+                <form method="post" action="{{ path('administration_compte_mot_de_passe', {id: compte.id}) }}" class="mot-de-passe">
+                    <input type="hidden" name="_token" value="{{ csrf_token('mot-de-passe-compte-' ~ compte.id) }}">
+                    {% if depuisEquipe %}<input type="hidden" name="depuis" value="equipe">{% endif %}
+                    <button type="submit" class="bouton bouton--secondaire"{% if not compte.estActif() %} aria-describedby="mot-de-passe-aide"{% endif %}>{{ icones.icone('cle', 15) }}{{ 'administration.compte.fiche.mot_de_passe'|trans }}</button>
+                </form>
+            </div>
+            <p class="section__aide" id="mot-de-passe-aide">{{ 'administration.compte.fiche.mot_de_passe_aide'|trans }}</p>
+        </section>
+
+        <section class="section affectations" aria-labelledby="roles-titre">
+            <div class="section__entete">
+                <h2 id="roles-titre">{{ 'administration.compte.fiche.affectations'|trans }} <span class="compteur">{{ compte.affectations|length }}</span></h2>
+            </div>
+            {% for affectation in compte.affectations %}
+                <div class="section__ligne section__ligne--action">
+                    <span class="section__icone" aria-hidden="true">{{ icones.icone(affectation.ville ? 'villes' : 'associations') }}</span>
+                    <span class="section__texte">
+                        <span class="section__principal">{{ ('role.' ~ affectation.role.value)|trans }}</span>
+                        <span class="section__secondaire">{{ affectation.ville ? affectation.ville.nom : (affectation.association ? affectation.association.nom : 'administration.comptes.plateforme'|trans) }} · {{ 'administration.compte.fiche.depuis'|trans({date: affectation.creeLe|format_date('medium')}) }}</span>
+                    </span>
+                    <form method="post" action="{{ path('administration_compte_retirer_affectation', {id: compte.id, affectation: affectation.id}) }}" class="retrait">
+                        <input type="hidden" name="_token" value="{{ csrf_token('retirer-affectation-' ~ affectation.id) }}">
+                        {% if depuisEquipe %}<input type="hidden" name="depuis" value="equipe">{% endif %}
+                        <button type="submit" class="bouton bouton--secondaire bouton--petit">{{ icones.icone('retirer', 14) }}{{ 'administration.compte.fiche.retirer'|trans }}</button>
+                    </form>
+                </div>
+            {% else %}
+                <p class="section__vide">{{ 'administration.compte.fiche.aucune_affectation'|trans }}</p>
+            {% endfor %}
+            {% if formAffectation.role.vars.choices|length > 0 %}
+                {{ form_start(formAffectation, {attr: {class: 'section__formulaire', novalidate: 'novalidate'}}) }}
+                    {{ form_errors(formAffectation) }}
+                    <div class="section__formulaire-champs">
+                        {{ formulaire.champ(formAffectation.role, null) }}
+                        {% if formAffectation.ville is defined %}
+                            {{ formulaire.champ(formAffectation.ville, 'administration.compte.ville.aide'|trans) }}
+                        {% endif %}
+                    </div>
+                    <div class="section__formulaire-actions">
+                        <button type="submit" class="bouton bouton--primaire">{{ icones.icone('plus', 15) }}{{ 'administration.compte.fiche.ajouter_affectation'|trans }}</button>
+                    </div>
+                {{ form_end(formAffectation) }}
+                <p class="section__aide">{{ 'administration.compte.role.aide'|trans }}</p>
+            {% else %}
+                <p class="section__vide">{{ 'administration.compte.fiche.aucun_role_possible'|trans }}</p>
+            {% endif %}
+        </section>
+    </div>
+{% endblock %}

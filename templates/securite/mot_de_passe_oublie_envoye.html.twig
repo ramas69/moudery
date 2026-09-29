@@ -1,0 +1,13 @@
+{# Confirmation neutre : la page ne dit pas si l'adresse correspond à un compte. #}
+{% extends 'securite/_layout.html.twig' %}
+
+{% block title %}{{ 'mot_de_passe_oublie.envoye_titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block contenu %}
+    <div class="securite__entete">
+        <span class="surtitre">{{ 'mot_de_passe_oublie.surtitre'|trans }}</span>
+        <h1 class="securite__titre">{{ 'mot_de_passe_oublie.envoye_titre'|trans }}</h1>
+        <p class="securite__intro">{{ 'mot_de_passe_oublie.envoye_texte'|trans }}</p>
+    </div>
+    <p class="securite__lien"><a href="{{ path('connexion') }}">{{ 'mot_de_passe_oublie.retour'|trans }}</a></p>
+{% endblock %}

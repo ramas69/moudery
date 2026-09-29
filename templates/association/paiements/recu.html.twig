@@ -1,0 +1,35 @@
+{# Le reçu d'un paiement (F-18), imprimable par le navigateur : association, ville, membre, date, moyen, échéances réglées.
+   Variables : association, paiement, retour (facultatif : l'adresse du bouton retour, pour l'espace membre). #}
+{% extends 'base.html.twig' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block title %}{{ 'paiements_association.recu.titre'|trans({numero: paiement.id}) }} · {{ association.nom }}{% endblock %}
+{% block stylesheets %}{{ parent() }}<link rel="stylesheet" href="{{ asset('styles/console.css') }}">{% endblock %}
+
+{% block body %}
+    <main class="recu">
+        <header class="recu__entete">
+            <div class="recu__association"><strong>{{ association.nom }}</strong>{% if association.adresseSiege %}<br>{{ association.adresseSiege|nl2br }}{% endif %}{% if association.emailContact %}<br>{{ association.emailContact }}{% endif %}</div>
+            <div class="recu__actions">
+                <a class="bouton bouton--secondaire bouton--petit" href="{{ retour ?? path('association_paiements', {slug: association.slug}) }}">{{ icones.icone('chevron-gauche', 14) }}{{ 'paiements_association.recu.retour'|trans }}</a>
+                <button type="button" class="bouton bouton--primaire bouton--petit" onclick="window.print()">{{ icones.icone('recu', 15) }}{{ 'paiements_association.recu.imprimer'|trans }}</button>
+            </div>
+        </header>
+        <h1 class="recu__titre">{{ 'paiements_association.recu.titre'|trans({numero: paiement.id}) }}</h1>
+        <p class="recu__sous-titre">{{ 'paiements_association.recu.sous_titre'|trans({membre: paiement.membre.nomComplet, date: paiement.recuLe|format_date('long')}) }}</p>
+        {% if paiement.estAnnule %}<p class="alerte alerte--erreur" role="status">{{ 'paiements_association.recu.annule'|trans({date: paiement.annuleLe|format_date('long')}) }}</p>{% endif %}
+        <p>{{ 'paiements_association.recu.recu_par'|trans({association: association.nom, ville: paiement.ville.nom}) }}</p>
+        <table class="recu__table">
+            <caption>{{ 'paiements_association.recu.regle'|trans }}</caption>
+            <tbody>
+                {% for e in paiement.echeances %}
+                    <tr><td>{% if e.appel %}{{ e.appel.objet }}{% else %}{{ 'paiements_association.echeance.cotisation'|trans({mois: ('membres_association.mois.' ~ e.mois)|trans, annee: e.annee}) }}{% endif %}</td><td class="numerique">{{ (e.montant / 100)|format_currency('EUR') }}</td></tr>
+                {% endfor %}
+            </tbody>
+            <tfoot><tr><th scope="row">{{ 'paiements_association.nouveau.total'|trans }}</th><td class="numerique"><strong>{{ (paiement.montant / 100)|format_currency('EUR') }}</strong></td></tr></tfoot>
+        </table>
+        <p class="recu__detail">{{ 'paiements_association.recu.moyen'|trans({moyen: ('paiements_association.moyen.' ~ paiement.moyen.value)|trans}) }}{% if paiement.reference %} · {{ 'paiements_association.recu.reference'|trans({reference: paiement.reference}) }}{% endif %}{% if paiement.estSimule %} · {{ 'paiements_association.recu.simulation'|trans }}{% endif %}</p>
+        <p class="recu__detail">{{ 'paiements_association.recu.enregistre_par'|trans({personne: paiement.enregistrePar ? paiement.enregistrePar.nomComplet : '—', date: paiement.enregistreLe|format_datetime('medium', 'short')}) }}</p>
+        <p class="recu__mention">{{ 'paiements_association.recu.mention'|trans({association: association.nom}) }}</p>
+    </main>
+{% endblock %}

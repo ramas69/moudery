@@ -1,0 +1,59 @@
+{# Paramètres du compte connecté : identité et adresse de connexion, mot de passe. La page s'affiche dans la coquille
+   de la personne (administration, espace de l'association, ou coquille simple).
+   Variables : coquille, association (facultatif, pour l'espace de l'association), formProfil, formMotDePasse. #}
+{% extends coquille %}
+{% set page = 'parametres' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block title %}{{ 'parametres.titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block titre_page %}{{ 'parametres.titre'|trans }}{% endblock %}
+{% set pilote = association is defined and association and is_granted(constant('App\\Security\\Permission::ASSOCIATION_PILOTER'), association) %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'parametres.sous_titre'|trans }}</p>{% endblock %}
+
+{% block actions %}
+    {% if pilote %}
+        <a class="bouton bouton--primaire" href="{{ path('association_responsables_inviter', {slug: association.slug}) }}">{{ icones.icone('envoyer', 15) }}{{ 'responsables_association.inviter.bouton'|trans }}</a>
+    {% endif %}
+{% endblock %}
+
+{% block contenu %}
+    {% if pilote %}{{ include('parametres/_onglets.html.twig', {actif: 'compte'}) }}{% endif %}
+    <div class="fiche-grille">
+        <section class="section" aria-labelledby="profil-titre">
+            <div class="section__entete">
+                <h2 id="profil-titre">{{ 'parametres.profil.titre'|trans }}</h2>
+            </div>
+            {{ form_start(formProfil, {attr: {class: 'section__formulaire', novalidate: 'novalidate'}}) }}
+                {{ form_errors(formProfil) }}
+                <div class="section__formulaire-champs section__formulaire-champs--colonne">
+                    {{ formulaire.champ(formProfil.prenom, null) }}
+                    {{ formulaire.champ(formProfil.nom, null) }}
+                    {{ formulaire.champ(formProfil.email, 'parametres.profil.email_aide'|trans) }}
+                </div>
+                <div class="section__formulaire-actions">
+                    <button type="submit" class="bouton bouton--primaire">{{ 'parametres.profil.bouton'|trans }}</button>
+                </div>
+            {{ form_end(formProfil) }}
+        </section>
+
+        <section class="section" aria-labelledby="mot-de-passe-titre">
+            <div class="section__entete">
+                <h2 id="mot-de-passe-titre">{{ 'parametres.mot_de_passe.titre'|trans }}</h2>
+            </div>
+            {{ form_start(formMotDePasse, {attr: {class: 'section__formulaire', novalidate: 'novalidate'}}) }}
+                {{ form_errors(formMotDePasse) }}
+                <div class="section__formulaire-champs section__formulaire-champs--colonne">
+                    {{ formulaire.champ(formMotDePasse.actuel, null) }}
+                    {{ formulaire.champ(formMotDePasse.motDePasse, 'parametres.mot_de_passe.aide'|trans) }}
+                    {{ formulaire.champ(formMotDePasse.confirmation, null) }}
+                </div>
+                <div class="section__formulaire-actions">
+                    <button type="submit" class="bouton bouton--primaire">{{ icones.icone('cle', 15) }}{{ 'parametres.mot_de_passe.bouton'|trans }}</button>
+                </div>
+            {{ form_end(formMotDePasse) }}
+        </section>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,5150 @@
+/*
+ * Coquille « Console » des pages de l'application (canevas Console : navigation, tableau de bord, villes) :
+ * barre latérale de 240 px à gauche sur écran large, en-tête de page de 56 px, contenu blanc,
+ * indicateurs en cartes, tableaux à en-tête gris. Mobile first ; uniquement les variables et composants de app.css.
+ */
+.console {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Barre latérale : logo, périmètre, navigation, compte. Sur mobile, elle devient un bandeau en haut. */
+.console__barre {
+    display: flex;
+    flex-direction: column;
+    background: var(--fond);
+    border-bottom: 1px solid var(--bordure);
+}
+
+.console__marque {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1rem 0.625rem;
+}
+
+.console__perimetre {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.5rem;
+    margin: 0 0.75rem 0.625rem;
+    padding: 0 0.625rem 0 0.5rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon-petit);
+    background: var(--surface);
+    box-shadow: var(--ombre);
+    font-size: var(--taille-petit);
+    font-weight: 600;
+}
+
+.console__perimetre-initiales {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: var(--accent-doux);
+    color: var(--accent-texte);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.console__perimetre-nom {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.console__nav {
+    display: flex;
+    gap: 0.125rem;
+    padding: 0 0.75rem 0.625rem;
+    overflow-x: auto;
+    scrollbar-width: thin;
+}
+
+.console__lien {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.25rem;
+    padding: 0 0.625rem;
+    border: 1px solid transparent;
+    border-radius: var(--rayon-petit);
+    color: var(--texte-2);
+    font-size: 0.84375rem;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color var(--duree-courte) ease, color var(--duree-courte) ease;
+}
+
+.console__lien svg {
+    color: var(--texte-3);
+}
+
+.console__lien:hover {
+    background: var(--surface-2);
+    color: var(--texte);
+}
+
+.console__lien[aria-current="page"] {
+    border-color: var(--bordure);
+    background: var(--surface);
+    box-shadow: var(--ombre);
+    color: var(--texte);
+    font-weight: 600;
+}
+
+.console__lien[aria-current="page"] svg {
+    color: var(--accent);
+}
+
+.console__compte {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.75rem;
+    border-top: 1px solid var(--bordure);
+}
+
+.console__avatar {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--sur-accent);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.console__identite {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.console__nom {
+    font-size: var(--taille-petit);
+    font-weight: 600;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.console__role {
+    font-size: 0.75rem;
+    color: var(--texte-3);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.console__compte .deconnexion {
+    flex: none;
+}
+
+/* Zone principale : en-tête de page, puis le contenu. */
+.console__principal {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: var(--surface);
+}
+
+.console__entete {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+    min-height: 3.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--bordure);
+}
+
+.console__entete-titre {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.console__titre {
+    margin: 0;
+    font-size: var(--taille-titre-bloc);
+    line-height: 1.3;
+}
+
+.console__sous-titre {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--texte-3);
+}
+
+.console__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.console__contenu {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem 1rem 2rem;
+    animation: apparition var(--duree-entree) var(--courbe-sortie) 0.05s both;
+}
+
+/* Compteurs en chip, à côté d'un titre. */
+.compteur {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: var(--rayon-chip);
+    background: var(--surface-2);
+    color: var(--texte-2);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.compteur--accent {
+    background: var(--accent-doux);
+    color: var(--accent-texte);
+}
+
+/* Indicateurs clés : une carte par chiffre. */
+.kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 0.75rem;
+}
+
+.kpi {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+}
+
+.kpi__libelle {
+    font-size: var(--taille-libelle);
+    font-weight: 600;
+    color: var(--texte-2);
+}
+
+.kpi__valeur {
+    font-size: 1.625rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+
+.kpi__detail {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 1.375rem;
+    font-size: 0.75rem;
+    color: var(--texte-3);
+}
+
+.kpi__chip {
+    display: inline-flex;
+    align-items: center;
+    height: 1.375rem;
+    padding: 0 0.4375rem;
+    border-radius: var(--rayon-chip);
+    background: var(--surface-2);
+    color: var(--texte-2);
+    font-weight: 700;
+}
+
+.kpi__chip--attente {
+    background: var(--attention-doux);
+    color: var(--attention-texte);
+}
+
+/* Sections : un bloc blanc à en-tête, des lignes séparées par un filet. */
+.section {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+    overflow: hidden;
+}
+
+.section__entete {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.875rem 1.125rem 0.625rem;
+}
+
+.section__entete h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 0.9375rem;
+}
+
+.section__lien {
+    font-size: var(--taille-libelle);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.console__titre .compteur {
+    margin-left: 0.5rem;
+    vertical-align: middle;
+}
+
+.section__ligne {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.6875rem 1.125rem;
+    border-top: 1px solid var(--bordure);
+}
+
+.section__icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--rayon-petit);
+    background: var(--surface-2);
+    color: var(--texte-2);
+}
+
+.section__icone--attente {
+    background: var(--attention-doux);
+    color: var(--attention-texte);
+}
+
+.section__icone--erreur {
+    background: var(--erreur-doux);
+    color: var(--erreur-texte);
+}
+
+/* Ligne avec une action à droite (sur mobile, l'action passe sous le texte). */
+.section__ligne--action {
+    grid-template-columns: 32px minmax(0, 1fr);
+}
+
+.section__ligne--action .renvoi,
+.section__ligne--action > .bouton {
+    grid-column: 2;
+    justify-self: start;
+    margin: 0;
+}
+
+@media (min-width: 48rem) {
+    .section__ligne--action {
+        grid-template-columns: 32px minmax(0, 1fr) auto;
+    }
+
+    .section__ligne--action .renvoi,
+    .section__ligne--action > .bouton {
+        grid-column: auto;
+    }
+}
+
+.section__texte {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.section__principal {
+    font-size: 0.84375rem;
+    font-weight: 600;
+}
+
+.section__secondaire {
+    font-size: 0.75rem;
+    color: var(--texte-3);
+}
+
+.section__vide {
+    margin: 0;
+    padding: 0.75rem 1.125rem 1rem;
+    border-top: 1px solid var(--bordure);
+    font-size: var(--taille-petit);
+    color: var(--texte-3);
+}
+
+/* Tableaux : en-tête gris, lignes fines, chiffres tabulaires alignés à droite. Défilement horizontal sur mobile. */
+.tableau {
+    overflow-x: auto;
+    border-top: 1px solid var(--bordure);
+}
+
+/* Pas de largeur minimale : chaque tableau masque ses colonnes secondaires par palier (tableau__tertiaire dès 48 rem,
+   tableau__secondaire dès 64 rem, tableau__large dès 80 rem, tableau__tres-large dès 96 rem) plutôt que de défiler. */
+.tableau table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84375rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.tableau th {
+    height: 2.375rem;
+    padding: 0 1rem;
+    border-bottom: 1px solid var(--bordure);
+    background: var(--surface-3);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--texte-3);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.tableau td {
+    padding: 0.625rem 1rem;
+    border-bottom: 1px solid var(--bordure);
+    vertical-align: middle;
+}
+
+.tableau tr:last-child td {
+    border-bottom: 0;
+}
+
+.tableau .numerique {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.tableau__precision {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--attention-texte);
+}
+
+.tableau__precision--neutre {
+    margin-top: 0.25rem;
+    font-weight: 400;
+    color: var(--texte-3);
+}
+
+.tableau__vide {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--texte-3);
+}
+
+/* Une entité dans un tableau : initiales, nom, détail. */
+.entite {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-width: 0;
+}
+
+.entite__initiales {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--rayon-petit);
+    background: var(--accent-doux);
+    color: var(--accent-texte);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* Une personne : initiales dans un rond neutre. */
+.entite__initiales--rond {
+    border-radius: 50%;
+    background: var(--surface-2);
+    color: var(--texte-2);
+}
+
+a.entite__nom {
+    color: var(--texte);
+    text-decoration: none;
+}
+
+a.entite__nom:hover {
+    color: var(--accent-texte);
+    text-decoration: underline;
+}
+
+.tableau__ligne-secondaire {
+    display: block;
+    font-size: var(--taille-petit);
+}
+
+.entite__texte {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.entite__nom {
+    font-weight: 700;
+}
+
+.entite__detail {
+    font-size: 0.75rem;
+    color: var(--texte-3);
+}
+
+/* Formulaires de l'administration : une colonne étroite. */
+.formulaire {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.formulaire--etroit {
+    max-width: 36rem;
+}
+
+.formulaire__section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--bordure);
+}
+
+.formulaire__sous-titre {
+    margin: 0;
+    font-size: var(--taille-titre-bloc);
+}
+
+.formulaire__actions {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+}
+
+@media (min-width: 30rem) {
+    .formulaire__actions {
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+}
+
+@media (min-width: 48rem) {
+    .console__entete {
+        padding: 0.75rem 1.75rem;
+    }
+
+    .console__contenu {
+        gap: 1.25rem;
+        padding: 1.5rem 1.75rem 2.5rem;
+    }
+}
+
+@media (min-width: 64rem) {
+    .console {
+        flex-direction: row;
+    }
+
+    .console__barre {
+        position: sticky;
+        top: 0;
+        flex: none;
+        width: 15rem;
+        height: 100vh;
+        border-bottom: 0;
+        border-right: 1px solid var(--bordure);
+    }
+
+    .console__nav {
+        flex-direction: column;
+        padding: 0.375rem 0.75rem 0;
+        overflow: visible;
+    }
+
+    .console__lien {
+        flex: initial;
+    }
+
+    .console__compte {
+        margin-top: auto;
+    }
+}
+
+/* Filtres : une rangée de liens en chips, le filtre courant en blanc à filet. */
+.filtres {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.filtres__libelle {
+    margin-right: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--texte-3);
+}
+
+.filtre {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    padding: 0 0.625rem;
+    border: 1px solid transparent;
+    border-radius: var(--rayon-petit);
+    background: var(--surface-2);
+    color: var(--texte-2);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.filtre:hover {
+    color: var(--texte);
+}
+
+.filtre[aria-current="true"] {
+    border-color: var(--bordure);
+    background: var(--surface);
+    box-shadow: var(--ombre);
+    color: var(--texte);
+}
+
+/* Fiche : deux blocs côte à côte quand chacun dispose d'au moins 26 rem, sinon empilés (selon la place réelle, pas l'écran). */
+.fiche-grille {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(26rem, 100%), 1fr));
+    gap: 1rem;
+    align-items: start;
+}
+
+/* Propriétés d'une fiche : libellé à gauche, valeur à droite, un filet entre chaque ligne. */
+.proprietes {
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr);
+    gap: 0 1rem;
+    margin: 0;
+    padding: 0 1.125rem 0.5rem;
+}
+
+.proprietes dt,
+.proprietes dd {
+    padding: 0.5rem 0;
+    border-top: 1px solid var(--bordure);
+    font-size: 0.84375rem;
+}
+
+.proprietes dt {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--texte-3);
+}
+
+.proprietes dd {
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.section__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.125rem;
+    border-top: 1px solid var(--bordure);
+}
+
+.section__actions form {
+    margin: 0;
+}
+
+.section__aide {
+    margin: 0;
+    padding: 0 1.125rem 0.875rem;
+    font-size: 0.75rem;
+    color: var(--texte-3);
+}
+
+/* Formulaire dans une section : les champs se répartissent selon la largeur du bloc (14 rem au moins chacun),
+   le bouton passe en dessous, à droite. Aucun champ ne peut déborder de sa colonne. */
+.section__formulaire {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.875rem 1.125rem 1rem;
+    border-top: 1px solid var(--bordure);
+}
+
+.section__formulaire-champs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+    gap: 0.75rem;
+    align-items: start;
+}
+
+.section__formulaire-champs .champ {
+    min-width: 0;
+}
+
+.section__formulaire-champs .champ__saisie {
+    max-width: 100%;
+}
+
+.section__formulaire-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.section__ligne--action .retrait {
+    grid-column: 2;
+    margin: 0;
+}
+
+@media (min-width: 48rem) {
+    .section__ligne--action .retrait {
+        grid-column: auto;
+    }
+}
+
+/* Actions à droite d'une ligne de tableau. */
+.tableau__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.375rem;
+    white-space: nowrap;
+}
+
+.bouton--petit {
+    min-height: 2rem;
+    padding: 0 0.625rem;
+    font-size: 0.8125rem;
+}
+
+/* Chips neutres : les rôles d'un compte. */
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    height: 1.375rem;
+    padding: 0 0.5rem;
+    border-radius: 6px;
+    background: var(--surface-2);
+    color: var(--texte-2);
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Barre d'outils d'une liste : recherche et actions. */
+.barre-outils {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.recherche {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1 1 18rem;
+    min-height: var(--hauteur-controle);
+    padding: 0 0.75rem;
+    border: 1px solid var(--bordure-champ);
+    border-radius: var(--rayon-petit);
+    background: var(--surface);
+    color: var(--texte-3);
+    box-shadow: var(--ombre);
+    transition: border-color var(--duree-courte) ease, box-shadow var(--duree-courte) ease;
+}
+
+.recherche:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-doux);
+}
+
+.recherche__saisie {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    color: var(--texte);
+    outline: none;
+}
+
+/* En-têtes de colonne triables. */
+.tri {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: inherit;
+    text-decoration: none;
+}
+
+.tri:hover,
+.tri--actif {
+    color: var(--texte);
+}
+
+.tri__sens {
+    font-size: 0.75rem;
+    color: var(--desactive);
+}
+
+.tri--actif .tri__sens {
+    color: var(--accent);
+}
+
+/* Sur écran étroit, les colonnes secondaires disparaissent : le tableau tient sans défilement, et les menus peuvent s'ouvrir.
+   La section qui l'entoure laisse déborder les menus ; les coins arrondis sont portés par l'en-tête du tableau. */
+.section:has(.tableau--menus) {
+    overflow: visible;
+}
+
+.tableau--menus {
+    overflow: visible;
+}
+
+.tableau--menus thead th:first-child {
+    border-top-left-radius: var(--rayon);
+}
+
+.tableau--menus thead th:last-child {
+    border-top-right-radius: var(--rayon);
+}
+
+.section > .tableau--menus:first-child thead th:first-child,
+.section > .tableau--menus:first-child thead th:last-child {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.section > .tableau--menus:first-child {
+    border-top: 0;
+    border-radius: var(--rayon);
+    overflow: visible;
+}
+
+.section > .tableau--menus:first-child thead th:first-child {
+    border-top-left-radius: var(--rayon);
+}
+
+.section > .tableau--menus:first-child thead th:last-child {
+    border-top-right-radius: var(--rayon);
+}
+
+.tableau--menus table {
+    min-width: 0;
+}
+
+.tableau__secondaire,
+.tableau__tertiaire {
+    display: none;
+}
+
+.tableau__menu {
+    width: 2.75rem;
+    padding-right: 0.5rem;
+    text-align: right;
+}
+
+.tableau tfoot th,
+.tableau tfoot td {
+    padding: 0.625rem 1rem;
+    border-top: 2px solid var(--bordure-forte);
+    background: var(--surface-3);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.tableau tfoot .numerique {
+    text-align: right;
+}
+
+.tableau tfoot .tableau__precision {
+    font-weight: 600;
+}
+
+/* Menu d'actions d'une ligne : un élément details, ouvert sous son bouton. */
+.menu {
+    position: relative;
+    display: inline-block;
+}
+
+.menu > summary {
+    list-style: none;
+}
+
+.menu > summary::-webkit-details-marker {
+    display: none;
+}
+
+.menu[open] > summary {
+    background: var(--surface-2);
+    color: var(--texte);
+}
+
+.menu__liste {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.25rem);
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    min-width: 15rem;
+    padding: 0.375rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+    box-shadow: var(--ombre-flottante);
+    text-align: left;
+    animation: apparition 0.15s var(--courbe-sortie) both;
+}
+
+.menu__form {
+    margin: 0;
+}
+
+.menu__item {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    width: 100%;
+    min-height: 2.25rem;
+    padding: 0 0.625rem;
+    border: 0;
+    border-radius: var(--rayon-petit);
+    background: none;
+    font: inherit;
+    font-size: var(--taille-petit);
+    font-weight: 500;
+    color: var(--texte);
+    text-align: left;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.menu__item svg {
+    color: var(--texte-3);
+}
+
+.menu__item:hover {
+    background: var(--surface-2);
+    color: var(--texte);
+}
+
+.menu__item--danger,
+.menu__item--danger svg {
+    color: var(--erreur-texte);
+}
+
+.menu__item--danger:hover {
+    background: var(--erreur-doux);
+}
+
+@media (min-width: 48rem) {
+    .tableau__tertiaire {
+        display: table-cell;
+    }
+}
+
+@media (min-width: 64rem) {
+    .tableau__secondaire {
+        display: table-cell;
+    }
+}
+
+/* Tableau de bord : « À traiter » et « Activité récente » côte à côte sur écran large. */
+.colonnes {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+}
+
+.kpi--lien {
+    color: inherit;
+    text-decoration: none;
+    transition: border-color var(--duree-courte) ease, box-shadow var(--duree-courte) ease;
+}
+
+.kpi--lien:hover {
+    border-color: var(--bordure-forte);
+    box-shadow: var(--ombre);
+    color: inherit;
+}
+
+.kpi__valeur--erreur {
+    color: var(--erreur-texte);
+}
+
+.kpi__chip--erreur {
+    background: var(--erreur-doux);
+    color: var(--erreur-texte);
+}
+
+a.section__principal {
+    color: var(--texte);
+    text-decoration: none;
+}
+
+a.section__principal:hover {
+    color: var(--accent-texte);
+    text-decoration: underline;
+}
+
+/* Fil d'activité : initiales, phrase, moment. */
+.fil__ligne {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) auto;
+    gap: 0.625rem;
+    align-items: start;
+    padding: 0.5625rem 1.125rem;
+    border-top: 1px solid var(--bordure);
+    font-size: var(--taille-petit);
+}
+
+.fil__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    color: var(--texte-2);
+    font-size: 0.65625rem;
+    font-weight: 700;
+}
+
+.fil__avatar--connexion {
+    background: var(--succes-doux);
+    color: var(--succes-texte);
+}
+
+.fil__avatar--compte_cree,
+.fil__avatar--invitation_acceptee {
+    background: var(--accent-doux);
+    color: var(--accent-texte);
+}
+
+.fil__avatar--association_creee {
+    background: var(--attention-doux);
+    color: var(--attention-texte);
+}
+
+/* La phrase se lit en entier : elle passe à la ligne plutôt que d'être coupée. */
+.fil__texte {
+    min-width: 0;
+    padding-top: 0.3125rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.fil__quand {
+    padding-top: 0.375rem;
+    font-size: 0.75rem;
+    color: var(--texte-3);
+    white-space: nowrap;
+}
+
+.formulaire__grille {
+    display: grid;
+    gap: 1rem;
+}
+
+@media (min-width: 48rem) {
+    .formulaire__grille {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 64rem) {
+    .colonnes {
+        grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+        align-items: start;
+    }
+}
+
+/* Tableau de bord : deux colonnes 2/1 pour le graphique et « À traiter ». */
+@media (min-width: 64rem) {
+    .colonnes--2-1 {
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    }
+}
+
+.section__titre-groupe {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-width: 0;
+}
+
+.section__sous-titre {
+    font-size: 0.78125rem;
+    color: var(--texte-3);
+}
+
+/* Ligne cliquable : icône, deux lignes de texte tronquées, chevron. */
+.section__ligne--lien {
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    color: inherit;
+    text-decoration: none;
+    transition: background-color var(--duree-courte) ease;
+}
+
+.section__ligne--lien:hover {
+    background: var(--surface-2);
+    color: inherit;
+}
+
+/* Le titre se lit en entier, quitte à prendre deux lignes ; seul le détail est tronqué. */
+.section__ligne--lien .section__secondaire {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.section__chevron {
+    display: flex;
+    color: var(--texte-3);
+}
+
+.section__ligne--compte {
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-height: 2.75rem;
+}
+
+/* Graphique en barres, en CSS seul : les hauteurs viennent des données, les couleurs des tokens. */
+.graphique__corps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem 1.125rem 1rem;
+}
+
+.graphique__barres {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 0.5rem;
+    align-items: end;
+    height: 11rem;
+}
+
+.graphique__colonne {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+}
+
+.graphique__pile {
+    display: flex;
+    flex-direction: column;
+    min-height: 3px;
+    border-radius: 4px 4px 0 0;
+    overflow: hidden;
+}
+
+.graphique__segment {
+    display: block;
+    min-height: 3px;
+    background: var(--accent);
+}
+
+.graphique__segment--retard {
+    background: var(--erreur-texte);
+}
+
+.graphique__mois {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 0.5rem;
+    font-size: 0.71875rem;
+    color: var(--texte-3);
+    text-align: center;
+}
+
+.graphique__legende {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 0.625rem;
+    border-top: 1px solid var(--bordure);
+    font-size: 0.78125rem;
+    color: var(--texte-2);
+}
+
+.graphique__cle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.graphique__pastille {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    background: var(--accent);
+}
+
+.graphique__pastille--retard {
+    background: var(--erreur-texte);
+}
+
+.graphique__donnees {
+    margin-left: auto;
+}
+
+.graphique__donnees summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--accent-texte);
+}
+
+.graphique__donnees table {
+    width: 100%;
+    margin-top: 0.5rem;
+    border-collapse: collapse;
+    font-size: 0.78125rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.graphique__donnees th,
+.graphique__donnees td {
+    padding: 0.25rem 0.5rem;
+    border-top: 1px solid var(--bordure);
+    text-align: left;
+}
+
+.graphique__donnees .numerique {
+    text-align: right;
+}
+
+.graphique__donnees[open] {
+    flex-basis: 100%;
+}
+
+/* Journal : un intertitre par jour. */
+.fil__jour {
+    margin: 0;
+    padding: 0.5rem 1.125rem;
+    border-top: 1px solid var(--bordure);
+    background: var(--surface-2);
+    font-size: 0.71875rem;
+    font-weight: 700;
+    color: var(--texte-2);
+}
+
+.fil__qui {
+    font-weight: 700;
+    color: var(--texte);
+    text-decoration: none;
+}
+
+.fil__qui:hover {
+    color: var(--accent-texte);
+    text-decoration: underline;
+}
+
+@media (max-width: 47.99rem) {
+    .graphique__mois span:nth-child(even) {
+        visibility: hidden;
+    }
+}
+
+/* Sélecteur avec recherche (liste des villes : association). */
+.combobox {
+    position: relative;
+    flex: 1 1 14rem;
+    min-width: 0;
+}
+
+.combobox__saisie {
+    width: 100%;
+    height: var(--hauteur-controle);
+    padding: 0 2.25rem 0 0.75rem;
+    border: 1px solid var(--bordure-champ);
+    border-radius: var(--rayon-petit);
+    background: var(--surface);
+    font: inherit;
+    font-size: 0.875rem;
+    color: var(--texte);
+}
+
+.combobox__saisie:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    border-color: var(--accent);
+}
+
+.combobox__effacer {
+    position: absolute;
+    top: 50%;
+    right: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--texte-3);
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.combobox__effacer:hover {
+    background: var(--surface-2);
+    color: var(--texte);
+}
+
+.combobox__liste {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 0.25rem);
+    left: 0;
+    right: 0;
+    max-height: 16rem;
+    margin: 0;
+    padding: 0.25rem;
+    overflow-y: auto;
+    list-style: none;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+    box-shadow: 0 8px 24px rgba(16, 24, 40, 0.12);
+}
+
+/* L'attribut hidden doit l'emporter sur le display des options. */
+.combobox__option[hidden],
+.combobox__vide[hidden] {
+    display: none;
+}
+
+.combobox__option {
+    display: flex;
+    flex-direction: column;
+    gap: 0.0625rem;
+    padding: 0.5rem 0.625rem;
+    border-radius: var(--rayon-petit);
+    cursor: pointer;
+}
+
+.combobox__option:hover,
+.combobox__option[aria-selected="true"] {
+    background: var(--accent-doux);
+}
+
+.combobox__nom {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.combobox__detail,
+.combobox__vide {
+    font-size: 0.75rem;
+    color: var(--texte-3);
+}
+
+.combobox__vide {
+    padding: 0.5rem 0.625rem;
+}
+
+/* Filtres sur une ligne : statuts à gauche, bascule à droite. */
+.filtres--ligne {
+    justify-content: space-between;
+}
+
+.filtres--ligne > .filtres {
+    flex: 1 1 auto;
+}
+
+.filtre--bascule {
+    gap: 0.375rem;
+}
+
+.filtre[aria-pressed="true"] {
+    border-color: var(--bordure);
+    background: var(--surface);
+    box-shadow: var(--ombre);
+    color: var(--texte);
+}
+
+/* Regroupement par association : une ligne d'intertitre dans le tableau. */
+.tableau__groupe th {
+    padding: 0.5rem 1rem;
+    background: var(--surface-2);
+    font-size: 0.78125rem;
+    font-weight: 700;
+    color: var(--texte-2);
+    text-align: left;
+}
+
+.tableau__groupe th a {
+    color: var(--texte);
+    text-decoration: none;
+}
+
+.tableau__groupe th a:hover {
+    color: var(--accent-texte);
+    text-decoration: underline;
+}
+
+/* Avancement de l'assistant : une jauge fine sous le libellé. */
+.progression {
+    display: block;
+    width: 5rem;
+    height: 0.25rem;
+    margin-bottom: 0.25rem;
+    border-radius: 0.125rem;
+    background: var(--surface-2);
+    overflow: hidden;
+}
+
+.progression__barre {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--accent);
+}
+
+/* Pagination : résumé, taille de page, précédente / suivante. */
+.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    padding: 0.75rem 1.125rem;
+    border-top: 1px solid var(--bordure);
+    font-size: 0.8125rem;
+    color: var(--texte-2);
+}
+
+.pagination__par {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.pagination__libelle {
+    margin-right: 0.25rem;
+    color: var(--texte-3);
+}
+
+.pagination__lien {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.75rem;
+    padding: 0 0.5rem;
+    border-radius: var(--rayon-petit);
+    color: var(--texte-2);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.pagination__lien:hover {
+    background: var(--surface-2);
+    color: var(--texte);
+}
+
+.pagination__lien[aria-current="true"] {
+    background: var(--accent-doux);
+    color: var(--accent-texte);
+}
+
+.pagination__pages {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+.pagination__position {
+    white-space: nowrap;
+}
+
+/* Deux paliers de plus pour les tableaux larges : dès 80 rem, puis dès 96 rem. */
+.tableau__large,
+.tableau__tres-large {
+    display: none;
+}
+
+@media (min-width: 80rem) {
+    .tableau__large {
+        display: table-cell;
+    }
+}
+
+@media (min-width: 96rem) {
+    .tableau__tres-large {
+        display: table-cell;
+    }
+}
+
+/* Ce qui ne doit jamais se couper : dates, pastilles, précisions courtes ; la première colonne garde sa place. */
+.tableau time,
+.tableau .pastille,
+.tableau__precision {
+    white-space: nowrap;
+}
+
+@media (min-width: 48rem) {
+    .tableau--menus th:first-child {
+        min-width: 13rem;
+    }
+}
+
+/* Sur téléphone, les tableaux ne défilent pas : cellules resserrées, initiales masquées, détails qui peuvent se couper. */
+@media (max-width: 47.99rem) {
+    .tableau th,
+    .tableau td {
+        padding-left: 0.625rem;
+        padding-right: 0.625rem;
+    }
+
+    .tableau .entite__initiales {
+        display: none;
+    }
+
+    .tableau .entite__detail,
+    .tableau .entite__nom {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    .tableau .tableau__precision {
+        white-space: normal;
+    }
+}
+
+/* Fil d'Ariane au-dessus du titre de page : retour à l'écran d'origine (bloc fil_ariane de la coquille). */
+.fil-ariane {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    align-self: flex-start;
+    margin-bottom: 0.125rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--texte-3);
+    text-decoration: none;
+}
+
+.fil-ariane:hover {
+    color: var(--texte);
+}
+
+/* Tableau de bord : filtres, grille de graphiques, canevas Chart.js à hauteur fixe. */
+.barre-outils--filtres {
+    align-items: center;
+}
+
+.barre-outils--filtres .filtres {
+    flex: 0 1 auto;
+}
+
+.periode-libre {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.periode-libre__champ {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    color: var(--texte-2);
+}
+
+.champ__saisie--compact {
+    width: auto;
+    height: 2.25rem;
+    padding: 0 0.5rem;
+    font-size: 0.8125rem;
+}
+
+.note--serree {
+    margin: -0.25rem 0 0;
+    font-size: 0.78125rem;
+}
+
+.colonnes--graphiques {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+}
+
+@media (min-width: 64rem) {
+    .colonnes--graphiques {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.section__entete--graphique {
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+}
+
+.filtres--compact {
+    gap: 0.25rem;
+}
+
+.filtre--petit {
+    min-height: 1.625rem;
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+}
+
+.graphique__cadre {
+    position: relative;
+    height: 15rem;
+    padding: 0.5rem 1rem 0.25rem;
+}
+
+.graphique__canevas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.graphique__donnees--pied {
+    margin: 0;
+    padding: 0.5rem 1.125rem 0.75rem;
+    border-top: 1px solid var(--bordure);
+    font-size: 0.78125rem;
+}
+
+.graphique__donnees--pied table {
+    margin-top: 0.5rem;
+}
+
+.graphique__donnees--pied th[scope="row"] {
+    font-weight: 500;
+    color: var(--texte-2);
+}
+
+/* Création d'association : aperçu de l'identifiant et champ replié pour le modifier. */
+.identifiant {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.375rem;
+    margin: -0.25rem 0 0;
+    font-size: var(--taille-petit);
+    color: var(--texte-2);
+}
+
+.identifiant__valeur {
+    padding: 0.125rem 0.375rem;
+    border-radius: var(--rayon-petit);
+    background: var(--surface-2);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.8125rem;
+    color: var(--texte);
+}
+
+.formulaire__avance > summary {
+    cursor: pointer;
+    font-size: var(--taille-petit);
+    font-weight: 600;
+    color: var(--accent-texte);
+}
+
+.formulaire__avance[open] > summary {
+    margin-bottom: 0.75rem;
+}
+
+/* Espace de l'association : modules annoncés mais pas encore livrés, valeur textuelle d'un indicateur, cellule d'action. */
+.console__lien--bientot {
+    color: var(--texte-3);
+    cursor: default;
+}
+
+.console__lien--bientot:hover {
+    background: transparent;
+    color: var(--texte-3);
+}
+
+.console__bientot {
+    margin-left: auto;
+    padding: 0.0625rem 0.375rem;
+    border-radius: var(--rayon-chip);
+    background: var(--surface-2);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.kpi__valeur--texte {
+    font-size: 1.25rem;
+    line-height: 1.3;
+}
+
+.fil__avatar--ville,
+.fil__avatar--association {
+    background: var(--attention-doux);
+    color: var(--attention-texte);
+}
+
+.fil__avatar--compte {
+    background: var(--accent-doux);
+    color: var(--accent-texte);
+}
+
+.fil__avatar--abonnement {
+    background: var(--succes-doux);
+    color: var(--succes-texte);
+}
+
+.section__accueil {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1.25rem 1.125rem 1.5rem;
+    border-top: 1px solid var(--bordure);
+}
+
+.section__accueil-titre {
+    margin: 0;
+    font-weight: 700;
+}
+
+.section__accueil-texte {
+    margin: 0 0 0.5rem;
+    font-size: var(--taille-petit);
+    color: var(--texte-2);
+}
+
+.tableau__actions-cellule {
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* Menu du compte connecté, en bas de la barre latérale : Paramètres, Se déconnecter. Sur écran large, il s'ouvre vers le haut. */
+.console__compte {
+    padding: 0.5rem;
+}
+
+.console__menu-compte {
+    flex: 1;
+    min-width: 0;
+}
+
+.console__compte-resume {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.375rem 0.5rem;
+    border-radius: var(--rayon-petit);
+    cursor: pointer;
+    transition: background-color var(--duree-courte) ease;
+}
+
+.console__compte-resume:hover {
+    background: var(--surface-2);
+}
+
+.console__compte-chevron {
+    flex: none;
+    display: flex;
+    color: var(--texte-3);
+    transform: rotate(90deg);
+    transition: transform var(--duree-courte) ease;
+}
+
+.console__menu-compte[open] .console__compte-chevron {
+    transform: rotate(-90deg);
+}
+
+.console__menu-compte > .menu__liste {
+    left: 0;
+    right: 0;
+    min-width: 0;
+}
+
+/* Champs d'un formulaire de section empilés sur une colonne (paramètres). */
+.section__formulaire-champs--colonne {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 28rem;
+}
+
+@media (min-width: 64rem) {
+    .console__menu-compte > .menu__liste {
+        top: auto;
+        bottom: calc(100% + 0.25rem);
+    }
+
+    .console__compte-chevron {
+        transform: rotate(-90deg);
+    }
+
+    .console__menu-compte[open] .console__compte-chevron {
+        transform: rotate(90deg);
+    }
+}
+
+/* Bas de la barre latérale : Paramètres, puis le menu du compte (maquette Console). */
+.console__bas {
+    display: flex;
+    flex-direction: column;
+}
+
+.console__bas-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 0.375rem 0.75rem 0.5rem;
+}
+
+@media (min-width: 64rem) {
+    .console__bas {
+        margin-top: auto;
+    }
+}
+
+/* En-tête du tableau de bord : l'exercice en cours, une information et non un contrôle. */
+.exercice {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: var(--hauteur-controle);
+    padding: 0 0.75rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon-petit);
+    background: var(--surface);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--texte);
+    white-space: nowrap;
+}
+
+.exercice svg {
+    color: var(--texte-3);
+}
+
+/* Barres empilées du tableau de bord : le second jeu en teinte douce de la couleur d'action. */
+.graphique__segment--doux {
+    background: var(--accent-doux);
+}
+
+.graphique__pastille--doux {
+    border: 1px solid var(--bordure);
+    background: var(--accent-doux);
+}
+
+.graphique__pile .graphique__segment {
+    min-height: 2px;
+}
+
+/* Avancement d'une ville sur une ligne : piste, puis pourcentage, comme la colonne « Membres à jour » de la maquette. */
+.progression--ligne {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    width: auto;
+    height: auto;
+    margin: 0;
+    background: none;
+    overflow: visible;
+}
+
+.progression__piste {
+    display: block;
+    flex: 1 1 4rem;
+    max-width: 9rem;
+    height: 0.375rem;
+    border-radius: 0.1875rem;
+    background: var(--surface-2);
+    overflow: hidden;
+}
+
+.progression__piste .progression__barre {
+    border-radius: inherit;
+}
+
+.progression__valeur {
+    flex: none;
+    min-width: 2.5rem;
+    font-size: 0.78125rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+/* Tableau resserré des villes : les cellules se calent sur le contenu, aucune colonne ne déborde du bloc. */
+.tableau--serre table {
+    min-width: 0;
+}
+
+.tableau--serre .tableau__actions {
+    width: 1%;
+    white-space: nowrap;
+    text-align: right;
+}
+
+/* Chiffres financiers annoncés (maquette) : en attente de leurs modules, la valeur reste un tiret discret. */
+.kpi--a-venir .kpi__valeur {
+    color: var(--texte-3);
+}
+
+/* Ligne d'état de l'association sous les chiffres : villes, avancement, responsables, abonnement, connexions. */
+.etat {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin: 0;
+    padding: 0.625rem 1rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+    font-size: 0.8125rem;
+}
+
+.etat__item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.375rem;
+    min-width: 0;
+    margin: 0;
+}
+
+.etat__item dt {
+    color: var(--texte-3);
+    font-weight: 500;
+}
+
+.etat__item dd {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.375rem;
+    margin: 0;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.etat__item dd a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.etat__item dd a:hover {
+    color: var(--accent-texte);
+    text-decoration: underline;
+}
+
+.etat__detail {
+    font-weight: 400;
+    color: var(--texte-3);
+}
+
+.etat__chip {
+    display: inline-flex;
+    align-items: center;
+    height: 1.25rem;
+    padding: 0 0.375rem;
+    border-radius: var(--rayon-chip);
+    background: var(--surface-2);
+    color: var(--texte-2);
+    font-size: 0.6875rem;
+    font-weight: 700;
+}
+
+.etat__chip--attente {
+    background: var(--attention-doux);
+    color: var(--attention-texte);
+}
+
+.etat__valeur--erreur {
+    color: var(--erreur-texte);
+}
+
+/* Import d'un fichier pour l'association : dépôt et mode d'emploi côte à côte, rattachement, aperçu, bilan. */
+.import__grille {
+    display: grid;
+    gap: 1rem;
+    align-items: start;
+}
+
+@media (min-width: 64rem) {
+    .import__grille {
+        grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    }
+}
+
+.import__etapes {
+    margin: 0;
+    padding: 0.25rem 1.125rem 0.5rem 2.25rem;
+    font-size: 0.84375rem;
+    color: var(--texte-2);
+}
+
+.import__etapes li + li {
+    margin-top: 0.5rem;
+}
+
+.import__modes {
+    margin-bottom: 0.5rem;
+}
+
+.import__aide {
+    margin: 0 0 1rem;
+    font-size: 0.8125rem;
+    color: var(--texte-3);
+}
+
+.import__formulaire {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.import__choix {
+    width: 100%;
+    max-width: 18rem;
+    min-height: 2.25rem;
+}
+
+.import__ligne--erreur td {
+    background: var(--erreur-doux);
+}
+
+.import__ligne--ignoree td {
+    color: var(--texte-3);
+}
+
+.import__kpi--attention {
+    color: var(--attention-texte);
+}
+
+.import__erreurs-bloc > .import__erreurs-resume {
+    cursor: pointer;
+    list-style: none;
+}
+
+.import__erreurs-bloc > .import__erreurs-resume::-webkit-details-marker {
+    display: none;
+}
+
+.import__erreurs-bloc > .import__erreurs-resume::after {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 1.75px solid var(--texte-3);
+    border-bottom: 1.75px solid var(--texte-3);
+    transform: rotate(45deg) translateY(-2px);
+}
+
+.import__erreurs-bloc[open] > .import__erreurs-resume::after {
+    transform: rotate(225deg) translateY(-2px);
+}
+
+/* Membres de l'association : deux rangées de filtres (villes, années) sous la recherche ; l'année choisie en chip accent. */
+.filtres-groupe {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0.75rem 0 1rem;
+}
+
+.chip--accent {
+    background: var(--accent-doux);
+    color: var(--accent-texte);
+}
+
+.tableau--membres-association .tableau__actions {
+    justify-content: flex-end;
+}
+
+/* L'entrée active d'un menu de choix (périmètre de la barre latérale). */
+.menu__item--actif {
+    font-weight: 700;
+    color: var(--accent-texte);
+}
+
+/* Grille du classeur (membres d'une année, fiche d'un membre) : une ligne par adhésion, les douze mois, le rapatriement,
+   le projet, le total et le reste. Le nom reste visible pendant le défilement horizontal. */
+.tableau--grille table {
+    min-width: 0;
+}
+
+.tableau--grille th,
+.tableau--grille td {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.78125rem;
+    white-space: nowrap;
+}
+
+.tableau--grille .grille__numero {
+    width: 2.5rem;
+    color: var(--texte-3);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.tableau--grille .grille__membre {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    min-width: 12rem;
+    background: var(--surface);
+    box-shadow: 1px 0 0 var(--bordure);
+}
+
+.tableau--grille thead .grille__membre {
+    background: var(--surface-3);
+}
+
+.grille__nom {
+    font-weight: 600;
+    color: var(--texte);
+    text-decoration: none;
+}
+
+.grille__nom:hover {
+    color: var(--accent-texte);
+    text-decoration: underline;
+}
+
+.grille__detail {
+    display: block;
+    font-size: 0.6875rem;
+    color: var(--texte-3);
+}
+
+.grille__mois {
+    min-width: 2.75rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.grille__mois--zero {
+    color: var(--texte-3);
+}
+
+.grille__annuel {
+    background: var(--surface-2);
+}
+
+.grille__total {
+    font-weight: 600;
+}
+
+.grille__code {
+    display: inline-block;
+    padding: 0 0.25rem;
+    border-radius: 4px;
+    background: var(--attention-doux);
+    color: var(--attention-texte);
+    font-size: 0.6875rem;
+    font-weight: 700;
+}
+
+.grille__reste--du {
+    color: var(--erreur-texte);
+}
+
+.grille__vide {
+    color: var(--texte-3);
+}
+
+.grille__annee {
+    font-weight: 700;
+    text-align: left;
+}
+
+/* Sélecteur de périmètre de la barre latérale : toute l'association ou une ville ; le bloc existant devient le résumé du menu. */
+.perimetre {
+    position: relative;
+    display: block;
+}
+
+.perimetre > summary {
+    cursor: pointer;
+    list-style: none;
+    transition: border-color var(--duree-courte) ease;
+}
+
+.perimetre > summary::-webkit-details-marker {
+    display: none;
+}
+
+.perimetre > summary:hover,
+.perimetre[open] > summary {
+    border-color: var(--bordure-forte);
+}
+
+.console__perimetre-chevron {
+    display: flex;
+    flex: none;
+    margin-left: auto;
+    color: var(--texte-3);
+    transform: rotate(90deg);
+}
+
+.perimetre .menu__liste {
+    left: 0.75rem;
+    right: 0.75rem;
+    top: calc(100% - 0.375rem);
+    min-width: 0;
+    max-height: 20rem;
+    overflow-y: auto;
+}
+
+.perimetre .menu__item--actif {
+    background: var(--accent-doux);
+}
+
+.choix-ville {
+    color: inherit;
+}
+
+/* Tableau de bord du bureau central : chips de variation, montants dus ou soldés, tableau des villes de la maquette. */
+.kpi__chip--succes {
+    background: var(--succes-doux);
+    color: var(--succes-texte);
+}
+
+.entite__precision {
+    margin-left: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--texte-3);
+}
+
+.tableau--villes .progression__piste {
+    max-width: 14rem;
+}
+
+.progression__barre--attention {
+    background: var(--attention-texte);
+}
+
+.montant {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.montant--du {
+    color: var(--erreur-texte);
+}
+
+.montant--ok {
+    color: var(--succes-texte);
+}
+
+/* Villes de l'association : le brouillon surligné, responsables en initiales, avancement et « à jour » en piste. */
+.villes__ligne--brouillon td {
+    background: var(--accent-doux);
+}
+
+.entite__initiales--eteinte {
+    color: var(--texte-3);
+    background: var(--surface-2);
+}
+
+.villes__avancement {
+    margin-top: 0.375rem;
+}
+
+.villes__avancement .progression__piste {
+    max-width: 7rem;
+}
+
+.villes__responsables {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.villes__avatars {
+    display: inline-flex;
+    flex: none;
+}
+
+.villes__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-left: -0.375rem;
+    border: 2px solid var(--surface);
+    border-radius: 50%;
+    background: var(--surface-2);
+    color: var(--texte-2);
+    font-size: 0.6875rem;
+    font-weight: 700;
+}
+
+.villes__avatar:first-child {
+    margin-left: 0;
+}
+
+.villes__avatar--plus {
+    background: var(--surface-3);
+}
+
+.villes__noms {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 12rem;
+}
+
+.villes__a-jour .progression__piste {
+    max-width: 7rem;
+}
+
+/* Paramètres › Responsables et rôles : fil d'Ariane, onglets, sélecteurs déroulants, rôles et journal. */
+.console__fil {
+    font-weight: 400;
+    color: var(--texte-3);
+}
+
+.console__fil a {
+    color: var(--texte-2);
+    text-decoration: none;
+}
+
+.console__fil a:hover {
+    color: var(--texte);
+    text-decoration: underline;
+}
+
+.onglets {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0 0 1rem;
+    border-bottom: 1px solid var(--bordure);
+    overflow-x: auto;
+}
+
+.onglet {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 0.875rem;
+    margin-bottom: -1px;
+    border-bottom: 2px solid transparent;
+    color: var(--texte-2);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.onglet:hover {
+    color: var(--texte);
+}
+
+.onglet[aria-current="page"] {
+    border-bottom-color: var(--accent);
+    color: var(--texte);
+}
+
+.menu--selecteur {
+    position: relative;
+}
+
+.menu--selecteur > summary {
+    gap: 0.375rem;
+    list-style: none;
+}
+
+.menu--selecteur > summary::-webkit-details-marker {
+    display: none;
+}
+
+.menu--selecteur .menu__liste {
+    right: auto;
+    left: 0;
+    min-width: 14rem;
+    max-height: 20rem;
+    overflow-y: auto;
+}
+
+.responsables__intro {
+    margin: 0 0 1rem;
+    font-size: 0.875rem;
+    color: var(--texte-2);
+}
+
+.responsables__outils {
+    margin-bottom: 1rem;
+}
+
+.responsables__compte {
+    margin-left: auto;
+    font-size: 0.8125rem;
+    color: var(--texte-3);
+    white-space: nowrap;
+}
+
+.responsables__aside {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.roles {
+    margin: 0;
+    padding: 0 1.125rem;
+}
+
+.roles__item {
+    padding: 0.875rem 0;
+    border-bottom: 1px solid var(--bordure);
+}
+
+.roles__item:last-child {
+    border-bottom: 0;
+}
+
+.roles__item dt {
+    font-weight: 700;
+}
+
+.roles__item dd {
+    margin: 0.25rem 0 0;
+    font-size: 0.84375rem;
+    color: var(--texte-2);
+}
+
+.roles__item dd p {
+    margin: 0;
+}
+
+.roles__droits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.roles__note {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--texte-3);
+}
+
+.journal-roles {
+    margin: 0;
+    padding: 0 1.125rem;
+    list-style: none;
+}
+
+.journal-roles__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--bordure);
+    font-size: 0.84375rem;
+}
+
+.journal-roles__item:last-child {
+    border-bottom: 0;
+}
+
+.journal-roles__date {
+    font-size: 0.75rem;
+    color: var(--texte-3);
+}
+
+.inviter__roles {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.inviter__role {
+    align-items: flex-start;
+}
+
+.inviter__role > span {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.inviter__role-aide {
+    font-size: 0.75rem;
+    color: var(--texte-3);
+}
+
+.inviter__actions {
+    gap: 0.5rem;
+}
+
+/* Responsables : la colonne de droite reste à droite dès 64 rem, comme la maquette ; le tableau se resserre pour tenir. */
+.colonnes.responsables {
+    align-items: start;
+}
+
+@media (min-width: 64rem) {
+    .colonnes.responsables {
+        grid-template-columns: minmax(0, 5fr) minmax(16rem, 2fr);
+    }
+}
+
+.tableau--responsables table {
+    font-size: 0.8125rem;
+}
+
+.tableau--responsables th,
+.tableau--responsables td {
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+}
+
+.tableau--responsables .entite__nom,
+.tableau--responsables .entite__detail {
+    max-width: 9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tableau--responsables .chip {
+    white-space: nowrap;
+}
+
+.responsables__depuis {
+    white-space: nowrap;
+    color: var(--texte-2);
+}
+
+.tableau--responsables .tableau__precision {
+    max-width: 10rem;
+}
+
+/* Barre d'outils des villes de l'association : la recherche et les chips à gauche, le panneau « Filtres » poussé à droite. */
+.barre-outils__form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.barre-outils__fin {
+    margin-left: auto;
+}
+
+.filtres-menu .menu__liste {
+    min-width: 18rem;
+    gap: 0.75rem;
+    padding: 1rem;
+}
+
+.filtres-menu__champ {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.filtres-menu__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+@media (max-width: 47.99rem) {
+    .barre-outils__fin {
+        margin-left: 0;
+    }
+
+    .filtres-menu .menu__liste {
+        right: auto;
+        left: 0;
+    }
+}
+
+/* Liste des villes : aucune colonne ne déborde du bloc (vérifié à 390, 800, 1100, 1390 et 1600 px). Sous 80 rem, les
+   noms des responsables cèdent la place à leurs initiales, les en-têtes et les précisions peuvent se couper, les jauges
+   raccourcissent et les cellules se resserrent ; sous 48 rem, la colonne Membres rejoint les colonnes masquées. */
+@media (max-width: 79.99rem) {
+    .tableau--villes-association th,
+    .tableau--villes-association td {
+        padding-left: 0.625rem;
+        padding-right: 0.625rem;
+    }
+
+    .tableau--villes-association th,
+    .tableau--villes-association .tableau__precision {
+        white-space: normal;
+    }
+
+    .tableau--villes-association .villes__noms {
+        display: none;
+    }
+
+    .tableau--villes-association .villes__a-jour .progression__piste,
+    .tableau--villes-association .villes__avancement .progression__piste {
+        max-width: 4.5rem;
+    }
+}
+
+/* Sur téléphone, le pied du tableau des villes se coupe sur deux lignes et se resserre comme les autres cellules :
+   sinon « Total collecté sur 2021 » à lui seul élargit la première colonne au-delà de l'écran. */
+@media (max-width: 47.99rem) {
+    .tableau--villes-association tfoot th,
+    .tableau--villes-association tfoot td {
+        padding-left: 0.625rem;
+        padding-right: 0.625rem;
+        white-space: normal;
+    }
+}
+
+/* Revue design du 28 septembre 2026 (skills frontend-design-direction, make-interfaces-feel-better, accessibility). */
+/* Titres équilibrés, textes d'aide sans orphelin. */
+.console__titre,
+.section__entete h2,
+.kpi__libelle {
+    text-wrap: balance;
+}
+
+.console__sous-titre,
+.section__aide,
+.section__vide,
+.kpi__detail,
+.section__texte {
+    text-wrap: pretty;
+}
+
+/* « Bientôt » : en bas de casse, lisible (texte-3 : 4,6:1), jamais de capitales espacées (direction Console). */
+.console__bientot {
+    color: var(--texte-3);
+    font-size: 0.6875rem;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+/* Graphique sans encaissement : un état vide qui dit quoi faire, à la place d'une zone blanche. */
+.graphique__corps {
+    position: relative;
+}
+
+.graphique__vide {
+    position: absolute;
+    inset: 0 0 2.5rem;
+    display: grid;
+    place-items: center;
+    margin: 0;
+    padding: 1rem 2rem;
+    font-size: var(--taille-petit);
+    color: var(--texte-3);
+    text-align: center;
+    text-wrap: pretty;
+}
+
+/* Sur écran tactile, les petites commandes atteignent 40 px (boutons icône, chips de filtre, petits boutons), et la
+   navigation qui défile horizontalement s'estompe sur son bord droit pour signaler la suite. */
+@media (max-width: 47.99rem) {
+    .bouton--icone {
+        width: 2.5rem;
+        min-height: 2.5rem;
+    }
+
+    .bouton--petit,
+    .filtre {
+        min-height: 2.5rem;
+    }
+
+    .console__nav {
+        -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+        mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+    }
+}
+
+/* Décisions de Rama du 28 septembre 2026 après la revue design. Une couleur, un sens : le vert clair ne dit plus que
+   « statut » (à jour, actif, payé). Les sélections passent en blanc cerclé, comme le filtre courant et l'entrée de
+   navigation active ; les initiales et avatars deviennent neutres ; la ligne d'un brouillon n'est plus verte. */
+.chip--accent,
+.compteur--accent,
+.pagination__lien[aria-current="true"] {
+    border: 1px solid var(--bordure);
+    background: var(--surface);
+    box-shadow: var(--ombre);
+    color: var(--texte);
+    font-weight: 700;
+}
+
+.combobox__option[aria-selected="true"],
+.menu__item--actif,
+.perimetre .menu__item--actif {
+    background: var(--surface-2);
+    color: var(--texte);
+    font-weight: 700;
+}
+
+.entite__initiales,
+.console__perimetre-initiales,
+.fil__avatar--compte,
+.fil__avatar--invitation_acceptee {
+    background: var(--surface-2);
+    color: var(--texte-2);
+}
+
+.entite__initiales--eteinte {
+    background: var(--surface-3);
+    color: var(--desactive);
+}
+
+.villes__ligne--brouillon td {
+    background: var(--surface-3);
+}
+
+/* « Exercice 2026 » n'est pas un bouton : une chip calme, sans bordure. */
+.exercice {
+    border-color: transparent;
+    background: var(--surface-2);
+    color: var(--texte-2);
+}
+
+/* Les modules à venir tiennent sur une ligne discrète en bas de la navigation ; sur téléphone, la navigation défile
+   horizontalement et cette ligne disparaît. */
+.console__a-venir {
+    margin: 0.5rem 0 0;
+    padding: 0.5rem 0.625rem 0;
+    border-top: 1px solid var(--bordure);
+    font-size: 0.75rem;
+    line-height: 1.45;
+    color: var(--texte-3);
+    white-space: normal;
+    text-wrap: pretty;
+}
+
+@media (max-width: 47.99rem) {
+    .console__a-venir {
+        display: none;
+    }
+}
+
+/* Sélecteur d'exercice de l'en-tête du tableau de bord : la chip devient un menu quand plusieurs exercices sont suivis. */
+.exercice--choix {
+    cursor: pointer;
+    list-style: none;
+}
+
+.exercice--choix::-webkit-details-marker {
+    display: none;
+}
+
+.exercice-menu[open] > .exercice--choix {
+    background: var(--surface-3);
+}
+
+.exercice--choix svg:last-child {
+    transform: rotate(90deg);
+}
+
+.menu__note {
+    margin-left: auto;
+    padding-left: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--texte-3);
+}
+
+/* Sélecteur d'année (Membres, Cotisations) : la même chip-menu que l'exercice du tableau de bord, ouverte à gauche. */
+.selecteur {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.selecteur__bouton {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 2.25rem;
+    padding: 0 0.75rem;
+    border-radius: var(--rayon-petit);
+    background: var(--surface-2);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--texte);
+    cursor: pointer;
+    list-style: none;
+    transition: background-color var(--duree-courte) ease;
+}
+
+.selecteur__bouton::-webkit-details-marker {
+    display: none;
+}
+
+.selecteur__bouton svg:last-child {
+    color: var(--texte-3);
+    transform: rotate(90deg);
+}
+
+.selecteur__menu[open] > .selecteur__bouton,
+.selecteur__bouton:hover {
+    background: var(--bordure);
+}
+
+.selecteur__menu .menu__liste {
+    right: auto;
+    left: 0;
+    min-width: 13rem;
+    max-height: 20rem;
+    overflow-y: auto;
+}
+
+@media (max-width: 47.99rem) {
+    .selecteur__bouton {
+        height: 2.5rem;
+    }
+}
+
+/* Onglets de Paramètres (Mon compte, Responsables et rôles) : le niveau principal ; les onglets internes de Responsables
+   (Responsables, Rôles et droits, Journal) restent en dessous, plus discrets. */
+.onglets-parametres {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0 0 1.25rem;
+    border-bottom: 1px solid var(--bordure);
+    overflow-x: auto;
+}
+
+.onglet-parametres {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 1rem;
+    margin-bottom: -1px;
+    border-bottom: 2px solid transparent;
+    color: var(--texte-2);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.onglet-parametres:hover {
+    color: var(--texte);
+}
+
+.onglet-parametres[aria-current="page"] {
+    border-bottom-color: var(--accent);
+    color: var(--texte);
+}
+
+.onglets-parametres + .onglets {
+    border-bottom: 0;
+    gap: 0.25rem;
+}
+
+.onglets-parametres + .onglets .onglet {
+    padding: 0.375rem 0.75rem;
+    margin-bottom: 0;
+    border: 0;
+    border-radius: var(--rayon-petit);
+    font-size: 0.8125rem;
+}
+
+.onglets-parametres + .onglets .onglet[aria-current="page"] {
+    background: var(--surface-2);
+}
+
+/* Nouvel appel à contribution (maquette « 04 Lancer un appel ») : formulaire à gauche, « Ce qui va se passer » et
+   aperçu de l'e-mail à droite (collant sur grand écran) ; cartes de type en radio. */
+.appel {
+    display: grid;
+    gap: 1.25rem;
+    align-items: start;
+}
+
+@media (min-width: 64rem) {
+    .appel {
+        grid-template-columns: minmax(0, 1fr) 20rem;
+        gap: 1.5rem;
+    }
+
+    .appel__cote {
+        position: sticky;
+        top: 1rem;
+    }
+}
+
+/* Un élément masqué par le contrôleur (taux fixé par le type, ligne sans adresse) le reste malgré son display. */
+.appel [hidden] {
+    display: none !important;
+}
+
+.appel__principal,
+.appel__cote {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    min-width: 0;
+}
+
+.appel__intro {
+    margin: 0;
+    color: var(--texte-2);
+    text-wrap: pretty;
+}
+
+.appel__etat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: var(--taille-petit);
+    color: var(--texte-3);
+}
+
+.appel__etat svg {
+    color: var(--succes);
+}
+
+.appel__bloc {
+    margin: 0;
+    padding: 1.25rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+    box-shadow: var(--ombre);
+    min-width: 0;
+}
+
+.appel__legende {
+    padding: 0 0.375rem;
+    margin-left: -0.375rem;
+    font-size: var(--taille-titre-bloc);
+    font-weight: 700;
+}
+
+.appel__types {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+    gap: 0.75rem;
+}
+
+.appel-type {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    padding: 0.875rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+    cursor: pointer;
+    transition: border-color var(--duree-courte) ease, background-color var(--duree-courte) ease;
+}
+
+.appel-type:hover {
+    border-color: var(--bordure-champ);
+}
+
+.appel-type:has(input:checked) {
+    border: 2px solid var(--accent);
+    padding: calc(0.875rem - 1px);
+    background: var(--accent-doux);
+}
+
+.appel-type input {
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin: 0.125rem 0 0;
+    accent-color: var(--accent);
+}
+
+.appel-type__texte {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.appel-type__nom {
+    font-weight: 700;
+}
+
+.appel-type__detail {
+    font-size: var(--taille-petit);
+    color: var(--texte-2);
+}
+
+.appel__champs {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.appel__ligne {
+    display: grid;
+    gap: 1rem;
+}
+
+@media (min-width: 48rem) {
+    .appel__ligne--3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .appel__ligne--2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.appel__euro {
+    position: relative;
+    display: block;
+}
+
+.appel__euro .champ__saisie {
+    padding-right: 2rem;
+}
+
+.appel__euro-signe {
+    position: absolute;
+    top: 50%;
+    right: 0.875rem;
+    transform: translateY(-50%);
+    color: var(--texte-3);
+    pointer-events: none;
+}
+
+.appel__reversement {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: var(--hauteur-controle);
+    padding: 0 0.875rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon-petit);
+    background: var(--surface-3);
+    color: var(--texte-2);
+}
+
+.appel__reversement-note {
+    font-size: var(--taille-petit);
+    color: var(--texte-3);
+}
+
+.appel__message {
+    min-height: 5.5rem;
+    resize: vertical;
+}
+
+.appel__pied {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.appel__relances {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--texte-2);
+    cursor: pointer;
+}
+
+.appel__relances input {
+    width: 1.125rem;
+    height: 1.125rem;
+    accent-color: var(--accent);
+}
+
+.appel__chiffres {
+    margin: 0;
+    padding: 0 1.125rem;
+}
+
+.appel__chiffres > div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--bordure);
+}
+
+.appel__chiffres > div:last-child {
+    border-bottom: 0;
+}
+
+.appel__chiffres dt {
+    color: var(--texte-2);
+}
+
+.appel__chiffres dd {
+    margin: 0;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.appel__chiffres .appel__fort {
+    font-size: 1.0625rem;
+    font-weight: 700;
+}
+
+.appel__chiffres .appel__alerte dt,
+.appel__chiffres .appel__alerte dd {
+    color: var(--erreur-texte);
+    font-weight: 600;
+}
+
+.appel__synthese .section__aide {
+    padding-top: 0.25rem;
+}
+
+.appel__apercu {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.625rem;
+    padding: 1.125rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface-3);
+    scroll-margin-top: 1rem;
+}
+
+.appel__apercu-titre {
+    margin: 0;
+    font-size: var(--taille-petit);
+    font-weight: 600;
+    color: var(--texte-3);
+}
+
+.appel__apercu-objet {
+    margin: 0;
+    font-weight: 700;
+}
+
+.appel__apercu-texte {
+    margin: 0;
+    font-size: var(--taille-petit);
+    color: var(--texte-2);
+    text-wrap: pretty;
+}
+
+.appel__apercu-bouton {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+    padding: 0 0.875rem;
+    border-radius: var(--rayon-petit);
+    background: var(--accent);
+    color: var(--sur-accent);
+    font-weight: 700;
+    font-size: var(--taille-petit);
+}
+
+.appel__suivi-message {
+    margin: 0;
+    padding: 0 1.125rem 1rem;
+    white-space: pre-line;
+}
+
+/* Dépenses (F-21 à F-23) : compteur de navigation, saisie en deux colonnes, fiche avec décision et suivi. */
+.console__badge {
+    margin-left: auto;
+    min-width: 1.375rem;
+    padding: 0.0625rem 0.4375rem;
+    border: 1px solid var(--attention-bordure);
+    border-radius: var(--rayon-chip);
+    background: var(--attention-doux);
+    color: var(--attention-texte);
+    font-size: 0.71875rem;
+    font-weight: 700;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.kpi__valeur--attention {
+    color: var(--attention-texte);
+}
+
+.alerte--info {
+    border-color: var(--info-doux);
+    background: var(--info-doux);
+    color: var(--info-texte);
+}
+
+.depense-saisie,
+.depense-fiche {
+    display: grid;
+    gap: 1.25rem;
+    align-items: start;
+}
+
+@media (min-width: 64rem) {
+    .depense-saisie,
+    .depense-fiche {
+        grid-template-columns: minmax(0, 1fr) 20rem;
+        gap: 1.5rem;
+    }
+}
+
+.depense-saisie__formulaire {
+    display: flex;
+    flex-direction: column;
+    gap: 1.125rem;
+    padding: 1.25rem;
+}
+
+.depense-saisie__grille {
+    display: grid;
+    gap: 1rem;
+}
+
+@media (min-width: 48rem) {
+    .depense-saisie__grille--libelle {
+        grid-template-columns: minmax(0, 1fr) 12rem;
+    }
+
+    .depense-saisie__grille--3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .depense-saisie__grille--2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.depense-saisie__montant {
+    text-align: right;
+}
+
+.depense-saisie__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--bordure);
+}
+
+.depense-saisie__cote,
+.depense-fiche__principal,
+.depense-fiche__cote {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    min-width: 0;
+}
+
+.depense-justificatif__zone {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem;
+    border: 1.5px dashed var(--bordure-champ);
+    border-radius: var(--rayon-petit);
+    background: var(--surface-3);
+}
+
+.champ--erreur .depense-justificatif__zone {
+    border-color: var(--erreur);
+}
+
+.depense-justificatif__texte {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.depense-justificatif__titre {
+    font-weight: 600;
+}
+
+.depense-justificatif__fichier {
+    max-width: 100%;
+    font: inherit;
+    font-size: var(--taille-petit);
+}
+
+.depense-circuit {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    margin: 0;
+    padding: 0 1.125rem 1.125rem;
+    list-style: none;
+}
+
+.depense-circuit li {
+    display: flex;
+    gap: 0.75rem;
+    color: var(--texte-2);
+    text-wrap: pretty;
+}
+
+.depense-circuit strong {
+    color: var(--texte);
+}
+
+.depense-circuit__numero {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: var(--surface-2);
+    color: var(--texte-2);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.depense-circuit__alerte {
+    margin: 0 1.125rem 1.125rem;
+}
+
+.depense-fiche__carte {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1.25rem;
+}
+
+.depense-fiche__libelle {
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 1.3;
+    text-wrap: balance;
+}
+
+.depense-fiche__montant {
+    margin: 0;
+    font-size: 1.875rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.depense-fiche__details {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    gap: 0;
+    width: 100%;
+    margin: 0.25rem 0 0;
+    padding-top: 0.375rem;
+    border-top: 1px solid var(--bordure);
+    font-size: var(--taille-petit);
+}
+
+.depense-fiche__details dt,
+.depense-fiche__details dd {
+    margin: 0;
+    padding: 0.375rem 0;
+}
+
+.depense-fiche__details dt {
+    color: var(--texte-3);
+}
+
+.depense-fiche__motif {
+    color: var(--erreur-texte);
+}
+
+.depense-fiche__justificatif {
+    display: grid;
+    grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.75rem 1rem;
+    color: var(--texte);
+    text-decoration: none;
+}
+
+.depense-fiche__vignette {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 3.25rem;
+    border: 1px solid var(--bordure);
+    border-radius: 6px;
+    background: var(--surface-2);
+    color: var(--texte-3);
+}
+
+.depense-fiche__fichier {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.depense-fiche__fichier-nom {
+    overflow: hidden;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.depense-verrou {
+    display: flex;
+    gap: 0.625rem;
+    align-items: flex-start;
+    padding: 0.875rem;
+    border: 1.5px solid var(--texte);
+    border-radius: var(--rayon);
+    background: var(--surface);
+    font-size: var(--taille-petit);
+}
+
+.depense-verrou p {
+    margin: 0;
+    text-wrap: pretty;
+}
+
+.depense-verrou__icone {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.375rem;
+    height: 1.375rem;
+    border-radius: 7px;
+    background: var(--texte);
+    color: var(--surface);
+}
+
+.depense-decision__corps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0 1.125rem 1.125rem;
+}
+
+.depense-decision__corps form {
+    margin: 0;
+}
+
+.depense-decision__bouton {
+    width: 100%;
+}
+
+.depense-decision__refus > summary {
+    list-style: none;
+    cursor: pointer;
+}
+
+.depense-decision__refus > summary::-webkit-details-marker {
+    display: none;
+}
+
+.depense-decision__motif {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.75rem !important;
+}
+
+.depense-suivi {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0 1.125rem 1rem;
+    list-style: none;
+}
+
+.depense-suivi__etape {
+    display: grid;
+    grid-template-columns: 1.125rem minmax(0, 1fr) auto;
+    gap: 0.625rem;
+    align-items: center;
+    padding: 0.375rem 0;
+    font-size: var(--taille-petit);
+    color: var(--desactive);
+}
+
+.depense-suivi__point {
+    width: 0.75rem;
+    height: 0.75rem;
+    margin-left: 0.1875rem;
+    border: 1.5px solid var(--bordure-forte);
+    border-radius: 50%;
+}
+
+.depense-suivi__etape--faite {
+    color: var(--texte);
+}
+
+.depense-suivi__etape--faite .depense-suivi__point {
+    border-color: var(--succes);
+    background: var(--succes);
+}
+
+.depense-suivi__etape--courante {
+    color: var(--texte);
+    font-weight: 600;
+}
+
+.depense-suivi__etape--courante .depense-suivi__point {
+    border: 2px solid var(--attention);
+}
+
+.depense-suivi__etape--refusee {
+    color: var(--erreur-texte);
+}
+
+.depense-suivi__etape--refusee .depense-suivi__point {
+    border-color: var(--erreur);
+    background: var(--erreur);
+}
+
+.depense-suivi__date {
+    font-weight: 400;
+    color: var(--texte-3);
+    font-variant-numeric: tabular-nums;
+}
+
+.depense-suivi__bloquee {
+    font-weight: 600;
+    color: var(--erreur-texte);
+}
+
+/* Reversements (F-20) : déclarations à confirmer, tableau du dû par ville, graphique G-11 en barres horizontales. */
+.reversements__confirmation {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    grid-column: 2;
+}
+
+@media (min-width: 48rem) {
+    .reversements__confirmation {
+        grid-column: auto;
+        flex-wrap: nowrap;
+    }
+}
+
+.reversements__montant-recu {
+    display: block;
+    width: 8.5rem;
+}
+
+.reversements__montant-recu .champ__saisie {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.colonnes.reversements {
+    align-items: start;
+}
+
+@media (min-width: 64rem) {
+    .colonnes.reversements {
+        grid-template-columns: minmax(0, 3fr) minmax(18rem, 2fr);
+    }
+}
+
+.reversements__compteurs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.375rem;
+    white-space: normal;
+}
+
+.reversements__barres {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    margin: 0;
+    padding: 0.5rem 1.125rem 0.875rem;
+    list-style: none;
+}
+
+.reversements__barre {
+    display: grid;
+    grid-template-columns: 6rem minmax(0, 1fr) auto;
+    gap: 0.625rem;
+    align-items: center;
+    font-size: 0.8125rem;
+}
+
+.reversements__barre-nom {
+    overflow: hidden;
+    font-weight: 600;
+    color: var(--texte-2);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.reversements__barre-piste {
+    display: flex;
+    height: 0.875rem;
+    border-radius: 4px;
+    background: var(--surface-2);
+    overflow: hidden;
+}
+
+.reversements__barre-segment {
+    display: block;
+    min-width: 2px;
+    height: 100%;
+}
+
+.reversements__barre-segment--recu {
+    background: var(--accent);
+}
+
+.reversements__barre-segment--restant {
+    background: var(--erreur-texte);
+}
+
+.reversements__barre-valeur {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.reversements__legende {
+    margin: 0 1.125rem;
+    padding-bottom: 0.875rem;
+}
+
+@media (max-width: 47.99rem) {
+    .reversements__graphique .section__lien {
+        display: none;
+    }
+}
+
+/* Paramètres de l'association (onglet du bureau central) : deux sections puis une ligne d'action commune. */
+.parametres-association__actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 1rem;
+}
+
+/* Types de contribution (F-11) : lignes archivées estompées, boutons radio en ligne, règles en marge. */
+.contributions__ligne--archive td {
+    color: var(--texte-3);
+}
+
+.choix-radio {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    min-height: var(--hauteur-controle);
+    align-items: center;
+}
+
+.choix-radio__option {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.contributions__regles {
+    margin: 0;
+    padding: 0.25rem 1.125rem 1rem 2.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    color: var(--texte-2);
+    font-size: 0.8125rem;
+}
+
+/* Cotisation périodique (F-12) : le panneau de l'année au-dessus de la grille. */
+.cotisation-panneau__corps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    padding: 0.25rem 1.125rem 1rem;
+}
+
+.cotisation-panneau__chiffres {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--texte-2);
+}
+
+.cotisation-panneau__retard {
+    font-weight: 600;
+    color: var(--erreur-texte);
+}
+
+.cotisation-panneau__texte {
+    margin: 0;
+    max-width: 60ch;
+    color: var(--texte-2);
+    text-wrap: pretty;
+}
+
+.cotisation-panneau__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cotisation-panneau__actions form {
+    margin: 0;
+}
+
+.cotisation-panneau .section__entete h2 .pastille {
+    margin-left: 0.25rem;
+}
+
+/* Paiements (F-17) : lignes annulées estompées, liste d'échéances à cocher, reçu imprimable. */
+.paiements__ligne--annule td {
+    color: var(--texte-3);
+}
+
+.paiements__ligne--annule td strong {
+    text-decoration: line-through;
+}
+
+.menu__item--danger {
+    color: var(--erreur-texte);
+}
+
+.paiement-recherche {
+    padding: 0 1.125rem 1rem;
+}
+
+.paiement-echeances {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon-controle, 8px);
+    list-style: none;
+}
+
+.paiement-echeances__ligne {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.625rem 0.875rem;
+    border-top: 1px solid var(--bordure);
+}
+
+.paiement-echeances__ligne:first-child {
+    border-top: 0;
+}
+
+.paiement-echeances__ligne--retard .paiement-echeances__detail {
+    color: var(--erreur-texte);
+    font-weight: 600;
+}
+
+.paiement-echeances__choix {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+    cursor: pointer;
+}
+
+.paiement-echeances__texte {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.paiement-echeances__libelle {
+    font-weight: 600;
+}
+
+.paiement-echeances__detail {
+    font-size: 0.75rem;
+    color: var(--texte-3);
+}
+
+.paiement-echeances__montant {
+    flex: none;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+
+.paiement-echeances__montant .appel__euro {
+    width: 8rem;
+}
+
+.paiement-echeances__montant .champ__saisie {
+    text-align: right;
+}
+
+.paiement-echeances__total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.625rem 0.875rem;
+    border-top: 1px solid var(--bordure-forte);
+    background: var(--surface-2);
+    font-variant-numeric: tabular-nums;
+}
+
+.recu {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+    color: var(--texte);
+}
+
+.recu__entete {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--bordure);
+    font-size: 0.8125rem;
+    color: var(--texte-2);
+}
+
+.recu__actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.recu__titre {
+    margin: 1.5rem 0 0.25rem;
+    font-size: 1.5rem;
+}
+
+.recu__sous-titre {
+    margin: 0 0 1rem;
+    color: var(--texte-2);
+}
+
+.recu__table {
+    width: 100%;
+    margin: 1rem 0;
+    border-collapse: collapse;
+}
+
+.recu__table caption {
+    padding-bottom: 0.5rem;
+    font-weight: 600;
+    text-align: left;
+}
+
+.recu__table td,
+.recu__table th {
+    padding: 0.5rem 0;
+    border-top: 1px solid var(--bordure);
+    text-align: left;
+}
+
+.recu__table .numerique {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.recu__detail {
+    margin: 0.25rem 0;
+    font-size: 0.875rem;
+    color: var(--texte-2);
+}
+
+.recu__mention {
+    margin-top: 1.5rem;
+    font-size: 0.75rem;
+    color: var(--texte-3);
+}
+
+@media print {
+    .recu__actions,
+    .emprunt {
+        display: none;
+    }
+
+    .recu {
+        max-width: none;
+        padding: 0;
+    }
+}
+
+/* Impayés (F-25) : colonne des cases, barres d'ancienneté (G-06). */
+.impayes__case {
+    width: 1%;
+    padding-right: 0 !important;
+    white-space: nowrap;
+}
+
+.impayes__case input {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--accent);
+}
+
+.impayes__segment--info {
+    background: var(--info-texte, var(--accent));
+}
+
+.impayes__segment--attention {
+    background: var(--attention-texte);
+}
+
+.impayes__segment--erreur {
+    background: var(--erreur-texte);
+}
+
+/* Fiche d'un membre : colonne de droite (compte, adhésions, transfert), derniers paiements. */
+.fiche-colonne {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.fiche-paiements {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0 1.125rem 0.875rem;
+    list-style: none;
+    font-size: 0.8125rem;
+}
+
+.fiche-paiements__ligne {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.375rem 0;
+    border-top: 1px solid var(--bordure);
+    color: var(--texte-2);
+}
+
+.fiche-paiements__ligne a {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.fiche-paiements__ligne--annule a {
+    text-decoration: line-through;
+    color: var(--texte-3);
+}
+
+.villes__reversement-du {
+    font-weight: 600;
+    color: var(--erreur-texte);
+}
+
+/* G-12 : mini-courbe sous « Collecté ». */
+.kpi__sparkline {
+    width: 100%;
+    max-width: 8rem;
+    height: 1.75rem;
+    margin-top: 0.125rem;
+    color: var(--accent);
+}
+
+/* G-04 et G-05 : comparatif des villes, trois barres par ville et le taux à jour. */
+.comparatif__liste {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0.5rem 1.125rem 0.875rem;
+    list-style: none;
+}
+
+.comparatif__ville {
+    display: grid;
+    grid-template-columns: 6rem minmax(0, 1fr) 7.5rem;
+    gap: 0.75rem;
+    align-items: center;
+    font-size: 0.8125rem;
+}
+
+.comparatif__nom {
+    overflow: hidden;
+    font-weight: 600;
+    color: var(--texte-2);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.comparatif__barres {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.comparatif__piste {
+    display: block;
+    height: 0.5rem;
+    border-radius: 3px;
+    background: var(--surface-2);
+    overflow: hidden;
+}
+
+.comparatif__segment {
+    display: block;
+    min-width: 2px;
+    height: 100%;
+}
+
+.comparatif__segment--collecte,
+.comparatif__pastille--collecte {
+    background: var(--accent);
+}
+
+.comparatif__segment--depense,
+.comparatif__pastille--depense {
+    background: var(--attention-texte);
+}
+
+.comparatif__segment--reverse,
+.comparatif__pastille--reverse {
+    background: var(--info-texte);
+}
+
+.comparatif__legende {
+    margin: 0 1.125rem;
+    padding-bottom: 0.875rem;
+}
+
+@media (max-width: 47.99rem) {
+    .comparatif__ville {
+        grid-template-columns: 5rem minmax(0, 1fr);
+    }
+
+    .comparatif__a-jour {
+        grid-column: 2;
+    }
+}
+
+.comparatif__aide {
+    padding-top: 0;
+}
+
+/* Périmètre figé d'un responsable de ville : même bloc que le sélecteur, sans chevron ni menu. */
+.console__perimetre--fixe {
+    cursor: default;
+}
+
+/* Suivi d'un appel (F-14, G-09) : collecté et progression, collecte jour par jour. */
+.appel-suivi {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+.appel-suivi__tete {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.appel-suivi__collecte {
+    margin: 0;
+}
+
+.appel-suivi__montant {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.appel-suivi__sur,
+.appel-suivi__detail {
+    color: var(--texte-3);
+}
+
+.appel-suivi__detail {
+    margin: 0.125rem 0 0;
+    font-size: var(--taille-petit);
+}
+
+.appel-suivi__pourcentage {
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.appel-suivi__piste {
+    height: 0.625rem;
+    border-radius: 0.3125rem;
+    background: var(--surface-2);
+    overflow: hidden;
+}
+
+.appel-suivi__piste > span {
+    display: block;
+    height: 100%;
+    border-radius: 0.3125rem;
+    background: var(--accent);
+}
+
+.appel-suivi__legende {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem 1.25rem;
+    padding: 0 1.125rem 0.75rem;
+    font-size: 0.75rem;
+    color: var(--texte-2);
+}
+
+.appel-suivi__cle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4375rem;
+}
+
+.appel-suivi__cle-barre {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 2px;
+    background: var(--accent);
+    opacity: 0.55;
+}
+
+.appel-suivi__cle-ligne {
+    width: 1rem;
+    height: 0;
+    border-top: 2px solid var(--texte);
+}
+
+.appel-suivi__graphique {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.5rem;
+    padding: 0 1.125rem;
+}
+
+.appel-suivi__echelle {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 9rem;
+    font-size: 0.6875rem;
+    color: var(--texte-3);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.appel-suivi__zone {
+    position: relative;
+    min-width: 0;
+}
+
+.appel-suivi__jours {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 9rem;
+    border-top: 1px dashed var(--bordure);
+    border-bottom: 1px solid var(--bordure-forte);
+}
+
+.appel-suivi__cumul {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 9rem;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.appel-suivi__cumul polyline {
+    fill: none;
+    stroke: var(--texte);
+    stroke-width: 2;
+    stroke-linejoin: round;
+}
+
+.appel-suivi__dates {
+    display: flex;
+    gap: 2px;
+    height: 1.25rem;
+}
+
+.appel-suivi__date {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 2px;
+}
+
+.appel-suivi__date > span {
+    position: absolute;
+    top: 0.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.6875rem;
+    color: var(--texte-3);
+    white-space: nowrap;
+}
+
+.appel-suivi__date:first-child > span {
+    left: 0;
+    transform: none;
+}
+
+.appel-suivi__date:last-child > span {
+    right: 0;
+    left: auto;
+    transform: none;
+}
+
+.appel-suivi__jour {
+    display: flex;
+    flex: 1 1 0;
+    align-items: flex-end;
+    height: 100%;
+    min-width: 2px;
+}
+
+.appel-suivi__jour > span {
+    display: block;
+    width: 100%;
+    min-height: 1px;
+    border-radius: 2px 2px 0 0;
+    background: var(--accent);
+    opacity: 0.55;
+}
+
+.appel-suivi__donnees {
+    margin: 0.75rem 1.125rem 1rem;
+}
+
+/* Accueil d'un responsable de ville (artboard « Accueil trésorière mobile ») : quatre chiffres en 2 × 2 sur mobile,
+   « À faire » en lignes cliquables, derniers paiements. */
+.accueil-ville__kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 64rem) {
+    .accueil-ville__kpis {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+.accueil-ville__tache {
+    text-decoration: none;
+    color: inherit;
+    transition: background var(--duree-courte) ease;
+}
+
+.accueil-ville__tache:hover {
+    background: var(--surface-2);
+    color: inherit;
+}
+
+.accueil-ville__tache .bouton {
+    pointer-events: none;
+}
+
+.section__icone--neutre {
+    background: var(--surface-2);
+    color: var(--texte-2);
+}
+
+.section__icone--info {
+    background: var(--info-doux, var(--accent-doux));
+    color: var(--info-texte, var(--accent-texte));
+}
+
+.accueil-ville__paiement {
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+}
+
+.accueil-ville__paiement .entite__initiales {
+    width: 32px;
+    height: 32px;
+    font-size: 0.6875rem;
+}
+
+.accueil-ville__paiement--annule .accueil-ville__montant {
+    color: var(--texte-3);
+    text-decoration: line-through;
+}
+
+.accueil-ville__montant {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-decoration: none;
+}
+
+/* Barre d'onglets en bas sur mobile pour un responsable de ville : cinq entrées, la dernière ouvre le reste. */
+.console__onglets {
+    display: none;
+}
+
+@media (max-width: 47.99rem) {
+    .console__onglets {
+        position: fixed;
+        inset: auto 0 0 0;
+        z-index: 20;
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        padding: 0.25rem 0.25rem calc(0.5rem + env(safe-area-inset-bottom));
+        border-top: 1px solid var(--bordure);
+        background: var(--surface);
+    }
+
+    .console__onglet {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.1875rem;
+        min-height: 3.25rem;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        color: var(--texte-2);
+        text-decoration: none;
+        list-style: none;
+        cursor: pointer;
+    }
+
+    .console__onglet[aria-current="page"] {
+        color: var(--accent-texte);
+        font-weight: 700;
+    }
+
+    .console__onglet::-webkit-details-marker {
+        display: none;
+    }
+
+    .console__onglet-badge {
+        position: absolute;
+        top: 0.125rem;
+        right: calc(50% - 1.25rem);
+        min-width: 1.125rem;
+        padding: 0 0.3125rem;
+        border-radius: var(--rayon-chip);
+        border: 1.5px solid var(--surface);
+        background: var(--erreur-texte);
+        color: #fff;
+        font-size: 0.625rem;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .console__onglet-plus {
+        position: relative;
+    }
+
+    .console__onglet-plus .menu__liste {
+        bottom: calc(100% + 0.5rem);
+        top: auto;
+        right: 0.25rem;
+        left: auto;
+    }
+
+    .console:has(.console__onglets) .console__contenu {
+        padding-bottom: 5.5rem;
+    }
+}
+
+/* Fiche d'une dépense côté ville : feu vert du décideur, note sous le verrou, barre de décision fixée en bas sur mobile. */
+.depense-feu-vert {
+    display: flex;
+    gap: 0.625rem;
+    align-items: flex-start;
+    margin: 0 0 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--succes-bordure, var(--bordure));
+    border-radius: var(--rayon);
+    background: var(--succes-doux);
+    color: var(--succes-texte);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+}
+
+.depense-feu-vert__icone {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.375rem;
+    height: 1.375rem;
+    border-radius: 50%;
+    background: var(--succes-texte);
+    color: #fff;
+    margin-top: 1px;
+}
+
+.depense-verrou__action {
+    margin: 0.625rem 0 0;
+}
+
+.depense-verrou__note,
+.depense-decision__note {
+    margin: 0.5rem 0 0;
+    font-size: 0.75rem;
+    color: var(--texte-3);
+    text-align: center;
+}
+
+@media (max-width: 47.99rem) {
+    .depense-decision {
+        position: sticky;
+        bottom: calc(5.5rem);
+        z-index: 5;
+        box-shadow: var(--ombre);
+    }
+}
+
+/* Paiement groupé : réglages sur deux colonnes, chips à cocher pour les mois et appels, barre d'envoi collée en bas. */
+.paiement-groupe {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.paiement-groupe__reglages {
+    display: grid;
+    gap: 1rem;
+}
+
+@media (min-width: 64rem) {
+    .paiement-groupe__reglages {
+        grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    }
+}
+
+.paiement-groupe__cibles {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0 1.125rem 1rem;
+}
+
+.paiement-groupe__legende {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--texte-2);
+}
+
+.paiement-groupe__mois {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.chip-case {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: var(--hauteur-controle);
+    padding: 0 0.75rem;
+    border: 1px solid var(--bordure-champ);
+    border-radius: var(--rayon-chip);
+    background: var(--surface);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.chip-case:has(input:checked) {
+    border-color: var(--accent);
+    background: var(--accent-doux);
+    color: var(--accent-texte);
+}
+
+.chip-case input {
+    accent-color: var(--accent);
+}
+
+.paiement-groupe__champs {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0 1.125rem 1rem;
+}
+
+.paiement-groupe__filtre {
+    flex: 1 1 14rem;
+    max-width: 24rem;
+}
+
+.paiement-groupe__barre {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+    box-shadow: var(--ombre);
+}
+
+.paiement-groupe__resume {
+    font-size: 0.8125rem;
+    color: var(--texte-2);
+}
+
+.tableau--paiement-groupe tr[hidden] {
+    display: none;
+}
+
+@media (max-width: 47.99rem) {
+    .console:has(.console__onglets) .paiement-groupe__barre {
+        bottom: 5.5rem;
+    }
+}
+
+/* Membres d'une ville (artboard « 05 Membres · trésorière ») : bandeau des inscriptions, reste dû, barre de sélection. */
+.bandeau {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+}
+
+.bandeau--attente {
+    border-color: var(--attention-bordure);
+    background: var(--attention-doux);
+}
+
+.bandeau__icone {
+    display: flex;
+    color: var(--attention-texte);
+}
+
+.bandeau__texte {
+    flex: 1 1 20rem;
+    margin: 0;
+    font-size: 0.875rem;
+    text-wrap: pretty;
+}
+
+.bandeau__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.bandeau__actions form {
+    margin: 0;
+}
+
+.membres-ville__du {
+    color: var(--erreur-texte);
+}
+
+/* Sous 48 rem, la colonne « Reste dû » cède sa place au nom : le montant passe en détail sous le nom. */
+.membres-ville__du-mobile {
+    display: none;
+}
+
+@media (max-width: 47.99rem) {
+    .tableau--membres-ville .membres-ville__colonne-du {
+        display: none;
+    }
+
+    .membres-ville__du-mobile {
+        display: block;
+    }
+}
+
+.selection-barre {
+    position: sticky;
+    bottom: 1rem;
+    z-index: 6;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    width: fit-content;
+    max-width: 100%;
+    margin: 1rem auto 0;
+    padding: 0.625rem 0.75rem 0.625rem 1rem;
+    border-radius: var(--rayon);
+    background: var(--texte);
+    color: #fff;
+    box-shadow: var(--ombre);
+}
+
+.selection-barre[hidden] {
+    display: none;
+}
+
+.selection-barre__resume {
+    margin-right: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.selection-barre form {
+    margin: 0;
+}
+
+.selection-barre .bouton--secondaire {
+    background: var(--surface);
+}
+
+.selection-barre .bouton--discret {
+    color: #fff;
+}
+
+.selection-barre__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.selection-barre__court {
+    display: none;
+}
+
+/* Sous 48 rem : barre pleine largeur, résumé et croix sur la première rangée, les trois actions sur la seconde. */
+@media (max-width: 47.99rem) {
+    .selection-barre {
+        width: 100%;
+        padding: 0.625rem 0.75rem;
+    }
+
+    .console:has(.console__onglets) .selection-barre {
+        bottom: 6rem;
+    }
+
+    .selection-barre__resume {
+        flex: 1;
+        margin-right: 0;
+    }
+
+    .selection-barre__fermer {
+        order: 1;
+    }
+
+    .selection-barre__actions {
+        order: 2;
+        flex-basis: 100%;
+    }
+
+    .selection-barre__actions > * {
+        flex: 1 1 calc(50% - 0.25rem);
+        min-width: 0;
+    }
+
+    .selection-barre__actions .bouton {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .selection-barre__long {
+        display: none;
+    }
+
+    .selection-barre__court {
+        display: inline;
+    }
+}
+
+/* Frame Turbo autour d'une liste filtrée : même colonne et même espacement que le contenu qui l'entoure ;
+   pendant le chargement, la liste s'estompe légèrement (attribut busy posé par Turbo). */
+turbo-frame {
+    display: block;
+}
+
+.frame-liste {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.frame-liste .section {
+    transition: opacity 0.15s ease;
+}
+
+.frame-liste[busy] .section {
+    opacity: 0.6;
+}
+
+/* La colonne des cases à cocher échappe à la largeur minimale de la colonne d'identité. */
+.tableau th.impayes__case,
+.tableau td.impayes__case {
+    min-width: 0;
+    width: 1%;
+}
+
+/* Impayés et relances (artboard « Impayés et relances », 29 septembre 2026) : compteur rouge dans le titre, barre
+   d'ancienneté empilée, origines dues en liste, panneau du calendrier des relances, mention « sans e-mail » de la
+   barre de sélection. */
+.compteur--erreur {
+    background: var(--erreur-doux);
+    color: var(--erreur-texte);
+}
+
+.anciennete__barre {
+    display: flex;
+    gap: 3px;
+    height: 0.625rem;
+    margin: 0.25rem 0 0.75rem;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.anciennete__segment {
+    display: block;
+    flex: 0 1 auto;
+    min-width: 0.375rem;
+    border-radius: 999px;
+}
+
+.anciennete__legende {
+    padding-top: 0;
+    border-top: 0;
+}
+
+.impayes__sources {
+    display: grid;
+    gap: 0.375rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.impayes__sources li {
+    display: grid;
+    gap: 0.125rem;
+}
+
+.impayes__source {
+    font-weight: 500;
+    color: var(--texte);
+}
+
+.entite__detail--attention {
+    color: var(--attention-texte);
+}
+
+.calendrier-relances__panneau {
+    gap: 0.5rem;
+    min-width: 20rem;
+    max-width: 24rem;
+    padding: 0.875rem 1rem;
+    font-size: var(--taille-petit);
+    white-space: normal;
+}
+
+.calendrier-relances__titre {
+    margin: 0;
+    font-weight: 600;
+    color: var(--texte);
+}
+
+.calendrier-relances__regles + .calendrier-relances__titre,
+.calendrier-relances__vide + .calendrier-relances__titre {
+    margin-top: 0.5rem;
+}
+
+.calendrier-relances__regles,
+.calendrier-relances__prochaines {
+    display: grid;
+    gap: 0.375rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--texte-2);
+}
+
+.calendrier-relances__regles li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.calendrier-relances__regles svg {
+    flex: none;
+    color: var(--texte-3);
+}
+
+.calendrier-relances__prochaines li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+}
+
+.calendrier-relances__prochaines strong {
+    color: var(--texte);
+}
+
+.calendrier-relances__vide,
+.calendrier-relances__note {
+    margin: 0;
+    color: var(--texte-3);
+    text-wrap: pretty;
+}
+
+.calendrier-relances__panneau .menu__item {
+    margin-top: 0.25rem;
+}
+
+.selection-barre__alerte {
+    margin-left: 0.25rem;
+    opacity: 0.8;
+}
+
+.console__actions form {
+    margin: 0;
+}
+
+/* Le badge de navigation contient un texte pour lecteur d'écran (.visuellement-cache, positionné en absolu) : sans
+   ancêtre positionné, ce texte se rattachait à la page entière et, dans la bande de navigation horizontale de mobile,
+   débordait hors de la zone défilante et élargissait toute la mise en page (Chrome mobile passait à 700 px). */
+.console__badge {
+    position: relative;
+}
+
+@media (max-width: 47.99rem) {
+    .anciennete__legende .graphique__donnees {
+        margin-left: 0;
+    }
+
+    .calendrier-relances__panneau {
+        min-width: min(20rem, calc(100vw - 2rem));
+    }
+}
+
+/* Onglet Abonnement des Paramètres (29 septembre 2026) : règlement simulé de l'abonnement à Caisses. */
+.abonnement__details {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0 var(--espace-4, 1rem);
+}
+
+.abonnement__details > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.625rem 0;
+    border-bottom: 1px solid var(--bordure);
+}
+
+.abonnement__details dt {
+    color: var(--texte-2);
+}
+
+.abonnement__details dd {
+    margin: 0;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.abonnement__retard {
+    color: var(--erreur-texte);
+}
+
+.abonnement__payer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+}
+
+.abonnement__offres {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.abonnement__offres legend {
+    margin-bottom: 0.5rem;
+    font-size: var(--taille-petit);
+    font-weight: 600;
+    color: var(--texte-2);
+}
+
+.abonnement__offre {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    min-height: var(--hauteur-controle);
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--bordure-champ);
+    border-radius: var(--rayon-controle, 8px);
+    background: var(--surface);
+    cursor: pointer;
+}
+
+.abonnement__offre:has(input:checked) {
+    border-color: var(--texte);
+    box-shadow: var(--ombre);
+}
+
+.abonnement__offre input {
+    margin-top: 0.2rem;
+    accent-color: var(--accent);
+}
+
+.abonnement__offre > span {
+    display: flex;
+    flex-direction: column;
+}
+
+.abonnement__economie {
+    font-size: var(--taille-petit);
+    color: var(--texte-3);
+}
+
+.abonnement__simulation {
+    margin: 0;
+}
+
+/* Grille d'un exercice qui chevauche deux années (29 septembre 2026) : l'année civile sous le mois. */
+.grille__annee {
+    display: block;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--texte-3);
+}
+
+/* Graphiques du 29 septembre 2026 : filtres communs (F-32), comparaison avec l'exercice précédent (F-34), flux de
+   l'argent (G-02), carte des villes (G-03), export PNG (F-35). « Une couleur, un sens » : les contributions ponctuelles
+   passent en bleu (--serie-2) partout, le vert clair restant réservé aux statuts. */
+.graphique__segment--doux,
+.graphique__pastille--doux {
+    border-color: transparent;
+    background: var(--serie-2);
+}
+
+.filtres-page {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filtres-page__libelle {
+    font-size: var(--taille-petit);
+    font-weight: 600;
+    color: var(--texte-2);
+}
+
+.filtres-page__comparer {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-left: auto;
+}
+
+@media (max-width: 47.99rem) {
+    .filtres-page__comparer {
+        margin-left: 0;
+    }
+}
+
+.graphique__colonne {
+    position: relative;
+}
+
+.graphique__precedent {
+    position: absolute;
+    right: -2px;
+    left: -2px;
+    z-index: 1;
+    height: 0;
+    border-top: 2px dashed var(--texte);
+    pointer-events: none;
+}
+
+.graphique__pastille--precedent {
+    height: 0;
+    border-top: 2px dashed var(--texte);
+    border-radius: 0;
+    background: none;
+}
+
+.kpi__precedent {
+    color: var(--texte-3);
+}
+
+.section__entete--graphique .export-png,
+.section__entete .export-png {
+    margin-left: auto;
+}
+
+.section__entete--graphique .export-png + .filtres {
+    margin-left: 0;
+}
+
+@media (max-width: 47.99rem) {
+    .export-png span {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+    }
+}
+
+.flux {
+    margin: 0;
+}
+
+.flux__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.flux__lien {
+    opacity: 0.35;
+    transition: opacity 0.15s ease-out;
+}
+
+.flux__lien:hover {
+    opacity: 0.6;
+}
+
+.flux__lien--cotisations { fill: var(--serie-1); }
+.flux__lien--ponctuelles { fill: var(--serie-2); }
+.flux__lien--depense { fill: var(--serie-3); }
+.flux__lien--du { fill: var(--serie-4); }
+.flux__lien--reste { fill: var(--desactive); }
+
+.flux__noeud { fill: var(--texte-2); }
+.flux__noeud--cotisations, .flux__pastille--cotisations { fill: var(--serie-1); background: var(--serie-1); }
+.flux__noeud--ponctuelles, .flux__pastille--ponctuelles { fill: var(--serie-2); background: var(--serie-2); }
+.flux__noeud--depense, .flux__pastille--depense { fill: var(--serie-3); background: var(--serie-3); }
+.flux__noeud--du, .flux__pastille--du { fill: var(--serie-4); background: var(--serie-4); }
+.flux__noeud--reste, .flux__pastille--reste { fill: var(--desactive); background: var(--desactive); }
+
+.flux__texte {
+    font-family: var(--police);
+    font-size: 12px;
+    fill: var(--texte);
+    paint-order: stroke;
+    stroke: #fff;
+    stroke-width: 3px;
+    stroke-linejoin: round;
+}
+
+.flux__nom {
+    font-weight: 600;
+}
+
+.flux__montant {
+    font-variant-numeric: tabular-nums;
+    fill: var(--texte-2);
+}
+
+.carte {
+    margin: 0;
+}
+
+.carte__svg {
+    display: block;
+    width: 100%;
+    max-width: 26rem;
+    height: auto;
+    margin: 0 auto;
+}
+
+.carte__pays {
+    fill: var(--surface-2);
+    stroke: var(--bordure-forte);
+    stroke-width: 1;
+    stroke-linejoin: round;
+}
+
+.carte__bulle circle {
+    fill: var(--accent);
+    fill-opacity: 0.55;
+    stroke: var(--accent-survol);
+    stroke-width: 1.5;
+}
+
+.carte__bulle:hover circle {
+    fill-opacity: 0.8;
+}
+
+.carte__bulle text {
+    font-family: var(--police);
+    font-size: 11px;
+    font-weight: 600;
+    fill: var(--texte);
+    paint-order: stroke;
+    stroke: #fff;
+    stroke-width: 3px;
+    stroke-linejoin: round;
+}
+
+@media print {
+    .export-png,
+    .filtres-page {
+        display: none;
+    }
+}

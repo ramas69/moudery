@@ -1,0 +1,21 @@
+{# Toutes les dépenses payées de ma ville sur l'exercice (F-27) : libellé, catégorie, date, montant, sans nom de membre.
+   Variables : membre, onglet, depenses. #}
+{% extends 'mon_espace/_layout.html.twig' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block title %}{{ 'mon_espace.depenses.titre'|trans }} · {{ membre.ville.nom }}{% endblock %}
+
+{% block contenu %}
+    <a class="espace-membre__retour" href="{{ path('mon_espace_ville') }}">{{ icones.icone('chevron-gauche', 14) }}{{ 'mon_espace.ville.titre'|trans }}</a>
+    <h1 class="espace-membre__titre">{{ 'mon_espace.depenses.titre'|trans }}</h1>
+    <p class="espace-membre__intro">{{ 'mon_espace.depenses.intro'|trans({ville: membre.ville.nom, nombre: depenses|length, total: (depenses|reduce((s, d) => s + d.montant, 0) / 100)|format_currency('EUR')}) }}</p>
+    {% if depenses is empty %}
+        <p class="espace-membre__vide">{{ 'mon_espace.ville.aucune_depense'|trans }}</p>
+    {% else %}
+        <ul class="espace-membre__liste">
+            {% for d in depenses %}
+                <li class="espace-membre__ligne"><span class="espace-membre__ligne-texte"><span class="espace-membre__ligne-titre">{{ d.libelle }}</span><span class="espace-membre__ligne-detail">{{ ('depenses_association.categorie.' ~ d.categorie.value)|trans }} · {{ d.dateDepense|format_date('medium') }}</span></span><span class="espace-membre__montant">{{ (d.montant / 100)|format_currency('EUR') }}</span></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

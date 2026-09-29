@@ -1,0 +1,222 @@
+ville:
+    association:
+        obligatoire: 'Choisissez l’association de la ville.'
+    statut:
+        obligatoire: 'Choisissez un statut.'
+        transition: 'Une ville « {{ actuel }} » ne peut pas passer à « {{ cible }} ». Cycle permis : brouillon, active, archivée, puis réactivation.'
+    nom:
+        obligatoire: 'Le nom de la ville est obligatoire.'
+        trop_long: 'Le nom de la ville ne peut pas dépasser {{ limit }} caractères.'
+        deja_utilise: 'Ce nom est déjà utilisé par une autre ville de l’association.'
+    email:
+        invalide: 'Cette adresse email n’est pas valide.'
+compte:
+    association:
+        obligatoire: 'Choisissez l’association de la personne.'
+    role:
+        obligatoire: 'Choisissez un rôle.'
+        ville_obligatoire: 'Ce rôle s’attribue sur une ville : choisissez-la.'
+        sans_ville: 'Ce rôle s’attribue sur toute l’association : ne choisissez pas de ville.'
+        association_requise: 'Ce rôle exige un compte rattaché à une association.'
+    ville:
+        hors_association: 'Cette ville n’appartient pas à l’association de la personne.'
+    affectation:
+        existante: 'Ce compte a déjà ce rôle sur ce périmètre.'
+    promotion:
+        obligatoire: 'Choisissez un compte.'
+    email:
+        obligatoire: 'L’adresse email est obligatoire.'
+        invalide: 'Cette adresse email n’est pas valide.'
+        deja_utilise: 'Un compte existe déjà pour cette adresse email.'
+    prenom:
+        obligatoire: 'Le prénom est obligatoire.'
+    nom:
+        obligatoire: 'Le nom est obligatoire.'
+    mot_de_passe:
+        obligatoire: 'Le mot de passe est obligatoire.'
+        trop_court: 'Le mot de passe doit contenir au moins {{ limit }} caractères.'
+        trop_faible: 'Ce mot de passe est trop facile à deviner. Mélangez lettres, chiffres et ponctuation.'
+        confirmation: 'Les deux mots de passe ne sont pas identiques.'
+        actuel_obligatoire: 'Saisissez votre mot de passe actuel.'
+        actuel_incorrect: 'Le mot de passe actuel est incorrect.'
+association:
+    nom:
+        obligatoire: 'Le nom de l’association est obligatoire.'
+        trop_long: 'Le nom de l’association ne peut pas dépasser {{ limit }} caractères.'
+    slug:
+        trop_long: 'L’identifiant ne peut pas dépasser {{ limit }} caractères.'
+        invalide: 'L’identifiant ne contient que des minuscules, des chiffres et des tirets, par exemple « moudery ».'
+        deja_utilise: 'L’identifiant « {{ slug }} » est déjà utilisé par une autre association.'
+    bureau_central:
+        obligatoire: 'Indiquez l’adresse e-mail du bureau central : c’est elle qui recevra l’invitation.'
+    village:
+        trop_long: 'Le nom du village ne peut pas dépasser {{ limit }} caractères.'
+    telephone:
+        invalide: 'Ce numéro de téléphone n’est pas valide : chiffres, espaces, points, parenthèses et tirets seulement.'
+    rna:
+        invalide: 'Le numéro RNA se compose de la lettre W suivie de neuf chiffres, par exemple W123456789.'
+    siren:
+        invalide: 'Le SIREN se compose de neuf chiffres.'
+    exercice:
+        invalide: 'Choisissez un mois de début d’exercice.'
+    premier_exercice:
+        invalide: 'Le premier exercice est une année entre 2000 et 2100.'
+    taux:
+        invalide: 'Le taux de reversement va de 0 à 100 %.'
+    relances:
+        obligatoire: 'Indiquez au moins un jour de relance, par exemple « -7, 0, 15 ».'
+        invalide: 'Le calendrier des relances se compose de nombres de jours séparés par des virgules, par exemple « -7, 0, 15 ».'
+abonnement:
+    formule:
+        obligatoire: 'La formule est obligatoire, par exemple « Gratuit ».'
+        trop_long: 'La formule ne peut pas dépasser {{ limit }} caractères.'
+    statut:
+        obligatoire: 'Choisissez un statut.'
+    montant:
+        obligatoire: 'Indiquez un montant, 0 pour un abonnement offert.'
+        negatif: 'Le montant ne peut pas être négatif.'
+        trop_eleve: 'Le montant ne peut pas dépasser 100 000 €.'
+    periodicite:
+        obligatoire: 'Choisissez une périodicité.'
+    debut:
+        obligatoire: 'Indiquez la date de début.'
+    echeance:
+        avant_debut: 'La prochaine échéance ne peut pas précéder le début de l’abonnement.'
+souscription:
+    offre:
+        obligatoire: 'Choisissez l’abonnement de votre association.'
+        inconnue: 'Cette offre n’existe pas.'
+    conditions:
+        obligatoire: 'Acceptez les conditions et le tarif pour continuer.'
+
+membre:
+    prenom:
+        obligatoire: 'Le prénom est obligatoire.'
+        trop_long: 'Le prénom ne peut pas dépasser {{ limit }} caractères.'
+    nom:
+        obligatoire: 'Le nom est obligatoire.'
+        trop_long: 'Le nom ne peut pas dépasser {{ limit }} caractères.'
+    email:
+        invalide: 'Cette adresse e-mail n’est pas valide.'
+        trop_long: 'L’adresse e-mail ne peut pas dépasser {{ limit }} caractères.'
+        deja_membre: 'Un membre de cette ville utilise déjà cette adresse.'
+    telephone:
+        trop_long: 'Le numéro ne peut pas dépasser {{ limit }} caractères.'
+        invalide: 'Le numéro ne contient que des chiffres, des espaces et le signe +.'
+    foyer:
+        trop_long: 'Le nom du foyer ne peut pas dépasser {{ limit }} caractères.'
+    localite:
+        trop_long: 'La localité ne peut pas dépasser {{ limit }} caractères.'
+    annee_naissance:
+        invalide: 'L’année de naissance n’est pas plausible.'
+    import:
+        fichier_obligatoire: 'Choisissez un fichier CSV.'
+        trop_lourd: 'Le fichier dépasse {{ limit }} {{ suffix }} : coupez-le en plusieurs fichiers.'
+        format: 'Le fichier doit être un CSV ou un classeur Excel (.xlsx), pas un fichier {{ type }}.'
+        illisible: 'Ce classeur Excel ne se lit pas. Enregistrez-le de nouveau au format .xlsx, ou exportez la feuille en CSV.'
+        vide: 'Le fichier est vide.'
+        colonnes: 'Les colonnes « Prénom » et « Nom » sont introuvables dans la première ligne. Téléchargez le fichier modèle pour voir les en-têtes attendus.'
+        trop_de_lignes: 'Le fichier dépasse {{ maximum }} lignes : coupez-le en plusieurs fichiers.'
+        rattachement:
+            aucune: 'Rattachez au moins un onglet ou une valeur à une ville.'
+            ville_en_double: 'Cette ville est déjà choisie pour un autre onglet.'
+        reglages:
+            ligne_en_tete: 'La ligne des en-têtes est un nombre entre 0 et 200.'
+            prenom_manquant: 'Indiquez la colonne du prénom.'
+            nom_manquant: 'Indiquez la colonne du nom.'
+            champ_en_double: 'Ce champ est déjà attribué à une autre colonne.'
+
+invitation:
+    email:
+        obligatoire: 'Indiquez l’adresse e-mail de la personne.'
+        invalide: 'Cette adresse e-mail n’est pas valide.'
+        trop_long: 'L’adresse e-mail ne peut pas dépasser {{ limit }} caractères.'
+        deja_ce_role: 'Cette personne a déjà ce rôle sur ce périmètre.'
+        deja_invitee: 'Une invitation pour ce rôle est déjà en cours pour cette adresse : renvoyez-la plutôt.'
+    ville:
+        obligatoire: 'Choisissez la ville pour ce rôle.'
+        inutile: 'Le bureau central agit sur toute l’association : ne choisissez pas de ville.'
+appel:
+    type:
+        obligatoire: 'Choisissez un type de contribution.'
+    objet:
+        obligatoire: 'Donnez un objet à l’appel : il apparaît dans l’e-mail.'
+        trop_long: 'L’objet tient en 160 caractères au plus.'
+    montant:
+        obligatoire: 'Indiquez le montant demandé à chaque membre.'
+        invalide: 'Indiquez un montant en euros, par exemple 10 ou 10,50.'
+    date_limite:
+        obligatoire: 'Choisissez une date limite.'
+        passee: 'La date limite ne peut pas être passée.'
+    taux:
+        obligatoire: 'Ce type n’a pas de taux fixé : indiquez la part reversée au bureau central.'
+        invalide: 'Le taux va de 0 à 100 %.'
+    message:
+        trop_long: 'Le message tient en 4 000 caractères au plus.'
+depense:
+    libelle:
+        obligatoire: 'Donnez un libellé à la dépense.'
+        trop_long: 'Le libellé tient en 160 caractères au plus.'
+    montant:
+        obligatoire: 'Indiquez le montant de la dépense.'
+        invalide: 'Indiquez un montant en euros, par exemple 180 ou 180,50.'
+    date:
+        obligatoire: 'Indiquez la date de la dépense.'
+        future: 'La date de la dépense ne peut pas être dans le futur.'
+    beneficiaire:
+        obligatoire: 'Indiquez à qui la dépense est payée.'
+        trop_long: 'Le bénéficiaire tient en 160 caractères au plus.'
+    justificatif:
+        trop_lourd: 'Le justificatif dépasse 10 Mo.'
+        format: 'Le justificatif doit être un PDF, un JPG ou un PNG.'
+    commentaire:
+        trop_long: 'Le commentaire tient en 2 000 caractères au plus.'
+justificatif:
+    obligatoire: 'Ajoutez un justificatif : une dépense sans pièce ne peut pas être soumise.'
+reversement:
+    ville:
+        obligatoire: 'Choisissez la ville qui a fait le virement.'
+    exercice:
+        obligatoire: 'Choisissez l’exercice auquel rattacher ce reversement.'
+    montant:
+        obligatoire: 'Indiquez le montant reçu.'
+        invalide: 'Indiquez un montant en euros, par exemple 1200 ou 1200,50.'
+    date:
+        obligatoire: 'Indiquez la date du virement.'
+        future: 'La date du virement ne peut pas être dans le futur.'
+    reference:
+        trop_long: 'La référence tient en 80 caractères au plus.'
+    note:
+        trop_long: 'La note tient en 255 caractères au plus.'
+type_contribution:
+    nom:
+        obligatoire: 'Donnez un nom au type de contribution.'
+        trop_long: 'Le nom tient en 80 caractères au plus.'
+    unite:
+        obligatoire: 'Indiquez qui paie : chaque personne ou chaque foyer.'
+    mode:
+        obligatoire: 'Choisissez un montant fixe ou libre.'
+    montant:
+        invalide: 'Indiquez un montant en euros, par exemple 10 ou 12,50.'
+    taux:
+        invalide: 'Le taux de reversement va de 0 à 100 %.'
+cotisation:
+    type:
+        obligatoire: 'Choisissez le type de contribution.'
+    montant:
+        obligatoire: 'Indiquez le tarif mensuel.'
+        invalide: 'Indiquez un tarif en euros, par exemple 10 ou 12,50.'
+    jour:
+        invalide: 'Le jour d’échéance va de 1 à 28.'
+paiement:
+    echeances:
+        obligatoire: 'Cochez au moins une échéance.'
+    moyen:
+        obligatoire: 'Indiquez le moyen de paiement.'
+    date:
+        obligatoire: 'Indiquez la date du paiement.'
+        future: 'La date du paiement ne peut pas être dans le futur.'
+    reference:
+        trop_long: 'La référence tient en 80 caractères au plus.'
+    note:
+        trop_long: 'La note tient en 255 caractères au plus.'

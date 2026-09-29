@@ -1,0 +1,48 @@
+{# Import d'un fichier pour toute l'association (F-31) : dépôt du classeur, rappel du parcours, import en cours à reprendre.
+   Variables : association, form, enCours (fichier, etape) ou null, villes, reglages (mémorisés par l'association). #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'import' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block title %}{{ 'import_association.titre'|trans }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}{{ 'import_association.titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'import_association.sous_titre'|trans }}</p>{% endblock %}
+
+{% block contenu %}
+    {% if enCours %}
+        <p class="alerte alerte--attention" role="status">
+            {{ 'import_association.en_cours'|trans({fichier: enCours.fichier}) }}
+            <a href="{{ path(enCours.etape == 'apercu' ? 'association_import_apercu' : 'association_import_rattachement', {slug: association.slug}) }}">{{ 'import_association.reprendre'|trans }}</a>
+        </p>
+    {% endif %}
+
+    <div class="import__grille">
+        <section class="section" aria-labelledby="import-depot">
+            <div class="section__entete"><h2 id="import-depot">{{ 'import_association.depot.titre'|trans }}</h2></div>
+            <p class="section__aide">{{ 'import_association.depot.aide'|trans }}</p>
+            {{ form_start(form, {attr: {class: 'section__formulaire', novalidate: 'novalidate'}}) }}
+                {{ form_errors(form) }}
+                <div class="section__formulaire-champs">
+                    {{ formulaire.champ(form.fichier, null) }}
+                </div>
+                <div class="section__formulaire-actions">
+                    <button type="submit" class="bouton bouton--primaire">{{ icones.icone('export', 15) }}{{ 'import_association.depot.bouton'|trans }}</button>
+                </div>
+            {{ form_end(form) }}
+        </section>
+
+        <section class="section" aria-labelledby="import-comment">
+            <div class="section__entete"><h2 id="import-comment">{{ 'import_association.comment.titre'|trans }}</h2></div>
+            <ol class="import__etapes">
+                <li>{{ 'import_association.comment.etape_1'|trans }}</li>
+                <li>{{ 'import_association.comment.etape_2'|trans }}</li>
+                <li>{{ 'import_association.comment.etape_3'|trans }}</li>
+            </ol>
+            <p class="section__aide">{{ 'import_association.comment.villes'|trans({nombre: villes|length}) }}</p>
+            {% if reglages.colonnes is defined and reglages.colonnes is not empty %}
+                <p class="section__aide">{{ 'import_association.comment.memoire'|trans({nombre: reglages.colonnes|length}) }}</p>
+            {% endif %}
+        </section>
+    </div>
+{% endblock %}

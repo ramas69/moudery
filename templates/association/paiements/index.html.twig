@@ -1,0 +1,106 @@
+{# Paiements manuels (F-17) : trois chiffres, chips de période, tableau des paiements avec menu (reçu, fiche du membre,
+   annulation). Variables : association, ville (périmètre), aujourdhui, periode, lignes, libelleExercice,
+   encaisseExercice, nombreExercice, encaisseMois, annules. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'paiements' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% macro euros(centimes) %}{{ (centimes / 100)|format_currency('EUR') }}{% endmacro %}
+{% macro objet(paiement) %}
+    {%- set echeances = paiement.echeances -%}
+    {%- if echeances is empty -%}
+        —
+    {%- elseif echeances|length == 1 -%}
+        {%- set e = echeances|first -%}
+        {%- if e.appel %}{{ e.appel.objet }}{% else %}{{ 'paiements_association.objet.cotisation'|trans({mois: ('membres_association.mois.' ~ e.mois)|trans|lower, annee: e.annee}) }}{% endif -%}
+    {%- elseif echeances|filter(e => e.cotisation)|length == echeances|length -%}
+        {{ 'paiements_association.objet.cotisations'|trans({nombre: echeances|length, annee: (echeances|first).cotisation.annee}) }}
+    {%- else -%}
+        {{ 'paiements_association.objet.mixte'|trans({nombre: echeances|length}) }}
+    {%- endif -%}
+{% endmacro %}
+
+{% block title %}{{ 'paiements_association.titre'|trans }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}{{ 'paiements_association.titre'|trans }} <span class="compteur">{{ lignes|length }}</span>{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ (ville ? 'paiements_association.sous_titre_ville' : 'paiements_association.sous_titre')|trans({ville: ville ? ville.nom : ''}) }}</p>{% endblock %}
+
+{% block actions %}
+    <a class="bouton bouton--secondaire" href="{{ path('association_paiements_export', {slug: association.slug, periode: periode, format: 'csv'}) }}">{{ icones.icone('export', 15) }}{{ 'paiements_association.exporter'|trans }}</a>
+    <a class="bouton bouton--secondaire" href="{{ path('association_paiements_export', {slug: association.slug, periode: periode}|merge({format: 'xlsx'})) }}">{{ icones.icone('export', 15) }}{{ 'paiements_association.exporter_xlsx'|trans }}</a>
+{% if peutSaisir %}    <a class="bouton bouton--primaire" href="{{ path('association_paiement_nouveau', {slug: association.slug}) }}">{{ icones.icone('plus', 15) }}{{ 'paiements_association.enregistrer'|trans }}</a>{% endif %}
+{% endblock %}
+
+{% block contenu %}
+    <div class="kpis">
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'paiements_association.kpi.encaisse'|trans({exercice: libelleExercice}) }}</span>
+            <span class="kpi__valeur">{{ _self.euros(encaisseExercice) }}</span>
+            <span class="kpi__detail">{{ 'paiements_association.kpi.encaisse_detail'|trans({nombre: nombreExercice}) }}</span>
+        </div>
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'paiements_association.kpi.mois'|trans }}</span>
+            <span class="kpi__valeur">{{ _self.euros(encaisseMois) }}</span>
+            <span class="kpi__detail">{{ 'paiements_association.kpi.mois_detail'|trans }}</span>
+        </div>
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'paiements_association.kpi.annules'|trans }}</span>
+            <span class="kpi__valeur">{{ annules }}</span>
+            <span class="kpi__detail">{{ 'paiements_association.kpi.annules_detail'|trans }}</span>
+        </div>
+    </div>
+
+    <div class="filtres" role="group" aria-label="{{ 'paiements_association.colonne.date'|trans }}">
+        {% for p in ['exercice', 'mois', 'tout'] %}
+            <a class="filtre" href="{{ path('association_paiements', {slug: association.slug}|merge(p == 'exercice' ? {} : {periode: p})) }}"{% if periode == p %} aria-current="true"{% endif %}>{{ p == 'exercice' ? 'espace.tableau_de_bord.exercice'|trans({exercice: libelleExercice}) : (p == 'mois' ? 'paiements_association.kpi.mois'|trans : 'villes_association.statuts.tous'|trans) }}</a>
+        {% endfor %}
+    </div>
+
+    <section class="section" aria-labelledby="paiements-liste">
+        <h2 class="visuellement-cache" id="paiements-liste">{{ 'paiements_association.titre'|trans }}</h2>
+        {% if lignes is empty %}
+            <p class="section__vide">{{ (periode == 'tout' ? 'paiements_association.vide' : 'paiements_association.vide_periode')|trans }}</p>
+        {% else %}
+            <div class="tableau tableau--menus tableau--serre tableau--paiements">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ 'paiements_association.colonne.date'|trans }}</th>
+                            <th scope="col">{{ 'paiements_association.colonne.membre'|trans }}</th>
+                            <th scope="col" class="tableau__tertiaire">{{ 'paiements_association.colonne.objet'|trans }}</th>
+                            <th scope="col" class="tableau__secondaire">{{ 'paiements_association.colonne.moyen'|trans }}</th>
+                            <th scope="col" class="numerique">{{ 'paiements_association.colonne.montant'|trans }}</th>
+                            <th scope="col" class="tableau__large">{{ 'paiements_association.colonne.par'|trans }}</th>
+                            <th scope="col">{{ 'paiements_association.colonne.statut'|trans }}</th>
+                            <th scope="col"><span class="visuellement-cache">{{ 'paiements_association.colonne.actions'|trans }}</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in lignes %}
+                            <tr{% if p.estAnnule %} class="paiements__ligne--annule"{% endif %}>
+                                <td>{{ p.recuLe|format_date('medium') }}</td>
+                                <td><a class="entite__nom" href="{{ path('association_membre', {slug: association.slug, id: p.membre.id}) }}">{{ p.membre.nomComplet }}</a>{% if not ville %}<span class="tableau__precision tableau__precision--neutre">{{ p.ville.nom }}</span>{% endif %}</td>
+                                <td class="tableau__tertiaire">{{ _self.objet(p) }}{% if p.reference %}<span class="tableau__precision tableau__precision--neutre">{{ p.reference }}</span>{% endif %}</td>
+                                <td class="tableau__secondaire">{{ ('paiements_association.moyen.' ~ p.moyen.value)|trans }}</td>
+                                <td class="numerique"><strong>{{ _self.euros(p.montant) }}</strong></td>
+                                <td class="tableau__large">{{ p.enregistrePar ? p.enregistrePar.nomComplet : '—' }}</td>
+                                <td><span class="pastille pastille--{{ p.estAnnule ? 'erreur' : 'succes' }}">{{ ('paiements_association.statut.' ~ p.statut.value)|trans }}</span></td>
+                                <td class="tableau__menu">
+                                    <details class="menu" data-controller="menu" data-action="toggle->menu#ouvrir">
+                                        <summary class="bouton bouton--discret bouton--icone" aria-label="{{ 'paiements_association.actions_de'|trans({membre: p.membre.nomComplet}) }}">{{ icones.icone('menu', 16) }}</summary>
+                                        <div class="menu__liste">
+                                            <a class="menu__item" href="{{ path('association_paiement_recu', {slug: association.slug, id: p.id}) }}">{{ icones.icone('recu', 15) }}{{ 'paiements_association.menu.recu'|trans }}</a>
+                                            <a class="menu__item" href="{{ path('association_membre', {slug: association.slug, id: p.membre.id}) }}">{{ icones.icone('comptes', 15) }}{{ 'paiements_association.menu.membre'|trans }}</a>
+                                            {% if not p.estAnnule and peutSaisir %}
+                                                <form method="post" action="{{ path('association_paiement_annuler', {slug: association.slug, id: p.id}) }}" class="menu__form" data-turbo-confirm="{{ 'paiements_association.menu.annuler_confirmer'|trans }}"><input type="hidden" name="_token" value="{{ csrf_token('paiement-annuler-' ~ p.id) }}"><button type="submit" class="menu__item menu__item--danger">{{ icones.icone('croix', 15) }}{{ 'paiements_association.menu.annuler'|trans }}</button></form>
+                                            {% endif %}
+                                        </div>
+                                    </details>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

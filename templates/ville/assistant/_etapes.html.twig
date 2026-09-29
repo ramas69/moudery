@@ -1,0 +1,39 @@
+{# Progression : trois segments, couleur d'action pour les étapes faites et l'étape en cours, filet pour la suite.
+   Les étapes déjà atteintes sont cliquables : on peut reprendre où l'on veut. #}
+{% import 'ville/assistant/_liens.html.twig' as liens %}
+{% set numeroReprise = ville is not null and ville.id is not null ? ville.etapeAssistant.numero : 1 %}
+{% set total = etapes|length %}
+
+<nav class="etapes" aria-label="{{ 'assistant_ville.etapes.aria'|trans }}">
+    <div class="etapes__entete">
+        <p class="etapes__resume">
+            {{ 'assistant_ville.etapes.resume'|trans({numero: etape.numero, total: total, libelle: ('assistant_ville.etapes.' ~ etape.value)|trans}) }}
+        </p>
+        <p class="etapes__suite">{{ 'assistant_ville.etapes.suite'|trans }}</p>
+    </div>
+
+    <ol class="etapes__liste">
+        {% for e in etapes %}
+            {% set courante = e == etape %}
+            {% set accessible = not courante and e.numero <= numeroReprise %}
+            {% set terminee = e.numero < numeroReprise %}
+            {% set classes = ['etapes__item'] %}
+            {% set classes = classes|merge([courante ? 'etapes__item--courante' : (accessible ? 'etapes__item--accessible' : 'etapes__item--a-venir')]) %}
+            {% if terminee %}{% set classes = classes|merge(['etapes__item--terminee']) %}{% endif %}
+
+            <li class="{{ classes|join(' ') }}"{% if courante %} aria-current="step"{% endif %}>
+                {% if accessible %}
+                    <a class="etapes__contenu" href="{{ liens.etape(association, ville, e) }}">
+                {% else %}
+                    <span class="etapes__contenu">
+                {% endif %}
+                    <span class="etapes__barre" aria-hidden="true"></span>
+                    <span class="etapes__libelle">
+                        {{ e.numero }}. {{ ('assistant_ville.etapes.' ~ e.value)|trans }}
+                        {% if e.estFacultative %}<span class="etapes__facultatif">· {{ 'assistant_ville.etapes.facultative'|trans }}</span>{% endif %}
+                    </span>
+                {% if accessible %}</a>{% else %}</span>{% endif %}
+            </li>
+        {% endfor %}
+    </ol>
+</nav>

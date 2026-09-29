@@ -1,0 +1,10 @@
+Bonjour {{ prenom }},
+
+{{ appel.association.nom }} lance un appel à contribution{% if appel.mode.value == 'fixe' %} de {{ (appel.montant / 100)|format_currency('EUR') }}{% else %} (montant libre{% if appel.montant %}, {{ (appel.montant / 100)|format_currency('EUR') }} suggérés{% endif %}){% endif %}, à régler avant le {{ appel.dateLimite|format_date('long') }}.
+{% if appel.message %}
+
+{{ appel.message }}
+{% endif %}
+
+Pour contribuer en ligne : {{ lien }}
+Vous pouvez aussi régler auprès du trésorier de votre ville.

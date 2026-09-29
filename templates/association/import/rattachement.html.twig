@@ -1,0 +1,131 @@
+{# Rattachement des onglets (ou des valeurs d'une colonne « caisse ») aux villes de l'association (F-31).
+   Variables : association, form, mode, fichier, feuilles (toutes, reconnues), importables, valeurs, colonneEnTete, plusieursFeuilles. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'import' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block title %}{{ 'import_association.rattachement.titre'|trans }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}{{ 'import_association.rattachement.titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'import_association.rattachement.sous_titre'|trans({fichier: fichier}) }}</p>{% endblock %}
+
+{% block contenu %}
+    {% set params = {slug: association.slug} %}
+
+    <div class="filtres import__modes" role="group" aria-label="{{ 'import_association.rattachement.mode'|trans }}">
+        <span class="filtres__libelle">{{ 'import_association.rattachement.mode'|trans }}</span>
+        <a class="filtre" href="{{ path('association_import_rattachement', params|merge({mode: 'onglets'})) }}"{% if mode == 'onglets' %} aria-current="true"{% endif %}>{{ 'import_association.rattachement.mode_onglets'|trans }}</a>
+        <a class="filtre" href="{{ path('association_import_rattachement', params|merge({mode: 'colonne'})) }}"{% if mode == 'colonne' %} aria-current="true"{% endif %}>{{ 'import_association.rattachement.mode_colonne'|trans }}</a>
+    </div>
+    <p class="import__aide">{{ (mode == 'colonne' ? 'import_association.rattachement.mode_colonne_aide' : 'import_association.rattachement.mode_onglets_aide')|trans }}</p>
+
+    {{ form_start(form, {attr: {id: form.vars.id, class: 'import__formulaire', novalidate: 'novalidate'}}) }}
+        {% if form.vars.submitted and not form.vars.valid %}
+            <div class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</div>
+        {% endif %}
+        {{ form_errors(form) }}
+        {{ form_widget(form.mode) }}
+        {% if form.cibles.vars.errors|length > 0 %}
+            <p class="champ__erreur" role="alert">{% for erreur in form.cibles.vars.errors %}{{ erreur.message }}{% if not loop.last %} {% endif %}{% endfor %}</p>
+        {% endif %}
+
+        {% if mode == 'colonne' %}
+            <section class="section" aria-labelledby="import-colonne">
+                <div class="section__entete"><h2 id="import-colonne">{{ 'import_association.rattachement.colonne_titre'|trans }}</h2></div>
+                <p class="section__aide">{{ 'import_association.rattachement.colonne_aide'|trans }}</p>
+                <div class="section__formulaire">
+                    <div class="section__formulaire-champs">
+                        {{ formulaire.champ(form.feuille, null) }}
+                        {{ formulaire.champ(form.colonne, null) }}
+                    </div>
+                    <div class="section__formulaire-actions">
+                        {{ form_widget(form.appliquer, {attr: {class: 'bouton bouton--secondaire'}}) }}
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" aria-labelledby="import-valeurs">
+                <div class="section__entete"><h2 id="import-valeurs">{{ 'import_association.rattachement.valeurs_titre'|trans({colonne: colonneEnTete ?? ''}) }}</h2></div>
+                {% if valeurs is empty %}
+                    <p class="section__vide">{{ 'import_association.rattachement.aucune_valeur'|trans }}</p>
+                {% else %}
+                    <div class="tableau">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">{{ 'import_association.rattachement.valeur'|trans }}</th>
+                                    <th scope="col" class="numerique tableau__tertiaire">{{ 'import_association.rattachement.lignes'|trans }}</th>
+                                    <th scope="col">{{ 'import_association.rattachement.ville'|trans }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for valeur in valeurs %}
+                                    {% set enfant = form.cibles['v' ~ loop.index0] %}
+                                    {% set enErreur = enfant.vars.errors|length > 0 %}
+                                    <tr{% if enErreur %} class="import__ligne--erreur"{% endif %}>
+                                        <td><span class="entite__nom">{{ valeur.valeur }}</span></td>
+                                        <td class="numerique tableau__tertiaire">{{ valeur.lignes }}</td>
+                                        <td>
+                                            {{ form_widget(enfant, {attr: {class: 'champ__saisie import__choix', 'aria-label': 'import_association.rattachement.ville_de'|trans({nom: valeur.valeur}), 'aria-invalid': enErreur ? 'true' : false}}) }}
+                                            {% if enErreur %}<p class="champ__erreur">{% for erreur in enfant.vars.errors %}{{ erreur.message }}{% endfor %}</p>{% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </section>
+        {% else %}
+            <section class="section" aria-labelledby="import-onglets">
+                <div class="section__entete"><h2 id="import-onglets">{{ 'import_association.rattachement.onglets_titre'|trans }}</h2></div>
+                <p class="section__aide">{{ 'import_association.rattachement.onglets_aide'|trans }}</p>
+                <div class="tableau">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">{{ 'import_association.rattachement.onglet'|trans }}</th>
+                                <th scope="col" class="numerique tableau__tertiaire">{{ 'import_association.rattachement.lignes'|trans }}</th>
+                                <th scope="col" class="tableau__secondaire">{{ 'import_association.rattachement.colonnes'|trans }}</th>
+                                <th scope="col">{{ 'import_association.rattachement.ville'|trans }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for f in feuilles %}
+                                {% set enfant = f.importable ? form.cibles['f' ~ f.indice] : null %}
+                                {% set enErreur = enfant is not null and enfant.vars.errors|length > 0 %}
+                                <tr{% if enErreur %} class="import__ligne--erreur"{% elseif not f.importable %} class="import__ligne--ignoree"{% endif %}>
+                                    <td><span class="entite__nom">{{ f.nom ?? fichier }}</span></td>
+                                    <td class="numerique tableau__tertiaire">{{ f.lignes }}</td>
+                                    <td class="tableau__secondaire">
+                                        {% if f.importable %}
+                                            <div class="chips">{% for champ in f.colonnes|keys %}<span class="chip">{{ ('assistant_ville.membres.apercu.champ.' ~ champ)|trans }}</span>{% endfor %}</div>
+                                        {% else %}
+                                            <span class="tableau__precision tableau__precision--neutre">{{ 'import_association.rattachement.non_importable'|trans }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if f.importable %}
+                                            {{ form_widget(enfant, {attr: {class: 'champ__saisie import__choix', 'aria-label': 'import_association.rattachement.ville_de'|trans({nom: f.nom ?? fichier}), 'aria-invalid': enErreur ? 'true' : false}}) }}
+                                            {% if enErreur %}<p class="champ__erreur">{% for erreur in enfant.vars.errors %}{{ erreur.message }}{% endfor %}</p>{% endif %}
+                                        {% else %}
+                                            <span class="tableau__precision tableau__precision--neutre">{{ 'import_association.rattachement.ignoree'|trans }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        {% endif %}
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block actions %}
+    <form method="post" action="{{ path('association_import_annuler', {slug: association.slug}) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('import-association-' ~ association.id) }}">
+        <button type="submit" class="bouton bouton--secondaire">{{ 'import_association.annuler'|trans }}</button>
+    </form>
+    <button type="submit" form="{{ form.vars.id }}" class="bouton bouton--primaire">{{ 'import_association.rattachement.continuer'|trans }}</button>
+{% endblock %}

@@ -1,0 +1,59 @@
+{# Projets et appels : les appels de l'association, du plus récent au plus ancien (brouillons à reprendre, appels
+   ouverts avec leurs échéances). Variables : association, appels. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'appels' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block title %}{{ 'appels_association.titre'|trans }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}{{ 'appels_association.titre'|trans }} <span class="compteur">{{ appels|length }}</span>{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'appels_association.sous_titre'|trans }}</p>{% endblock %}
+
+{% block actions %}
+{% if peutLancer %}
+    <a class="bouton bouton--primaire" href="{{ path('association_appel_nouveau', {slug: association.slug}) }}">{{ icones.icone('plus', 15) }}{{ 'appels_association.nouveau.bouton'|trans }}</a>
+    {% endif %}
+{% endblock %}
+
+{% block contenu %}
+    <section class="section" aria-labelledby="appels-liste">
+        <h2 class="visuellement-cache" id="appels-liste">{{ 'appels_association.titre'|trans }}</h2>
+        {% if appels is empty %}
+            <p class="section__vide">{{ 'appels_association.vide'|trans }}{% if peutLancer %} <a href="{{ path('association_appel_nouveau', {slug: association.slug}) }}">{{ 'appels_association.nouveau.bouton'|trans }}</a>{% endif %}</p>
+        {% else %}
+            <div class="tableau tableau--menus">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ 'appels_association.colonne.objet'|trans }}</th>
+                            <th scope="col">{{ 'appels_association.colonne.statut'|trans }}</th>
+                            <th scope="col" class="tableau__tertiaire">{{ 'appels_association.colonne.perimetre'|trans }}</th>
+                            <th scope="col" class="numerique tableau__secondaire">{{ 'appels_association.colonne.montant'|trans }}</th>
+                            <th scope="col" class="tableau__secondaire">{{ 'appels_association.colonne.date_limite'|trans }}</th>
+                            <th scope="col" class="numerique tableau__tertiaire">{{ 'appels_association.colonne.echeances'|trans }}</th>
+                            <th scope="col" class="numerique">{{ 'appels_association.colonne.collecte'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appel in appels %}
+                            <tr>
+                                <td>
+                                    <span class="entite__texte">
+                                        <a class="entite__nom" href="{{ path('association_appel', {slug: association.slug, id: appel.id}) }}">{{ appel.objet ?: 'appels_association.sans_objet'|trans }}</a>
+                                        <span class="entite__detail">{{ appel.type.nom }}</span>
+                                    </span>
+                                </td>
+                                <td><span class="pastille pastille--{{ {brouillon: 'brouillon', ouvert: 'succes', cloture: 'archivee'}[appel.statut.value] }}">{{ ('appels_association.statut.' ~ appel.statut.value)|trans }}</span></td>
+                                <td class="tableau__tertiaire">{{ appel.ville ? appel.ville.nom : 'appels_association.toutes_villes'|trans }}</td>
+                                <td class="numerique tableau__secondaire">{{ appel.montant ? (appel.montant / 100)|format_currency('EUR') : 'appels_association.mode.libre'|trans }}</td>
+                                <td class="tableau__secondaire">{{ appel.dateLimite|format_date('medium') }}</td>
+                                {% set s = suivis[appel.id] ?? null %}
+                                <td class="numerique tableau__tertiaire">{{ s ? s.contributeurs ~ ' / ' ~ s.echeances : '—' }}</td>
+                                <td class="numerique">{% if s %}<strong>{{ (s.collecte / 100)|format_currency('EUR') }}</strong>{% if s.progression is not null %}<span class="tableau__precision tableau__precision--neutre">{{ s.progression }} %</span>{% endif %}{% else %}—{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

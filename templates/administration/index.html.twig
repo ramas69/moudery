@@ -1,0 +1,289 @@
+{# Tableau de bord du super-admin, d'après le canevas Console : cinq indicateurs, une barre de filtres (période,
+   association), huit graphiques Chart.js avec leur tableau de données, puis les associations et « À traiter ».
+   Variables : lignes, aTraiter, totaux, compteurs, synthese, aujourdhui, filtres, periode, association, associations, series, graphiques. #}
+{% extends 'administration/_layout.html.twig' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'administration/_macros.html.twig' as macros %}
+
+{# Un graphique : titre, sous-titre chiffré, puces de filtre propres au graphique, canevas, tableau de données dépliable. #}
+{% macro graphique(cle, bloc, titre, sousTitre, puces, libellePuces) %}
+    <section class="section graphique" aria-labelledby="graphique-{{ cle }}-titre">
+        <div class="section__entete section__entete--graphique">
+            <div class="section__titre-groupe">
+                <h2 id="graphique-{{ cle }}-titre">{{ titre }}</h2>
+                {% if sousTitre %}<span class="section__sous-titre">{{ sousTitre }}</span>{% endif %}
+            </div>
+            {% if puces %}
+                <nav class="filtres filtres--compact" aria-label="{{ libellePuces }}">
+                    {% for puce in puces %}
+                        <a class="filtre filtre--petit" href="{{ puce.lien }}"{% if puce.actif %} aria-current="true"{% endif %}>{{ puce.libelle }}</a>
+                    {% endfor %}
+                </nav>
+            {% endif %}
+        </div>
+        <div class="graphique__cadre">{{ render_chart(bloc.chart, {class: 'graphique__canevas'}) }}</div>
+        <details class="graphique__donnees graphique__donnees--pied">
+            <summary>{{ 'administration.tableau_de_bord.graphiques.donnees'|trans }}</summary>
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        {% for entete in bloc.entetes %}<th scope="col" class="numerique">{{ entete }}</th>{% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ligne in bloc.lignes %}
+                        <tr>
+                            {% for valeur in ligne %}
+                                {% if loop.first %}<th scope="row">{{ valeur }}</th>{% else %}<td class="numerique">{{ bloc.unites[loop.index0 - 1] ? valeur|format_currency('EUR') : valeur }}</td>{% endif %}
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </details>
+    </section>
+{% endmacro %}
+{% import _self as tdb %}
+
+{% block title %}{{ 'administration.tableau_de_bord.titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block titre_page %}{{ 'administration.tableau_de_bord.titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'administration.tableau_de_bord.sous_titre'|trans({associations: totaux.associations, villes: totaux.villes, comptes: totaux.comptes, date: aujourdhui|format_datetime('long', 'short')}) }}</p>{% endblock %}
+
+{% block actions %}
+    <a class="bouton bouton--secondaire" href="{{ path('administration_compte_inviter') }}">{{ icones.icone('personne-plus', 15) }}{{ 'administration.comptes.inviter'|trans }}</a>
+    <a class="bouton bouton--primaire" href="{{ path('administration_association_nouvelle') }}">{{ icones.icone('plus', 15) }}{{ 'administration.association.creer'|trans }}</a>
+{% endblock %}
+
+{% block contenu %}
+    {% set aEncaisser = synthese.montantEnRetard + synthese.montantEcheancesProches %}
+    {% set params = filtres|filter(valeur => valeur != '') %}
+    {% set g = 'administration.tableau_de_bord.graphiques.' %}
+    <section class="kpis kpis--cinq" aria-label="{{ 'administration.kpi.titre'|trans }}">
+        <a class="kpi kpi--lien" href="{{ path('administration_associations') }}">
+            <span class="kpi__libelle">{{ 'administration.kpi.associations'|trans }}</span>
+            <span class="kpi__valeur">{{ totaux.associations }}</span>
+            <span class="kpi__detail">
+                {% if compteurs.statut.suspendues > 0 %}<span class="kpi__chip kpi__chip--attente">{{ 'administration.kpi.suspendues'|trans({nombre: compteurs.statut.suspendues}) }}</span>{% endif %}
+                {{ 'administration.kpi.associations_actives'|trans({nombre: compteurs.statut.actives}) }}
+            </span>
+        </a>
+        <a class="kpi kpi--lien" href="{{ path('administration_villes') }}">
+            <span class="kpi__libelle">{{ 'administration.kpi.villes'|trans }}</span>
+            <span class="kpi__valeur">{{ totaux.villes }}</span>
+            <span class="kpi__detail">
+                {% if totaux.villesBrouillon > 0 %}<span class="kpi__chip kpi__chip--attente">{{ 'administration.kpi.brouillons'|trans({nombre: totaux.villesBrouillon}) }}</span>{% endif %}
+                {{ 'administration.kpi.villes_detail'|trans({actives: totaux.villes - totaux.villesBrouillon}) }}
+            </span>
+        </a>
+        <a class="kpi kpi--lien" href="{{ path('administration_comptes') }}">
+            <span class="kpi__libelle">{{ 'administration.kpi.comptes'|trans }}</span>
+            <span class="kpi__valeur">{{ totaux.comptes }}</span>
+            <span class="kpi__detail">
+                {% if totaux.comptesEnAttente > 0 %}<span class="kpi__chip kpi__chip--attente">{{ 'administration.kpi.en_attente'|trans({nombre: totaux.comptesEnAttente}) }}</span>{% endif %}
+                {{ 'administration.kpi.comptes_detail'|trans }}
+            </span>
+        </a>
+        <a class="kpi kpi--lien" href="{{ path('administration_abonnements') }}">
+            <span class="kpi__libelle">{{ 'administration.kpi.abonnements'|trans }}</span>
+            <span class="kpi__valeur">{{ (synthese.mensuel / 100)|format_currency('EUR') }}</span>
+            <span class="kpi__detail">
+                {% if synthese.aSouscrire > 0 %}<span class="kpi__chip kpi__chip--attente">{{ 'administration.abonnements.kpi.a_souscrire'|trans({nombre: synthese.aSouscrire}) }}</span>{% endif %}
+                {{ 'administration.kpi.abonnements_detail'|trans({actifs: synthese.actifs, offerts: synthese.offerts}) }}
+            </span>
+        </a>
+        <a class="kpi kpi--lien" href="{{ path('administration_associations', {abonnement: synthese.enRetard > 0 ? 'en-retard' : 'echeance-proche'}) }}">
+            <span class="kpi__libelle">{{ 'administration.kpi.a_encaisser'|trans }}</span>
+            <span class="kpi__valeur{{ synthese.enRetard > 0 ? ' kpi__valeur--erreur' }}">{{ (aEncaisser / 100)|format_currency('EUR') }}</span>
+            <span class="kpi__detail">
+                {% if synthese.enRetard > 0 %}<span class="kpi__chip kpi__chip--erreur">{{ 'administration.kpi.abonnements_en_retard'|trans({nombre: synthese.enRetard}) }}</span>{% endif %}
+                {{ 'administration.kpi.a_encaisser_detail'|trans({nombre: synthese.echeancesProches}) }}
+            </span>
+        </a>
+    </section>
+
+    <form method="get" action="{{ path('administration_accueil') }}" class="barre-outils barre-outils--filtres" role="search" aria-label="{{ 'administration.tableau_de_bord.filtres.titre'|trans }}">
+        <nav class="filtres" aria-label="{{ 'administration.tableau_de_bord.filtres.periode'|trans }}">
+            <span class="filtres__libelle">{{ 'administration.tableau_de_bord.filtres.periode'|trans }}</span>
+            {% for cle in ['30j', '3m', '12m', 'annee'] %}
+                <a class="filtre" href="{{ path('administration_accueil', params|merge({periode: cle, du: null, au: null})) }}"{% if filtres.periode == cle %} aria-current="true"{% endif %}>{{ ('administration.tableau_de_bord.filtres.periodes.' ~ cle)|trans }}</a>
+            {% endfor %}
+        </nav>
+        <div class="periode-libre">
+            <input type="hidden" name="periode" value="libre">
+            <label class="periode-libre__champ">
+                <span>{{ 'administration.tableau_de_bord.filtres.du'|trans }}</span>
+                <input class="champ__saisie champ__saisie--compact" type="date" name="du" value="{{ filtres.periode == 'libre' ? periode.debut|date('Y-m-d') : '' }}">
+            </label>
+            <label class="periode-libre__champ">
+                <span>{{ 'administration.tableau_de_bord.filtres.au'|trans }}</span>
+                <input class="champ__saisie champ__saisie--compact" type="date" name="au" value="{{ filtres.periode == 'libre' ? periode.fin|date_modify('-1 day')|date('Y-m-d') : '' }}">
+            </label>
+        </div>
+        <div class="combobox" data-controller="combobox">
+            <label class="visuellement-cache" for="filtre-association">{{ 'administration.villes.filtre_association'|trans }}</label>
+            <input class="combobox__saisie" id="filtre-association" type="text" name="association" value="{{ association ? association.nom : filtres.association }}" placeholder="{{ 'administration.villes.association_placeholder'|trans }}" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="filtre-association-liste" data-combobox-target="saisie" data-action="focus->combobox#ouvrir input->combobox#filtrer keydown->combobox#clavier blur->combobox#fermerBientot">
+            {% if association %}
+                <button type="button" class="combobox__effacer" aria-label="{{ 'administration.villes.association_effacer'|trans }}" data-action="combobox#effacer">{{ icones.icone('croix', 14) }}</button>
+            {% endif %}
+            <ul class="combobox__liste" id="filtre-association-liste" role="listbox" data-combobox-target="liste" hidden>
+                {% for candidate in associations %}
+                    <li class="combobox__option" id="filtre-association-{{ candidate.id }}" role="option" aria-selected="false" data-combobox-target="option" data-valeur="{{ candidate.nom }}" data-libelle="{{ candidate.nom }} {{ candidate.slug }} {{ candidate.nomVillage }}" data-action="mousedown->combobox#selectionner">
+                        <span class="combobox__nom">{{ candidate.nom }}</span>
+                        {% if candidate.village %}<span class="combobox__detail">{{ candidate.village }}</span>{% endif %}
+                    </li>
+                {% endfor %}
+                <li class="combobox__vide" role="presentation" data-combobox-target="vide" hidden>{{ 'administration.villes.association_aucune'|trans }}</li>
+            </ul>
+        </div>
+        <input type="hidden" name="statut_association" value="{{ filtres.statut_association }}">
+        <input type="hidden" name="statut_ville" value="{{ filtres.statut_ville }}">
+        <input type="hidden" name="role" value="{{ filtres.role }}">
+        <button type="submit" class="bouton bouton--secondaire">{{ 'administration.tableau_de_bord.filtres.appliquer'|trans }}</button>
+        {% if filtres.periode != '12m' or filtres.association != '' or filtres.statut_association != 'toutes' or filtres.statut_ville != 'tous' or filtres.role != 'tous' %}
+            <a class="bouton bouton--discret" href="{{ path('administration_accueil') }}">{{ icones.icone('croix', 15) }}{{ 'administration.tableau_de_bord.filtres.effacer'|trans }}</a>
+        {% endif %}
+    </form>
+    <p class="note note--serree">{{ 'administration.tableau_de_bord.filtres.resume'|trans({du: periode.debut|format_date('medium'), au: periode.fin|date_modify('-1 day')|format_date('medium'), pas: ('administration.tableau_de_bord.filtres.pas.' ~ periode.pas)|trans, association: association ? association.nom : 'administration.tableau_de_bord.filtres.toutes_les_associations'|trans}) }}</p>
+
+    {% set pucesAssociation = [] %}
+    {% for cle in ['toutes', 'actives', 'suspendues', 'archivees'] %}
+        {% set pucesAssociation = pucesAssociation|merge([{libelle: ('administration.associations.filtres.' ~ cle)|trans, lien: path('administration_accueil', params|merge({statut_association: cle})), actif: filtres.statut_association == cle}]) %}
+    {% endfor %}
+    {% set pucesVille = [] %}
+    {% for cle in ['tous', 'brouillon', 'active', 'archivee'] %}
+        {% set pucesVille = pucesVille|merge([{libelle: ('administration.villes.filtres.' ~ cle)|trans, lien: path('administration_accueil', params|merge({statut_ville: cle})), actif: filtres.statut_ville == cle}]) %}
+    {% endfor %}
+    {% set pucesRole = [{libelle: 'administration.tableau_de_bord.filtres.tous_les_roles'|trans, lien: path('administration_accueil', params|merge({role: 'tous'})), actif: filtres.role == 'tous'}] %}
+    {% for cle in ['bureau-central', 'tresorier', 'president', 'secretaire', 'membre'] %}
+        {% set pucesRole = pucesRole|merge([{libelle: ('role.' ~ cle)|trans, lien: path('administration_accueil', params|merge({role: cle})), actif: filtres.role == cle}]) %}
+    {% endfor %}
+
+    {% set revenuActuel = series.revenu.mensuel|length > 0 ? series.revenu.mensuel|last : 0 %}
+    {% set payantsActuels = series.revenu.payants|length > 0 ? series.revenu.payants|last : 0 %}
+    <div class="colonnes colonnes--graphiques">
+        {{ tdb.graphique('croissance', graphiques.croissance, (g ~ 'croissance.titre')|trans, (g ~ 'croissance.sous_titre')|trans({associations: series.croissance.associations|reduce((t, v) => t + v, 0), villes: series.croissance.villes|reduce((t, v) => t + v, 0), comptes: series.croissance.comptes|reduce((t, v) => t + v, 0)}), pucesAssociation, 'administration.associations.filtre_statut'|trans) }}
+        {{ tdb.graphique('revenu', graphiques.revenu, (g ~ 'revenu.titre')|trans, (g ~ 'revenu.sous_titre')|trans({mensuel: (revenuActuel / 100)|format_currency('EUR'), payants: payantsActuels}), [], '') }}
+        {{ tdb.graphique('encaissements', graphiques.encaissements, (g ~ 'encaissements.titre')|trans, (g ~ 'encaissements.sous_titre')|trans({recus: (series.encaissements.totalRecu / 100)|format_currency('EUR'), attendus: (series.encaissements.totalAttendu / 100)|format_currency('EUR'), retard: (series.encaissements.enRetard / 100)|format_currency('EUR')}), [], '') }}
+        {{ tdb.graphique('abonnements', graphiques.abonnements, (g ~ 'abonnements.titre')|trans, (g ~ 'abonnements.sous_titre')|trans({nombre: series.abonnements|reduce((t, v) => t + v.nombre, 0), mensuel: (series.abonnements|reduce((t, v) => t + v.mensuel, 0) / 100)|format_currency('EUR')}), [], '') }}
+        {{ tdb.graphique('villes', graphiques.villes, (g ~ 'villes.titre')|trans, (g ~ 'villes.sous_titre')|trans({nombre: series.villes.total, brouillons: series.villes.etapes|reduce((t, v) => t + v, 0)}), pucesVille, 'administration.villes.filtre_statut'|trans) }}
+        {{ tdb.graphique('invitations', graphiques.invitations, (g ~ 'invitations.titre')|trans, series.invitations.taux is null ? (g ~ 'invitations.aucune')|trans : (g ~ 'invitations.sous_titre')|trans({taux: (series.invitations.taux * 100)|round, envoyees: series.invitations.totalEnvoyees, delai: series.invitations.delaiMoyenHeures is null ? '—' : (series.invitations.delaiMoyenHeures < 48 ? (g ~ 'invitations.heures')|trans({nombre: series.invitations.delaiMoyenHeures|round}) : (g ~ 'invitations.jours')|trans({nombre: (series.invitations.delaiMoyenHeures / 24)|round(1)}))}), [], '') }}
+        {{ tdb.graphique('comptes', graphiques.comptes, (g ~ 'comptes.titre')|trans, (g ~ 'comptes.sous_titre')|trans({nombre: series.comptes.total, connectes: series.comptes.connectes}), pucesRole, 'administration.tableau_de_bord.filtres.role'|trans) }}
+        {{ tdb.graphique('activite', graphiques.activite, (g ~ 'activite.titre')|trans, (g ~ 'activite.sous_titre')|trans({connexions: series.activite.totalConnexions, actions: series.activite.totalActions}), [], '') }}
+    </div>
+
+    <div class="colonnes">
+        <section class="section" id="associations" aria-labelledby="associations-titre">
+            <div class="section__entete">
+                <h2 id="associations-titre">{{ 'administration.associations.titre'|trans }} <span class="compteur">{{ lignes|length }}</span></h2>
+                <a class="section__lien" href="{{ path('administration_associations') }}">{{ 'administration.associations.tout_voir'|trans }}</a>
+            </div>
+            <div class="tableau">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ 'administration.tableau_de_bord.colonne.association'|trans }}</th>
+                            <th scope="col" class="tableau__secondaire">{{ 'administration.tableau_de_bord.colonne.bureau_central'|trans }}</th>
+                            <th scope="col" class="numerique tableau__tres-large">{{ 'administration.tableau_de_bord.colonne.villes'|trans }}</th>
+                            <th scope="col" class="numerique tableau__tres-large">{{ 'administration.tableau_de_bord.colonne.comptes'|trans }}</th>
+                            <th scope="col">{{ 'administration.tableau_de_bord.colonne.abonnement'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ligne in lignes %}
+                            {% set association = ligne.association %}
+                            {% set abonnement = ligne.abonnement %}
+                            <tr>
+                                <td>
+                                    <span class="entite">
+                                        <span class="entite__initiales" aria-hidden="true">{{ association.nom|split(' ')|last|slice(0, 2)|upper }}</span>
+                                        <span class="entite__texte">
+                                            <a class="entite__nom" href="{{ path('administration_association_fiche', {id: association.id}) }}">{{ association.nom }}</a>
+                                            <span class="entite__detail">{% if association.estActive %}/associations/{{ association.slug }}{% else %}{{ macros.statut_association(association) }}{% endif %}</span>
+                                        </span>
+                                    </span>
+                                </td>
+                                <td class="tableau__secondaire">
+                                    {% if ligne.bureauCentral|length > 0 %}
+                                        {{ ligne.bureauCentral|map(compte => compte.nomComplet)|join(', ') }}
+                                    {% elseif ligne.invitation %}
+                                        <span class="pastille {{ ligne.invitationEtat == 'en_attente' ? 'pastille--attente' : 'pastille--erreur' }}">{{ (ligne.invitationEtat == 'en_attente' ? 'administration.associations.invitation_envoyee' : 'administration.associations.invitation_expiree')|trans }}</span>
+                                    {% else %}
+                                        <span class="pastille pastille--attente">{{ 'administration.associations.aucun_bureau_central'|trans }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="numerique tableau__tres-large">{{ ligne.villes.total }}{% if ligne.villes.brouillon > 0 %}<span class="tableau__precision">{{ 'administration.associations.brouillons'|trans({nombre: ligne.villes.brouillon}) }}</span>{% endif %}</td>
+                                <td class="numerique tableau__tres-large">{{ ligne.comptes.total }}{% if ligne.comptes.en_attente > 0 %}<span class="tableau__precision">{{ 'administration.associations.en_attente'|trans({nombre: ligne.comptes.en_attente}) }}</span>{% endif %}</td>
+                                <td>
+                                    {% if abonnement %}
+                                        {{ macros.statut_abonnement(abonnement, aujourdhui) }}
+                                        {% if abonnement.prochaineEcheanceLe %}<span class="tableau__precision tableau__precision--neutre">{{ abonnement.prochaineEcheanceLe|format_date('short') }}</span>{% endif %}
+                                    {% else %}
+                                        <span class="tableau__precision tableau__precision--neutre">{{ 'administration.associations.non_renseigne'|trans }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="5" class="tableau__vide">{{ 'administration.associations.aucune'|trans }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section class="section" aria-labelledby="a-traiter">
+            <div class="section__entete">
+                <h2 id="a-traiter">{{ 'administration.a_traiter.titre'|trans }}{% if aTraiter|length > 0 %} <span class="compteur compteur--accent">{{ aTraiter|length }}</span>{% endif %}</h2>
+            </div>
+            {% for element in aTraiter %}
+                {% set ligne = element.ligne %}
+                {% set association = ligne.association %}
+                {% set fiche = path('administration_association_fiche', {id: association.id}) %}
+                {% set abonnement = ligne.abonnement %}
+                {% if element.type == 'abonnement_en_retard' %}
+                    {% set lien = fiche ~ '#abonnement' %}{% set icone = 'euro' %}{% set ton = 'erreur' %}
+                    {% set titre = 'administration.a_traiter.abonnement_en_retard'|trans({nom: association.nom}) %}
+                    {% set detail = 'administration.a_traiter.abonnement_en_retard_aide'|trans({echeance: abonnement.prochaineEcheanceLe ? abonnement.prochaineEcheanceLe|format_date('medium') : '—', montant: (abonnement.montant / 100)|format_currency('EUR')}) %}
+                {% elseif element.type == 'premier_paiement' %}
+                    {% set lien = fiche ~ '#abonnement' %}{% set icone = 'euro' %}{% set ton = 'attente' %}
+                    {% set titre = 'administration.a_traiter.premier_paiement'|trans({nom: association.nom, date: abonnement.prochaineEcheanceLe|format_date('medium')}) %}
+                    {% set detail = 'administration.a_traiter.premier_paiement_aide'|trans({montant: (abonnement.montant / 100)|format_currency('EUR'), formule: abonnement.formule, periodicite: ('periodicite.' ~ abonnement.periodicite.value)|trans|lower, souscrit: abonnement.debutLe|format_date('medium')}) %}
+                {% elseif element.type == 'echeance_proche' %}
+                    {% set lien = fiche ~ '#abonnement' %}{% set icone = 'calendrier' %}{% set ton = 'attente' %}
+                    {% set titre = 'administration.a_traiter.echeance_proche'|trans({nom: association.nom, date: abonnement.prochaineEcheanceLe|format_date('medium')}) %}
+                    {% set detail = 'administration.a_traiter.echeance_proche_aide'|trans({montant: (abonnement.montant / 100)|format_currency('EUR')}) %}
+                {% elseif element.type == 'a_souscrire' %}
+                    {% set lien = fiche ~ '#abonnement' %}{% set icone = 'abonnements' %}{% set ton = 'attente' %}
+                    {% set titre = 'administration.a_traiter.a_souscrire'|trans({nom: association.nom}) %}
+                    {% set detail = 'administration.a_traiter.a_souscrire_aide'|trans %}
+                {% elseif element.type == 'invitation_en_attente' %}
+                    {% set lien = fiche %}{% set icone = 'horloge' %}{% set ton = 'attente' %}
+                    {% set titre = 'administration.a_traiter.invitation_en_attente'|trans({nom: association.nom}) %}
+                    {% set detail = 'administration.a_traiter.invitation_en_attente_aide'|trans({email: ligne.invitation.email, envoi: ligne.invitation.envoyeeLe|format_date('medium'), expiration: ligne.invitation.expireLe|format_date('medium')}) %}
+                {% elseif element.type == 'invitation_expiree' %}
+                    {% set lien = fiche %}{% set icone = 'horloge' %}{% set ton = 'erreur' %}
+                    {% set titre = 'administration.a_traiter.invitation_expiree'|trans({nom: association.nom}) %}
+                    {% set detail = 'administration.a_traiter.invitation_expiree_aide'|trans({email: ligne.invitation.email, expiration: ligne.invitation.expireLe|format_date('medium')}) %}
+                {% elseif element.type == 'sans_bureau_central' %}
+                    {% set lien = path('administration_compte_inviter', {association: association.slug}) %}{% set icone = 'personne-plus' %}{% set ton = 'attente' %}
+                    {% set titre = 'administration.a_traiter.sans_bureau_central'|trans({nom: association.nom}) %}
+                    {% set detail = 'administration.a_traiter.sans_bureau_central_aide'|trans %}
+                {% else %}
+                    {% set lien = fiche %}{% set icone = 'pause' %}{% set ton = 'neutre' %}
+                    {% set titre = 'administration.a_traiter.suspendue'|trans({nom: association.nom}) %}
+                    {% set detail = 'administration.a_traiter.suspendue_aide'|trans %}
+                {% endif %}
+                <a class="section__ligne section__ligne--lien" href="{{ lien }}">
+                    <span class="section__icone{{ ton != 'neutre' ? ' section__icone--' ~ ton }}" aria-hidden="true">{{ icones.icone(icone) }}</span>
+                    <span class="section__texte">
+                        <span class="section__principal">{{ titre }}</span>
+                        <span class="section__secondaire">{{ detail }}</span>
+                    </span>
+                    <span class="section__chevron" aria-hidden="true">{{ icones.icone('chevron') }}</span>
+                </a>
+            {% else %}
+                <p class="section__vide">{{ 'administration.a_traiter.rien'|trans }}</p>
+            {% endfor %}
+        </section>
+    </div>
+{% endblock %}

@@ -1,0 +1,5 @@
+# Messages du pare-feu (domaine « security »), en plus de ceux fournis par Symfony.
+compte.en_attente: 'Votre compte est en attente de validation par un responsable de votre ville.'
+compte.desactive: 'Ce compte est désactivé. Contactez le bureau central.'
+compte.association_suspendue: 'Votre association est suspendue : la connexion est fermée pour le moment. Contactez la plateforme.'
+compte.association_archivee: 'Votre association est archivée : elle est close. Contactez la plateforme.'

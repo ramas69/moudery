@@ -1,0 +1,43 @@
+{# Ouverture de la cotisation d'une année pour une ville (F-12), ou modification de son tarif. Variables : association,
+   ville, annee, cotisation (null à l'ouverture), form, concernes (adhérents concernés à l'ouverture, sinon null). #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'cotisations' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% set titre = cotisation ? 'cotisations_association.ouverture.modifier_titre'|trans({annee: annee, ville: ville.nom}) : 'cotisations_association.ouverture.ouvrir_titre'|trans({annee: annee, ville: ville.nom}) %}
+{% block title %}{{ titre }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}<span class="console__fil"><a href="{{ path('association_cotisations', {slug: association.slug, annee: annee}) }}">{{ 'cotisations_association.titre'|trans }}</a> <span aria-hidden="true">›</span> </span>{{ titre }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ (cotisation ? 'cotisations_association.ouverture.modifier_intro' : 'cotisations_association.ouverture.ouvrir_intro')|trans }}</p>{% endblock %}
+
+{% block contenu %}
+    <div class="depense-saisie">
+        {{ form_start(form, {attr: {class: 'section depense-saisie__formulaire', novalidate: 'novalidate'}}) }}
+            {% if form.vars.submitted and not form.vars.valid %}<p class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</p>{% endif %}
+            {{ formulaire.champ(form.type, 'cotisations_association.ouverture.type_aide'|trans) }}
+            <div class="depense-saisie__grille depense-saisie__grille--2">
+                <div class="champ{{ form.montantMensuel.vars.errors|length ? ' champ--erreur' }}">
+                    {{ form_label(form.montantMensuel, null, {label_attr: {class: 'champ__label'}}) }}
+                    <span class="appel__euro">{{ form_widget(form.montantMensuel, {attr: {class: 'champ__saisie depense-saisie__montant'}}) }}<span class="appel__euro-signe" aria-hidden="true">€</span></span>
+                    <p class="champ__aide">{{ 'cotisations_association.ouverture.montant_aide'|trans }}</p>
+                    {% for e in form.montantMensuel.vars.errors %}<p class="champ__erreur">{{ e.message }}</p>{% endfor %}
+                </div>
+                {{ formulaire.champ(form.jourEcheance, 'cotisations_association.ouverture.jour_aide'|trans) }}
+            </div>
+            <div class="depense-saisie__actions">
+                <button type="submit" class="bouton bouton--primaire">{{ icones.icone('coche', 15) }}{{ (cotisation ? 'cotisations_association.ouverture.enregistrer' : 'cotisations_association.ouverture.valider')|trans }}</button>
+                <a class="bouton bouton--discret" href="{{ path('association_cotisations', {slug: association.slug, annee: annee}) }}">{{ 'reversements_association.nouveau.annuler'|trans }}</a>
+            </div>
+        {{ form_end(form) }}
+        <aside class="depense-saisie__cote">
+            <section class="section" aria-labelledby="concernes-titre">
+                <div class="section__entete"><h2 id="concernes-titre">{{ ville.nom }} · {{ annee }}</h2></div>
+                <dl class="appel__chiffres">
+                    {% if concernes is not null %}<div><dt>{{ 'cotisations_association.ouverture.membres'|trans({nombre: concernes}) }}</dt><dd>{{ concernes }}</dd></div>{% endif %}
+                    {% if cotisation %}<div><dt>{{ 'cotisations_association.ouverture.tarif'|trans({montant: (cotisation.montantMensuel / 100)|format_currency('EUR'), jour: cotisation.jourEcheance}) }}</dt><dd></dd></div>{% endif %}
+                </dl>
+                <p class="section__aide">{{ 'cotisations_association.ouverture.ouvrir_intro'|trans }}</p>
+            </section>
+        </aside>
+    </div>
+{% endblock %}

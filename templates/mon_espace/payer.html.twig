@@ -1,0 +1,52 @@
+{# Payer mes échéances en ligne (F-15, F-16, maquette « Payer mes échéances »), SIMULÉ en attendant Stripe : aucune
+   donnée de carte n'est demandée. Variables : membre, onglet, dues, aPayer, enRetard, cochees, erreur. #}
+{% extends 'mon_espace/_layout.html.twig' %}
+{% macro euros(centimes) %}{{ (centimes / 100)|format_currency('EUR', centimes % 100 == 0 ? {fraction_digit: 0} : {}) }}{% endmacro %}
+{% import _self as r %}
+
+{% block title %}{{ 'mon_espace.payer.titre'|trans }} · {{ membre.association.nom }}{% endblock %}
+
+{% block contenu %}
+    <a class="espace-membre__lien" href="{{ path('mon_espace') }}">{{ 'mon_espace.payer.retour'|trans }}</a>
+    <h1 class="espace-membre__titre">{{ 'mon_espace.payer.titre'|trans }}</h1>
+
+    {% if erreur %}<p class="alerte alerte--erreur" role="alert">{{ erreur }}</p>{% endif %}
+
+    {% if dues is empty %}
+        <p class="espace-membre__vide">{{ 'mon_espace.echeances.a_jour'|trans }}</p>
+    {% else %}
+        <form method="post" class="payer" data-controller="paiement" novalidate>
+            <input type="hidden" name="_token" value="{{ csrf_token('payer-en-ligne') }}">
+            <fieldset class="payer__choix">
+                <legend class="payer__legende">{{ 'mon_espace.payer.choisir'|trans }}</legend>
+                <ul class="espace-membre__liste">
+                    {% for e in dues %}
+                        {% set retard = e.estEnRetard(aujourdhui) %}
+                        <li class="espace-membre__ligne payer__ligne">
+                            <label class="payer__case">
+                                <input type="checkbox" name="echeances[]" value="{{ e.id }}" data-montant="{{ e.montant ?? 0 }}" data-action="change->paiement#recalculer"{% if e.id in cochees %} checked{% endif %}>
+                                <span class="espace-membre__ligne-texte">
+                                    <span class="espace-membre__ligne-titre">{% if e.appel %}{{ e.appel.objet }}{% else %}{{ 'mon_espace.echeances.cotisation'|trans({mois: ('membres_association.mois.' ~ e.mois)|trans|lower, annee: e.annee}) }}{% endif %}</span>
+                                    <span class="espace-membre__ligne-detail{{ retard ? ' espace-membre__retard' }}">{{ (retard ? 'mon_espace.echeances.en_retard' : 'mon_espace.echeances.avant')|trans({date: e.dateLimite|format_date('medium')}) }}</span>
+                                </span>
+                                {% if e.montant is not null %}<span class="espace-membre__montant">{{ r.euros(e.montant) }}</span>{% endif %}
+                            </label>
+                            {% if e.montant is null %}
+                                <label class="payer__libre" for="libre-{{ e.id }}">
+                                    <span>{{ 'mon_espace.payer.libre'|trans }}{% if e.appel and e.appel.montant %} {{ 'mon_espace.payer.suggere'|trans({montant: r.euros(e.appel.montant)}) }}{% endif %}</span>
+                                    <span class="payer__euro"><input class="champ__saisie" id="libre-{{ e.id }}" type="text" name="montant_libre[{{ e.id }}]" inputmode="decimal" placeholder="0,00" value="{{ e.appel and e.appel.montant ? (e.appel.montant / 100)|number_format(2, ',', ' ') }}" data-libre="{{ e.id }}" data-action="input->paiement#recalculer"><span aria-hidden="true">€</span></span>
+                                </label>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </fieldset>
+
+            <div class="payer__pied">
+                <p class="payer__total"><span>{{ 'mon_espace.payer.total'|trans }}</span><strong data-paiement-target="total">—</strong></p>
+                <button type="submit" class="bouton bouton--primaire payer__bouton">{{ 'mon_espace.payer.bouton'|trans }}</button>
+                <p class="alerte alerte--info payer__simulation">{{ 'mon_espace.payer.simulation'|trans }}</p>
+            </div>
+        </form>
+    {% endif %}
+{% endblock %}

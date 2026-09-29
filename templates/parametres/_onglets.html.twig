@@ -1,0 +1,10 @@
+{# Onglets de Paramètres pour qui pilote son association (décision de Rama du 28 septembre 2026) : « Mon compte »
+   (identité, adresse, mot de passe), « Association » (contact, exercice, reversement, relances) et « Responsables
+   et rôles ». Variables : association, actif (compte|association|responsables). #}
+<nav class="onglets-parametres" aria-label="{{ 'parametres.onglets.aria'|trans }}">
+    <a class="onglet-parametres" href="{{ path('parametres') }}"{% if actif == 'compte' %} aria-current="page"{% endif %}>{{ 'parametres.onglets.compte'|trans }}</a>
+    <a class="onglet-parametres" href="{{ path('association_parametres', {slug: association.slug}) }}"{% if actif == 'association' %} aria-current="page"{% endif %}>{{ 'parametres.onglets.association'|trans }}</a>
+    <a class="onglet-parametres" href="{{ path('association_contributions', {slug: association.slug}) }}"{% if actif == 'contributions' %} aria-current="page"{% endif %}>{{ 'parametres.onglets.contributions'|trans }}</a>
+    <a class="onglet-parametres" href="{{ path('association_abonnement', {slug: association.slug}) }}"{% if actif == 'abonnement' %} aria-current="page"{% endif %}>{{ 'parametres.onglets.abonnement'|trans }}</a>
+    <a class="onglet-parametres" href="{{ path('association_responsables', {slug: association.slug}) }}"{% if actif == 'responsables' %} aria-current="page"{% endif %}>{{ 'responsables_association.titre'|trans }}</a>
+</nav>

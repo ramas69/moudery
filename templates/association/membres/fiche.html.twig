@@ -1,0 +1,144 @@
+{# La fiche d'un membre : identité et contact, puis ses années d'adhésion avec les versements mois par mois, comme les
+   lignes du classeur de sa ville. Variables : association, membre, adhesions (de la plus récente à la plus ancienne). #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'membres' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'association/membres/_grille.html.twig' as grille %}
+
+{% set classeStatut = {actif: 'succes', 'en-attente': 'attente', sorti: 'archivee'}[membre.statut.value] %}
+
+{% block title %}{{ membre.nomComplet }} · {{ association.nom }}{% endblock %}
+
+{% block titre_page %}{{ membre.nomComplet }} <span class="pastille pastille--{{ classeStatut }}">{{ ('membre.statut.' ~ membre.statut.value)|trans }}</span>{% endblock %}
+{% block sous_titre %}
+    <p class="console__sous-titre">
+        <a class="fil-ariane" href="{{ path('association_membres', {slug: association.slug, ville: membre.ville.id, annee: 'toutes'}) }}">{{ icones.icone('chevron-gauche', 14) }}{{ 'membres_association.fiche.retour'|trans }}</a>
+        {{ membre.ville.nom }}{% if membre.localite %} · {{ membre.localite }}{% endif %}{% if membre.age %} · {{ 'membres_association.tableau.age'|trans({age: membre.age}) }}{% endif %}
+    </p>
+{% endblock %}
+
+{# peutGerer vient du contrôleur : bureau central, ou MEMBRE_GERER sur la ville du membre (trésorier, secrétaire). #}
+{% block actions %}
+    {% if peutGerer %}
+        {% if dues is not empty and membre.estActif %}
+            <a class="bouton bouton--secondaire" href="{{ path('association_paiement_nouveau', {slug: association.slug, membre: membre.id, ville: membre.ville.id}) }}">{{ icones.icone('paiement', 15) }}{{ 'membre_fiche.enregistrer_paiement'|trans }}</a>
+        {% endif %}
+        <a class="bouton bouton--primaire" href="{{ path('association_membre_modifier', {slug: association.slug, id: membre.id}) }}">{{ icones.icone('modifier', 15) }}{{ 'membre_fiche.modifier'|trans }}</a>
+        <details class="menu" data-controller="menu" data-action="toggle->menu#ouvrir">
+            <summary class="bouton bouton--secondaire bouton--icone" aria-label="{{ 'membre_fiche.autres_actions'|trans }}">{{ icones.icone('menu', 16) }}</summary>
+            <div class="menu__liste">
+                {% if membre.statut.value == 'sorti' %}
+                    <form method="post" action="{{ path('association_membre_statut', {slug: association.slug, id: membre.id, action: 'reactiver'}) }}" class="menu__form"><input type="hidden" name="_token" value="{{ csrf_token('membre-statut-' ~ membre.id) }}"><button type="submit" class="menu__item">{{ icones.icone('coche', 15) }}{{ 'membre_fiche.reactiver'|trans }}</button></form>
+                {% else %}
+                    {% if membre.statut.value == 'en-attente' %}
+                        <form method="post" action="{{ path('association_membre_statut', {slug: association.slug, id: membre.id, action: 'reactiver'}) }}" class="menu__form"><input type="hidden" name="_token" value="{{ csrf_token('membre-statut-' ~ membre.id) }}"><button type="submit" class="menu__item">{{ icones.icone('coche', 15) }}{{ 'membre_fiche.valider'|trans }}</button></form>
+                    {% endif %}
+                    <form method="post" action="{{ path('association_membre_statut', {slug: association.slug, id: membre.id, action: 'sortir'}) }}" class="menu__form" data-turbo-confirm="{{ 'membre_fiche.sortir_confirmer'|trans({nom: membre.nomComplet}) }}"><input type="hidden" name="_token" value="{{ csrf_token('membre-statut-' ~ membre.id) }}"><button type="submit" class="menu__item menu__item--danger">{{ icones.icone('croix', 15) }}{{ 'membre_fiche.sortir'|trans }}</button></form>
+                {% endif %}
+                {# Pas d'inscription libre : le membre rejoint son espace par un lien de sa ville (décision du 29 septembre 2026). #}
+                {% if membre.email and membre.compte is null and membre.statut.value != 'sorti' %}
+                    <form method="post" action="{{ path('association_membre_inviter', {slug: association.slug, id: membre.id}) }}" class="menu__form" title="{{ 'membre_invitation.aide'|trans({email: membre.email}) }}"><input type="hidden" name="_token" value="{{ csrf_token('inviter-membre-' ~ membre.id) }}"><button type="submit" class="menu__item">{{ icones.icone('envoyer', 15) }}{{ 'membre_invitation.bouton'|trans }}</button></form>
+                {% endif %}
+                <a class="menu__item" href="{{ path('ville_assistant_membres', {slug: association.slug, id: membre.ville.id, q: membre.nom}) }}">{{ icones.icone('comptes', 15) }}{{ 'membres_association.fiche.ouvrir_ville'|trans }}</a>
+            </div>
+        </details>
+    {% endif %}
+{% endblock %}
+
+{% block contenu %}
+    <div class="fiche-grille">
+        <section class="section" aria-labelledby="identite-titre">
+            <div class="section__entete">
+                <h2 id="identite-titre">{{ 'membres_association.fiche.identite'|trans }}</h2>
+            </div>
+            <dl class="proprietes">
+                <dt>{{ 'membres_association.fiche.ville'|trans }}</dt>
+                <dd>{{ membre.ville.nom }}</dd>
+                <dt>{{ 'membres_association.fiche.localite'|trans }}</dt>
+                <dd>{{ membre.localite ?? '—' }}</dd>
+                <dt>{{ 'membres_association.fiche.naissance'|trans }}</dt>
+                <dd>{% if membre.anneeNaissance %}{{ membre.anneeNaissance }} · {{ 'membres_association.tableau.age'|trans({age: membre.age}) }}{% else %}—{% endif %}</dd>
+                <dt>{{ 'membres_association.fiche.email'|trans }}</dt>
+                <dd>{% if membre.email %}<a href="mailto:{{ membre.email }}">{{ membre.email }}</a>{% else %}—{% endif %}</dd>
+                <dt>{{ 'membres_association.fiche.telephone'|trans }}</dt>
+                <dd>{{ membre.telephoneAffiche ?? '—' }}</dd>
+                <dt>{{ 'membres_association.fiche.foyer'|trans }}</dt>
+                <dd>{% if membre.foyer %}{{ membre.foyer.nom }}{% if membre.foyer.payeur is same as(membre) %} · {{ 'membres_association.fiche.payeur'|trans }}{% endif %}{% else %}—{% endif %}</dd>
+                <dt>{{ 'membres_association.fiche.origine'|trans }}</dt>
+                <dd>{{ ('membres_association.fiche.origines.' ~ membre.origine)|trans }} · {{ membre.creeLe|format_date('medium') }}</dd>
+            </dl>
+        </section>
+
+        <div class="fiche-colonne">
+            <section class="section" aria-labelledby="compte-titre">
+                <div class="section__entete">
+                    <h2 id="compte-titre">{{ 'membre_fiche.compte.titre'|trans }}</h2>
+                </div>
+                <dl class="appel__chiffres">
+                    <div><dt>{{ 'membre_fiche.compte.dues'|trans({nombre: dues|length}) }}</dt><dd{% if dues|filter(e => e.estEnRetard(aujourdhui)) is not empty %} class="appel__alerte"{% endif %}>{{ (dues|reduce((s, e) => s + (e.montant ?? 0), 0) / 100)|format_currency('EUR') }}</dd></div>
+                    <div><dt>{{ 'membre_fiche.compte.paiements'|trans({nombre: paiements|filter(p => not p.estAnnule)|length}) }}</dt><dd>{{ (paiements|filter(p => not p.estAnnule)|reduce((s, p) => s + p.montant, 0) / 100)|format_currency('EUR') }}</dd></div>
+                </dl>
+                {% if paiements is not empty %}
+                    <ul class="fiche-paiements">
+                        {% for p in paiements|slice(0, 5) %}
+                            <li class="fiche-paiements__ligne{{ p.estAnnule ? ' fiche-paiements__ligne--annule' }}"><span>{{ p.recuLe|format_date('medium') }} · {{ ('paiements_association.moyen.' ~ p.moyen.value)|trans }}</span><a href="{{ path('association_paiement_recu', {slug: association.slug, id: p.id}) }}">{{ (p.montant / 100)|format_currency('EUR') }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </section>
+
+            <section class="section" aria-labelledby="adhesions-titre">
+                <div class="section__entete">
+                    <h2 id="adhesions-titre">{{ 'membres_association.fiche.adhesions'|trans }} <span class="compteur">{{ adhesions|length }}</span></h2>
+                </div>
+                {% if adhesions is empty %}
+                    <p class="section__vide">{{ 'membres_association.fiche.aucune_adhesion'|trans }}</p>
+                {% else %}
+                    <p class="section__aide">{{ 'membres_association.fiche.adhesions_aide'|trans }}</p>
+                {% endif %}
+            </section>
+
+            {% if villesCibles is not empty %}
+                <section class="section" aria-labelledby="transfert-titre">
+                    <div class="section__entete"><h2 id="transfert-titre">{{ 'membre_fiche.transfert.titre'|trans }}</h2></div>
+                    <form method="post" action="{{ path('association_membre_transferer', {slug: association.slug, id: membre.id}) }}" class="section__formulaire" data-turbo-confirm="{{ 'membre_fiche.transfert.confirmer'|trans({nom: membre.nomComplet}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('membre-transferer-' ~ membre.id) }}">
+                        <div class="section__formulaire-champs">
+                            <div class="champ">
+                                <label class="champ__label" for="transfert-ville">{{ 'membre_fiche.transfert.ville'|trans }}</label>
+                                <select class="champ__saisie" id="transfert-ville" name="ville">
+                                    {% for v in villesCibles %}<option value="{{ v.id }}">{{ v.nom }}</option>{% endfor %}
+                                </select>
+                                <p class="champ__aide">{{ 'membre_fiche.transfert.aide'|trans }}</p>
+                            </div>
+                        </div>
+                        <div class="section__formulaire-actions"><button type="submit" class="bouton bouton--secondaire">{{ icones.icone('villes', 15) }}{{ 'membre_fiche.transfert.bouton'|trans }}</button></div>
+                    </form>
+                </section>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if adhesions is not empty %}
+        <section class="section" aria-label="{{ 'membres_association.fiche.adhesions'|trans }}">
+            <div class="tableau tableau--grille">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col" class="grille__annee">{{ 'membres_association.tableau.annee'|trans }}</th>
+                            {{ grille.entetes(association.debutExerciceMois) }}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for adhesion in adhesions %}
+                            <tr>
+                                <th scope="row" class="grille__annee">{{ adhesion.annee }}</th>
+                                {{ grille.cellules(adhesion, association.debutExerciceMois) }}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    {% endif %}
+{% endblock %}

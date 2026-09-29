@@ -1,0 +1,16 @@
+twig:
+    file_name_pattern: '*.twig'
+    # PHP et la base tournent en UTC ; les dates s'affichent à l'heure de Paris (format_datetime, date, il_y_a).
+    date:
+        timezone: Europe/Paris
+    # Mentions légales (29 septembre 2026) : l'éditeur de la plateforme se règle dans .env.local sur le serveur.
+    globals:
+        legal:
+            editeur: '%env(LEGAL_EDITEUR)%'
+            adresse: '%env(LEGAL_ADRESSE)%'
+            directeur: '%env(LEGAL_DIRECTEUR)%'
+            contact: '%env(LEGAL_CONTACT)%'
+
+when@test:
+    twig:
+        strict_variables: true

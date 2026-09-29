@@ -1,0 +1,36 @@
+{# Mes échéances (F-26, maquette 10a) : à payer, payé sur l'exercice, la liste des échéances dues. « Payer en ligne » ouvre le paiement simulé
+   (F-15, en attendant Stripe). Variables : membre, onglet, dues, aPayer,
+   enRetard, payeExercice, exercice. #}
+{% extends 'mon_espace/_layout.html.twig' %}
+{% macro euros(centimes) %}{{ (centimes / 100)|format_currency('EUR', centimes % 100 == 0 ? {fraction_digit: 0} : {}) }}{% endmacro %}
+{% import _self as r %}
+
+{% block title %}{{ 'mon_espace.echeances.titre'|trans }} · {{ membre.association.nom }}{% endblock %}
+
+{% block contenu %}
+    <p class="espace-membre__surtitre">{{ 'mon_espace.bonjour'|trans({prenom: membre.prenom, ville: membre.ville.nom}) }}</p>
+    <h1 class="espace-membre__titre">{{ 'mon_espace.echeances.titre'|trans }}</h1>
+
+    <dl class="espace-membre__chiffres">
+        <div><dt>{{ 'mon_espace.echeances.a_payer'|trans }}</dt><dd{% if enRetard > 0 %} class="espace-membre__retard"{% endif %}>{{ r.euros(aPayer) }}</dd></div>
+        <div><dt>{{ 'mon_espace.echeances.paye'|trans({exercice: exercice}) }}</dt><dd>{{ r.euros(payeExercice) }}</dd></div>
+    </dl>
+
+    {% if dues is empty %}
+        <p class="espace-membre__vide">{{ 'mon_espace.echeances.a_jour'|trans }}</p>
+    {% else %}
+        <ul class="espace-membre__liste">
+            {% for e in dues %}
+                <li class="espace-membre__ligne">
+                    <span class="espace-membre__ligne-texte">
+                        <span class="espace-membre__ligne-titre">{% if e.appel %}{{ e.appel.objet }}{% else %}{{ 'mon_espace.echeances.cotisation'|trans({mois: ('membres_association.mois.' ~ e.mois)|trans|lower, annee: e.annee}) }}{% endif %}</span>
+                        <span class="espace-membre__ligne-detail{{ e.estEnRetard(aujourdhui) ? ' espace-membre__retard' }}">{{ (e.estEnRetard(aujourdhui) ? 'mon_espace.echeances.en_retard' : 'mon_espace.echeances.avant')|trans({date: e.dateLimite|format_date('medium')}) }}</span>
+                    </span>
+                    <span class="espace-membre__montant">{{ e.montant is null ? 'mon_espace.echeances.libre'|trans : r.euros(e.montant) }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+        <a class="bouton bouton--primaire espace-membre__cta" href="{{ path('mon_espace_payer') }}">{{ 'mon_espace.echeances.payer'|trans }}</a>
+        <p class="alerte alerte--info espace-membre__note">{{ 'mon_espace.echeances.regler'|trans({ville: membre.ville.nom}) }}</p>
+    {% endif %}
+{% endblock %}

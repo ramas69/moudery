@@ -1,0 +1,50 @@
+{# Les champs communs à l'activation et à la souscription : l'adresse (fixée par l'invitation), l'identité, le mot de passe.
+   Variables : invitation, form. #}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+<div class="champ">
+    <label class="champ__label" for="invitation-email">{{ 'connexion.email'|trans }}</label>
+    <input class="champ__saisie" type="email" id="invitation-email" value="{{ invitation.email }}" readonly aria-describedby="invitation-email-aide">
+    <p class="champ__aide" id="invitation-email-aide">{{ 'invitation.email_aide'|trans }}</p>
+</div>
+
+<div class="invitation__identite">
+    {{ formulaire.champ(form.prenom, null) }}
+    {{ formulaire.champ(form.nom, null) }}
+</div>
+
+{% if form.telephone is defined %}{{ formulaire.champ(form.telephone, null) }}{% endif %}
+
+{% set champ = form.motDePasse %}
+{% set enErreur = champ.vars.errors|length > 0 %}
+<div class="champ{{ enErreur ? ' champ--erreur' }}" data-controller="mot-de-passe robustesse" data-robustesse-textes-value="{{ {
+        vide: 'invitation.robustesse.vide'|trans,
+        court: 'invitation.robustesse.court'|trans,
+        faible: 'invitation.robustesse.faible'|trans,
+        correct: 'invitation.robustesse.correct'|trans,
+        robuste: 'invitation.robustesse.robuste'|trans,
+    }|json_encode }}" data-mot-de-passe-afficher-value="{{ 'invitation.afficher'|trans }}" data-mot-de-passe-masquer-value="{{ 'invitation.masquer'|trans }}">
+    <span class="champ__label champ__label--ligne">
+        {{ form_label(champ) }}
+        <button type="button" class="lien-discret" data-mot-de-passe-target="bouton" data-action="mot-de-passe#basculer" aria-pressed="false">{{ 'invitation.afficher'|trans }}</button>
+    </span>
+    {{ form_widget(champ, {attr: champ.vars.attr|merge({
+        class: 'champ__saisie',
+        'data-mot-de-passe-target': 'champ',
+        'data-robustesse-target': 'champ',
+        'data-action': 'input->robustesse#evaluer',
+        'aria-describedby': (champ.vars.id ~ '_aide' ~ (enErreur ? ' ' ~ champ.vars.id ~ '_erreur' : '')),
+        'aria-invalid': enErreur ? 'true' : false,
+    })}) }}
+    <div class="robustesse" aria-hidden="true"><span data-robustesse-target="segment"></span><span data-robustesse-target="segment"></span><span data-robustesse-target="segment"></span><span data-robustesse-target="segment"></span></div>
+    <p class="champ__aide" id="{{ champ.vars.id }}_aide"><span class="robustesse__texte" data-robustesse-target="texte" aria-live="polite"></span>{{ 'reinitialisation.aide'|trans }}</p>
+    {% if enErreur %}
+        <p class="champ__erreur" id="{{ champ.vars.id }}_erreur">{% for erreur in champ.vars.errors %}{{ erreur.message }}{% if not loop.last %} {% endif %}{% endfor %}</p>
+    {% endif %}
+</div>
+
+{% if form.consentEmail is defined %}
+    <label class="invitation__consentement">
+        {{ form_widget(form.consentEmail) }}
+        <span>{{ ('invitation.consentement_' ~ (invitation.role.value in ['tresorier', 'president', 'secretaire', 'bureau-central'] ? 'responsable' : 'membre'))|trans }}</span>
+    </label>
+{% endif %}

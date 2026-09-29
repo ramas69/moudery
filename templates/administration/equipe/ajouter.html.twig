@@ -1,0 +1,27 @@
+{# Ajout d'un super-admin : identité, adresse, association facultative ; la personne choisit son mot de passe depuis le lien reçu. Variable : form. #}
+{% extends 'administration/_layout.html.twig' %}
+{% set page = 'equipe' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+
+{% block title %}{{ 'administration.equipe.ajouter_titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block titre_page %}{{ 'administration.equipe.ajouter_titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'administration.equipe.ajouter_sous_titre'|trans }}</p>{% endblock %}
+
+{% block contenu %}
+    {{ form_start(form, {attr: {class: 'formulaire formulaire--etroit', novalidate: 'novalidate'}}) }}
+        {% if form.vars.submitted and not form.vars.valid %}
+            <div class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</div>
+        {% endif %}
+        {{ form_errors(form) }}
+        {{ formulaire.champ(form.prenom, null) }}
+        {{ formulaire.champ(form.nom, null) }}
+        {{ formulaire.champ(form.email, 'administration.equipe.email.aide'|trans) }}
+        {{ formulaire.champ(form.association, 'administration.equipe.association.aide'|trans) }}
+        <p class="note">{{ 'administration.equipe.droits_aide'|trans }}</p>
+        <div class="formulaire__actions">
+            <a class="bouton bouton--secondaire" href="{{ path('administration_equipe') }}">{{ 'administration.equipe.annuler'|trans }}</a>
+            <button type="submit" class="bouton bouton--primaire">{{ 'administration.equipe.envoyer'|trans }}</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

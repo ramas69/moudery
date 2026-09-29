@@ -1,0 +1,54 @@
+{# Ajout ou modification d'un type de contribution (F-11). Variables : association, type (null pour un ajout), form. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'parametres' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% set titre = type ? 'contributions_association.modifier_titre'|trans({nom: type.nom}) : 'contributions_association.ajouter'|trans %}
+{% block title %}{{ titre }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}<span class="console__fil"><a href="{{ path('association_contributions', {slug: association.slug}) }}">{{ 'contributions_association.titre'|trans }}</a> <span aria-hidden="true">›</span> </span>{{ titre }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'contributions_association.formulaire.sous_titre'|trans }}</p>{% endblock %}
+
+{% block contenu %}
+    <div class="depense-saisie contribution-saisie">
+        {{ form_start(form, {attr: {class: 'section depense-saisie__formulaire', novalidate: 'novalidate'}}) }}
+            {% if form.vars.submitted and not form.vars.valid %}<p class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</p>{% endif %}
+            {{ formulaire.champ(form.nom, null) }}
+            <div class="depense-saisie__grille depense-saisie__grille--2">
+                <div class="champ{{ form.unite.vars.errors|length ? ' champ--erreur' }}">
+                    {{ form_label(form.unite, null, {label_attr: {class: 'champ__label'}}) }}
+                    <div class="choix-radio">{% for choix in form.unite %}<label class="choix-radio__option">{{ form_widget(choix) }}<span>{{ choix.vars.label|trans }}</span></label>{% endfor %}</div>
+                    <p class="champ__aide">{{ 'contributions_association.formulaire.unite_aide'|trans }}</p>
+                </div>
+                <div class="champ{{ form.mode.vars.errors|length ? ' champ--erreur' }}">
+                    {{ form_label(form.mode, null, {label_attr: {class: 'champ__label'}}) }}
+                    <div class="choix-radio">{% for choix in form.mode %}<label class="choix-radio__option">{{ form_widget(choix) }}<span>{{ choix.vars.label|trans }}</span></label>{% endfor %}</div>
+                    <p class="champ__aide">{{ 'contributions_association.formulaire.mode_aide'|trans }}</p>
+                </div>
+            </div>
+            <div class="depense-saisie__grille depense-saisie__grille--2">
+                <div class="champ{{ form.montantDefaut.vars.errors|length ? ' champ--erreur' }}">
+                    {{ form_label(form.montantDefaut, null, {label_attr: {class: 'champ__label'}}) }}
+                    <span class="appel__euro">{{ form_widget(form.montantDefaut, {attr: {class: 'champ__saisie depense-saisie__montant'}}) }}<span class="appel__euro-signe" aria-hidden="true">€</span></span>
+                    <p class="champ__aide">{{ 'contributions_association.formulaire.montant_aide'|trans }}</p>
+                    {% for e in form.montantDefaut.vars.errors %}<p class="champ__erreur">{{ e.message }}</p>{% endfor %}
+                </div>
+                {{ formulaire.champ(form.tauxReversement, 'contributions_association.formulaire.taux_aide'|trans) }}
+            </div>
+            <div class="depense-saisie__actions">
+                <button type="submit" class="bouton bouton--primaire">{{ icones.icone('coche', 15) }}{{ (type ? 'contributions_association.formulaire.enregistrer' : 'contributions_association.formulaire.ajouter')|trans }}</button>
+                <a class="bouton bouton--discret" href="{{ path('association_contributions', {slug: association.slug}) }}">{{ 'reversements_association.nouveau.annuler'|trans }}</a>
+            </div>
+        {{ form_end(form) }}
+        <aside class="depense-saisie__cote">
+            <section class="section" aria-labelledby="regles-titre">
+                <div class="section__entete"><h2 id="regles-titre">{{ 'contributions_association.regles.titre'|trans }}</h2></div>
+                <ul class="contributions__regles">
+                    <li>{{ 'contributions_association.regles.unite'|trans }}</li>
+                    <li>{{ 'contributions_association.regles.taux'|trans }}</li>
+                    <li>{{ 'contributions_association.regles.archive'|trans }}</li>
+                </ul>
+            </section>
+        </aside>
+    </div>
+{% endblock %}

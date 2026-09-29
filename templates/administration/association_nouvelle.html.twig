@@ -1,0 +1,38 @@
+{# Création d'une association, le tenant. L'identifiant dans les adresses se déduit du village (ou du nom) :
+   un aperçu se met à jour pendant la saisie, le champ lui-même reste replié pour les cas particuliers. #}
+{% extends 'administration/_layout.html.twig' %}
+{% set page = 'associations' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+
+{% block title %}{{ 'administration.association.titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block titre_page %}{{ 'administration.association.titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'administration.association.sous_titre'|trans }}</p>{% endblock %}
+
+{% block contenu %}
+    {% set slugEnErreur = form.slug.vars.errors|length > 0 %}
+    {{ form_start(form, {attr: {class: 'formulaire formulaire--etroit', novalidate: 'novalidate', 'data-controller': 'identifiant'}}) }}
+        {% if form.vars.submitted and not form.vars.valid %}
+            <div class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</div>
+        {% endif %}
+        {{ form_errors(form) }}
+        {{ formulaire.champ(form.nom, 'administration.association.nom.aide'|trans, {'data-identifiant-target': 'nom', 'data-action': 'input->identifiant#rafraichir'}) }}
+        {{ formulaire.champ(form.village, 'administration.association.village.aide'|trans, {'data-identifiant-target': 'village', 'data-action': 'input->identifiant#rafraichir'}) }}
+        <p class="identifiant" data-identifiant-target="apercu" aria-live="polite">
+            {{ 'administration.association.identifiant.apercu'|trans }} <code class="identifiant__valeur">/associations/<span data-identifiant-target="valeur">{{ form.slug.vars.value ?: '…' }}</span></code>
+        </p>
+        <details class="formulaire__avance"{% if slugEnErreur or form.slug.vars.value %} open{% endif %}>
+            <summary>{{ 'administration.association.identifiant.modifier'|trans }}</summary>
+            {{ formulaire.champ(form.slug, 'administration.association.slug.aide'|trans, {'data-identifiant-target': 'slug', 'data-action': 'input->identifiant#rafraichir'}) }}
+        </details>
+        <div class="formulaire__section">
+            <h2 class="formulaire__sous-titre">{{ 'administration.association.bureau_central.titre'|trans }}</h2>
+            <p class="note">{{ 'administration.association.bureau_central.intro'|trans }}</p>
+            {{ formulaire.champ(form.emailBureauCentral, 'administration.association.bureau_central.aide'|trans) }}
+        </div>
+        <div class="formulaire__actions">
+            <a class="bouton bouton--secondaire" href="{{ path('administration_associations') }}">{{ 'administration.association.annuler'|trans }}</a>
+            <button type="submit" class="bouton bouton--primaire">{{ 'administration.association.enregistrer'|trans }}</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

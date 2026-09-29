@@ -1,0 +1,34 @@
+{# Abonnement d'une association : formule, statut, montant, périodicité, échéances, notes. Variables : association, abonnement, form, retour. #}
+{% extends 'administration/_layout.html.twig' %}
+{% set page = 'abonnements' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+
+{% block title %}{{ 'administration.abonnement.modifier_titre'|trans }} · {{ association.nom }}{% endblock %}
+
+{% block titre_page %}{{ 'administration.abonnement.modifier_titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre"><a href="{{ path('administration_association_fiche', {id: association.id}) }}">{{ association.nom }}</a> · {{ 'administration.abonnement.modifier_sous_titre'|trans }}</p>{% endblock %}
+
+{% block contenu %}
+    {{ form_start(form, {attr: {class: 'formulaire formulaire--etroit', novalidate: 'novalidate'}}) }}
+        {% if form.vars.submitted and not form.vars.valid %}
+            <div class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</div>
+        {% endif %}
+        {{ form_errors(form) }}
+        {% if retour %}<input type="hidden" name="retour" value="{{ retour }}">{% endif %}
+        {{ formulaire.champ(form.formule, 'administration.abonnement.formule.aide'|trans) }}
+        {{ formulaire.champ(form.statut, 'administration.abonnement.statut.aide'|trans) }}
+        <div class="formulaire__grille">
+            {{ formulaire.champ(form.montant, 'administration.abonnement.montant.aide'|trans) }}
+            {{ formulaire.champ(form.periodicite, null) }}
+        </div>
+        <div class="formulaire__grille">
+            {{ formulaire.champ(form.debutLe, null) }}
+            {{ formulaire.champ(form.prochaineEcheanceLe, 'administration.abonnement.echeance.aide'|trans) }}
+        </div>
+        {{ formulaire.champ(form.notes, 'administration.abonnement.notes.aide'|trans) }}
+        <div class="formulaire__actions">
+            <a class="bouton bouton--secondaire" href="{{ retour ?: path('administration_association_fiche', {id: association.id}) ~ '#abonnement' }}">{{ 'administration.association.annuler'|trans }}</a>
+            <button type="submit" class="bouton bouton--primaire">{{ 'administration.abonnement.enregistrer'|trans }}</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

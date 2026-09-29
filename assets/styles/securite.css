@@ -1,0 +1,357 @@
+/*
+ * Pages de connexion et de mot de passe, direction « Console » : un panneau clair à gauche qui raconte le produit
+ * (le village et ses caisses, dessinés d'après le logo), le formulaire à droite sur fond blanc.
+ * Mobile first ; uniquement les variables et composants de app.css.
+ */
+.securite {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    background: var(--surface);
+}
+
+/* Panneau : sur mobile, une bande claire avec le logo et la promesse. */
+.securite__panneau {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1.25rem 1rem 1.5rem;
+    overflow: hidden;
+    background: var(--accent-doux);
+    color: var(--texte);
+}
+
+.securite__panneau-haut {
+    display: flex;
+}
+
+.securite__panneau-corps {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 28rem;
+}
+
+.securite__panneau .surtitre {
+    color: var(--accent-texte);
+}
+
+.securite__citation {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    text-wrap: pretty;
+    animation: apparition 0.6s var(--courbe-sortie) 0.15s both;
+}
+
+.securite__panneau-texte {
+    margin: 0;
+    font-size: var(--taille-texte);
+    color: var(--texte-2);
+    text-wrap: pretty;
+    animation: apparition 0.6s var(--courbe-sortie) 0.3s both;
+}
+
+.securite__points {
+    display: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.securite__point {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: start;
+    animation: apparition 0.6s var(--courbe-sortie) both;
+    animation-delay: calc(0.45s + var(--rang, 0) * 0.1s);
+}
+
+.securite__point:nth-child(2) { --rang: 1; }
+.securite__point:nth-child(3) { --rang: 2; }
+
+.securite__point-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--rayon-petit);
+    background: var(--surface);
+    color: var(--accent);
+    box-shadow: var(--ombre);
+}
+
+.securite__point-texte {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    font-size: var(--taille-petit);
+    color: var(--texte-2);
+}
+
+.securite__point-texte strong {
+    color: var(--texte);
+}
+
+/* Le village : caché sur mobile, plein cadre en bas du panneau sur écran large. */
+.securite__village {
+    display: none;
+}
+
+.securite__maison {
+    fill: var(--accent);
+    fill-opacity: 0.55;
+    transform-origin: 50% 180px;
+    transform-box: view-box;
+    animation: securite-lever 0.7s var(--courbe-sortie) both;
+    animation-delay: calc(0.35s + var(--rang, 0) * 0.09s);
+}
+
+.securite__maison--claire {
+    fill-opacity: 0.35;
+}
+
+.securite__maison--forte {
+    fill-opacity: 0.9;
+}
+
+.securite__porte,
+.securite__fenetre {
+    fill: var(--surface);
+    fill-opacity: 0.85;
+    animation: apparition 0.5s var(--courbe-sortie) 1.1s both;
+}
+
+.securite__socle {
+    stroke: var(--accent);
+    stroke-dasharray: 500;
+    stroke-dashoffset: 500;
+    animation: securite-tracer 0.9s var(--courbe-sortie) 0.15s both;
+}
+
+.securite__soleil {
+    fill: var(--attention-doux);
+    stroke: var(--attention);
+    stroke-width: 2;
+    animation: apparition 0.8s var(--courbe-sortie) 0.9s both;
+}
+
+@keyframes securite-lever {
+    from { transform: scaleY(0); }
+    to { transform: scaleY(1); }
+}
+
+@keyframes securite-tracer {
+    to { stroke-dashoffset: 0; }
+}
+
+/* Colonne du formulaire. */
+.securite__principal {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.25rem 1rem 1.5rem;
+}
+
+.securite__logo {
+    display: none;
+}
+
+.securite__contenu {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 26rem;
+    margin: 0 auto;
+    animation: apparition var(--duree-entree) var(--courbe-sortie) 0.2s both;
+}
+
+.securite__entete {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.securite__entete .surtitre {
+    color: var(--accent-texte);
+}
+
+.securite__titre {
+    margin: 0;
+    font-size: 1.625rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+}
+
+.securite__intro {
+    margin: 0;
+    color: var(--texte-2);
+    text-wrap: pretty;
+}
+
+.securite__formulaire {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.securite__options {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+}
+
+.securite__oubli {
+    font-size: var(--taille-petit);
+    font-weight: 600;
+}
+
+.lien-discret {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-weight: 600;
+    color: var(--lien);
+    cursor: pointer;
+}
+
+.lien-discret:hover {
+    color: var(--texte);
+}
+
+.securite__lien {
+    margin: 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--bordure);
+    font-size: var(--taille-petit);
+    color: var(--texte-2);
+    text-wrap: pretty;
+}
+
+.securite__lien strong {
+    display: block;
+    margin-bottom: 0.125rem;
+    color: var(--texte);
+}
+
+.securite__lien a {
+    font-weight: 600;
+}
+
+.securite__pied {
+    margin: 0;
+    font-size: var(--taille-libelle);
+    color: var(--texte-3);
+    text-align: center;
+}
+
+@media (min-width: 48rem) {
+    .securite__panneau {
+        padding: 2rem 3rem;
+    }
+
+    .securite__principal {
+        padding: 2rem 3rem;
+    }
+
+    .securite__contenu {
+        flex: 0 1 auto;
+        margin: auto;
+    }
+
+    .securite__titre {
+        font-size: 1.875rem;
+    }
+}
+
+@media (min-width: 64rem) {
+    .securite {
+        grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+        grid-template-rows: minmax(0, 1fr);
+    }
+
+    .securite__panneau {
+        justify-content: space-between;
+        gap: 2rem;
+        padding: 2.5rem 3rem 1.5rem;
+    }
+
+    .securite__panneau-haut {
+        display: none;
+    }
+
+    .securite__panneau-corps {
+        gap: 1rem;
+    }
+
+    .securite__citation {
+        font-size: 2.125rem;
+    }
+
+    .securite__points {
+        display: flex;
+    }
+
+    /* Le village tient toujours dans la colonne : limité en hauteur, il reste posé sur son socle. */
+    .securite__village {
+        display: block;
+        width: min(100%, 32rem);
+        max-height: 26vh;
+        margin: 0 auto;
+        flex-shrink: 0;
+    }
+
+    .securite__principal {
+        padding: 2rem 4rem 1.5rem;
+    }
+
+    .securite__logo {
+        display: flex;
+    }
+}
+
+@media (min-width: 90rem) {
+    .securite__panneau {
+        padding: 3rem 4.5rem 2rem;
+    }
+
+    .securite__citation {
+        font-size: 2.5rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .securite__maison,
+    .securite__socle,
+    .securite__soleil,
+    .securite__porte,
+    .securite__fenetre,
+    .securite__citation,
+    .securite__panneau-texte,
+    .securite__point,
+    .securite__contenu {
+        animation: none;
+    }
+
+    .securite__socle {
+        stroke-dashoffset: 0;
+    }
+}

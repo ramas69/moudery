@@ -1,0 +1,9 @@
+<p>Bonjour {{ prenom }},</p>
+<p>{% if automatique %}Petit rappel de {{ association.nom }} :{% else %}{{ association.nom }} vous rappelle que{% endif %} votre caisse de {{ ville.nom }} attend encore <strong>{{ (montant / 100)|format_currency('EUR') }}</strong> :</p>
+<ul>
+{% for e in echeances %}
+    <li>{% if e.appel %}{{ e.appel.objet }}{% else %}Cotisation {{ ('membres_association.mois.' ~ e.mois)|trans }} {{ e.annee }}{% endif %} · {% if e.montant is null %}montant libre{% else %}{{ (e.montant / 100)|format_currency('EUR') }}{% endif %} · {% if e.dateLimite < aujourdhui %}en retard depuis le {{ e.dateLimite|format_date('long') }}{% else %}à régler avant le {{ e.dateLimite|format_date('long') }}{% endif %}</li>
+{% endfor %}
+</ul>
+<p><a href="{{ lien }}" style="display:inline-block;padding:10px 16px;border-radius:8px;background:#21705b;color:#ffffff;font-weight:600;text-decoration:none">Payer en ligne</a></p>
+<p>Vous pouvez aussi régler auprès du trésorier de votre ville. Si vous avez déjà payé, merci de ne pas tenir compte de ce message.</p>

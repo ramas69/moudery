@@ -1,0 +1,34 @@
+{# Historique et reçus (F-26, maquette 10d) : mes paiements d'une année, les plus récents d'abord, chacun avec son reçu,
+   le total de l'année et l'attestation annuelle. Variables : membre, onglet, annee, annees, paiements, total. #}
+{% extends 'mon_espace/_layout.html.twig' %}
+{% import 'composants/selecteur.html.twig' as selecteur %}
+
+{% block title %}{{ 'mon_espace.historique.titre'|trans }} · {{ membre.association.nom }}{% endblock %}
+
+{% block contenu %}
+    <h1 class="espace-membre__titre">{{ 'mon_espace.historique.titre'|trans }}</h1>
+    {% if annees|length > 1 %}
+        {% set options = annees|map(a => {valeur: a, libelle: a, href: path('mon_espace_historique', {annee: a})}) %}
+        {{ selecteur.annee('mon_espace.historique.annee'|trans, options, annee) }}
+    {% endif %}
+    {% if paiements is empty %}
+        <p class="espace-membre__vide">{{ 'mon_espace.historique.vide_annee'|trans({annee: annee}) }}</p>
+    {% else %}
+        <ul class="espace-membre__liste">
+            {% for p in paiements %}
+                <li class="espace-membre__ligne{{ p.estAnnule ? ' espace-membre__ligne--annulee' }}">
+                    <span class="espace-membre__ligne-texte">
+                        <span class="espace-membre__ligne-titre">{% for e in p.echeances %}{% if e.appel %}{{ e.appel.objet }}{% else %}{{ 'mon_espace.echeances.cotisation'|trans({mois: ('membres_association.mois.' ~ e.mois)|trans|lower, annee: e.annee}) }}{% endif %}{% if not loop.last %} · {% endif %}{% else %}{{ 'mon_espace.historique.paiement'|trans }}{% endfor %}</span>
+                        <span class="espace-membre__ligne-detail">{{ p.recuLe|format_date('medium') }} · {{ ('paiements_association.moyen.' ~ p.moyen.value)|trans }}{% if p.estAnnule %} · {{ 'mon_espace.historique.annule'|trans }}{% endif %}</span>
+                    </span>
+                    <span class="espace-membre__ligne-droite">
+                        <span class="espace-membre__montant">{{ (p.montant / 100)|format_currency('EUR') }}</span>
+                        <a class="espace-membre__lien" href="{{ path('mon_espace_recu', {id: p.id}) }}" aria-label="{{ 'mon_espace.historique.recu_aria'|trans({date: p.recuLe|format_date('medium')}) }}">{{ 'mon_espace.historique.recu'|trans }}</a>
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+        <p class="espace-membre__total">{{ 'mon_espace.historique.total'|trans({annee: annee, montant: (total / 100)|format_currency('EUR')}) }}</p>
+        <a class="bouton bouton--secondaire espace-membre__attestation" href="{{ path('mon_espace_attestation', {annee: annee}) }}">{{ 'mon_espace.historique.attestation'|trans({annee: annee}) }}</a>
+    {% endif %}
+{% endblock %}

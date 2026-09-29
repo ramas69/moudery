@@ -1,0 +1,34 @@
+{# Les cotisations se lisent ville par ville : sans ville dans le périmètre, on la choisit ici (le choix vaut ensuite
+   pour toute l'application), avec les chiffres de chaque ville pour choisir en connaissance de cause. Une association
+   à une seule ville n'arrive jamais ici. Variables : association, annee, lignes (VillesAssociation::tableau()). #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'cotisations' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block title %}{{ 'cotisations_association.titre'|trans }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}{{ 'cotisations_association.titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'cotisations_association.choisir_sous_titre'|trans }}</p>{% endblock %}
+
+{% block contenu %}
+    <section class="section" aria-labelledby="choisir-ville-titre">
+        <div class="section__entete">
+            <h2 id="choisir-ville-titre">{{ 'cotisations_association.choisir_titre'|trans }}</h2>
+        </div>
+        {% if lignes is empty %}
+            <p class="section__vide">{{ 'cotisations_association.aucune_ville'|trans }}</p>
+        {% else %}
+            <p class="section__aide">{{ 'cotisations_association.choisir_texte'|trans }}</p>
+            {% for ligne in lignes %}
+                {% set ville = ligne.ville %}
+                <a class="section__ligne section__ligne--lien choix-ville" href="{{ path('association_perimetre', {slug: association.slug, ville: ville.id, retour: path('association_cotisations', {slug: association.slug})}) }}">
+                    <span class="section__icone" aria-hidden="true">{{ icones.icone('villes') }}</span>
+                    <span class="section__texte">
+                        <span class="section__principal">{{ ville.nom }}</span>
+                        <span class="section__secondaire">{{ ('assistant_ville.statut.' ~ ville.statut.value)|trans }} · {{ 'cotisations_association.membres_ville'|trans({nombre: ligne.membres}) }} · {{ ligne.avecHistorique > 0 ? 'cotisations_association.choix_collecte'|trans({annee: annee, montant: (ligne.collecte / 100)|format_currency('EUR')}) : 'cotisations_association.choix_sans_historique'|trans({annee: annee}) }}</span>
+                    </span>
+                    <span class="section__chevron" aria-hidden="true">{{ icones.icone('chevron') }}</span>
+                </a>
+            {% endfor %}
+        {% endif %}
+    </section>
+{% endblock %}

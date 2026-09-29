@@ -1,0 +1,76 @@
+security:
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    providers:
+        # Les comptes sont en base (App\Entity\Utilisateur), chargés par leur adresse email
+        # via UtilisateurRepository::loadUserByIdentifier, qui normalise la casse.
+        utilisateurs:
+            entity:
+                class: App\Entity\Utilisateur
+
+    firewalls:
+        dev:
+            # Ensure dev tools and static assets are always allowed
+            pattern: ^/(_profiler|_wdt|assets|build)/
+            security: false
+        main:
+            lazy: true
+            provider: utilisateurs
+            # Refuse les comptes en attente de validation ou désactivés, avec un message explicite.
+            user_checker: App\Security\VerificateurUtilisateur
+
+            # Connexion par email et mot de passe (F-03).
+            form_login:
+                login_path: connexion
+                check_path: connexion
+                username_parameter: email
+                password_parameter: mot_de_passe
+                enable_csrf: true
+                csrf_token_id: authenticate
+                default_target_path: accueil
+
+            # Déconnexion par formulaire POST protégé par jeton : jamais par un simple lien.
+            logout:
+                path: deconnexion
+                target: connexion
+                enable_csrf: true
+                csrf_token_id: logout
+
+            # « Rester connecté sur cet appareil » : 30 jours.
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 2592000
+                remember_me_parameter: rester_connecte
+                secure: auto
+                samesite: lax
+
+            # Limitation des tentatives de connexion (cahier des charges, section 5).
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'
+
+            # Emprunt d'identité : le super-admin voit l'application comme une autre personne (« Voir l'application comme… »).
+            # Le droit est accordé par App\Security\Voter\EmpruntVoter, l'emprunt est consigné par App\Security\EnregistreurEmprunt.
+            switch_user:
+                parameter: _voir_comme
+                role: ROLE_ALLOWED_TO_SWITCH
+                target_route: accueil
+
+    # Ici, seule la frontière connecté / anonyme. Les droits (créer une ville, la modifier…)
+    # sont décidés par les Voters (App\Security\Voter), jamais par des règles d'URL.
+    access_control:
+        - { path: ^/(connexion|mot-de-passe-oublie|mot-de-passe/|invitation/|mentions-legales$|confidentialite$), roles: PUBLIC_ACCESS }
+        - { path: ^/, roles: ROLE_USER }
+
+when@test:
+    security:
+        password_hashers:
+            # Password hashers are resource-intensive by design to ensure security.
+            # In tests, it's safe to reduce their cost to improve performance.
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4 # Lowest possible value for bcrypt
+                time_cost: 3 # Lowest possible value for argon
+                memory_cost: 10 # Lowest possible value for argon

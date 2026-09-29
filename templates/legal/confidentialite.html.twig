@@ -1,0 +1,42 @@
+{% extends 'legal/_layout.html.twig' %}
+{% set page = 'confidentialite' %}
+{% block title %}{{ 'legal.confidentialite'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+{% block contenu %}
+    <h1>Politique de confidentialité</h1>
+
+    <h2>Qui est responsable de vos données ?</h2>
+    <p>Chaque association qui utilise Caisses est responsable des données de ses membres : elle décide de ce qu’elle
+    enregistre et pourquoi. {{ legal.editeur }}, qui édite la plateforme, agit pour son compte comme sous-traitant, et
+    comme responsable pour les comptes des bureaux centraux et le suivi des abonnements.</p>
+
+    <h2>Quelles données ?</h2>
+    <ul>
+        <li>Identité et contact : prénom, nom, adresse e-mail, téléphone, localité, année de naissance, foyer.</li>
+        <li>Vie de la caisse : adhésions par année, échéances, paiements, relances, contributions aux appels.</li>
+        <li>Pour les responsables : compte, rôle, périmètre, dépenses saisies ou validées, justificatifs.</li>
+        <li>Pour la sécurité : journal des connexions et des actions sensibles.</li>
+    </ul>
+
+    <h2>Pourquoi ?</h2>
+    <p>Pour tenir la comptabilité des caisses, envoyer les appels, les reçus et les relances par e-mail (si vous l’avez
+    accepté), préparer le rapport d’assemblée générale et protéger l’accès aux données. Base légale : l’intérêt légitime
+    de l’association à gérer ses adhérents et ses comptes, et votre consentement pour les e-mails.</p>
+
+    <h2>Qui les voit ?</h2>
+    <p>Les responsables de votre ville et le bureau central de votre association, selon leur rôle. Dans l’espace membre,
+    aucune autre personne n’est jamais nommée. Les données ne sont ni vendues ni utilisées à des fins publicitaires, et
+    une association ne voit jamais les données d’une autre.</p>
+
+    <h2>Combien de temps ?</h2>
+    <p>Tant que vous êtes membre, puis le temps que l’association doit conserver ses pièces comptables (dix ans pour les
+    paiements et les dépenses). Le journal des connexions est conservé un an.</p>
+
+    <h2>Où ?</h2>
+    <p>Chez O2switch, en France. Aucun cookie publicitaire ni outil de mesure d’audience : seulement les cookies
+    nécessaires à la connexion.</p>
+
+    <h2>Vos droits</h2>
+    <p>Vous pouvez consulter et corriger vos informations dans votre espace, et demander leur accès, leur rectification,
+    leur effacement ou la limitation de leur usage au bureau de votre association ou à
+    <a href="mailto:{{ legal.contact }}">{{ legal.contact }}</a>. Vous pouvez aussi saisir la CNIL (cnil.fr).</p>
+{% endblock %}

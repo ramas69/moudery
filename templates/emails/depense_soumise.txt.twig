@@ -1,0 +1,7 @@
+Bonjour {{ destinataire.prenom }},
+
+{{ depense.saisiePar ? depense.saisiePar.nomComplet : 'Une personne du bureau central' }} a soumis une dépense de la caisse du bureau central à votre validation : « {{ depense.libelle }} », {{ (depense.montant / 100)|format_currency('EUR') }}, payée à {{ depense.beneficiaire }}.
+
+Une dépense n'est jamais validée par la personne qui l'a saisie : votre décision est attendue.
+
+Voir la dépense n° {{ depense.numero }} et son justificatif : {{ lien }}

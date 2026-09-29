@@ -1,0 +1,12 @@
+{# Bandeau d'emprunt d'identité : le super-admin voit l'application comme une autre personne (switch_user).
+   Inclus par base.html.twig avant le corps de chaque page ; invisible quand personne n'est emprunté.
+   « Voir une autre personne » quitte l'emprunt et ramène au menu Voir comme ; « Revenir à mon compte » à l'accueil. #}
+{% if app.user and is_granted('IS_IMPERSONATOR') %}
+    <div class="emprunt" role="status">
+        <span class="emprunt__texte">{{ 'emprunt.texte'|trans({nom: app.user.nomComplet, email: app.user.email}) }}</span>
+        <span class="emprunt__liens">
+            <a class="emprunt__lien" href="{{ path('administration_voir_comme', {'_voir_comme': '_exit'}) }}">{{ 'emprunt.autre'|trans }}</a>
+            <a class="emprunt__lien" href="{{ path('accueil', {'_voir_comme': '_exit'}) }}">{{ 'emprunt.revenir'|trans({nom: app.token.originalToken.user.nomComplet}) }}</a>
+        </span>
+    </div>
+{% endif %}

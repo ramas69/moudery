@@ -1,0 +1,73 @@
+{# Pages hors connexion (connexion, mot de passe oublié, réinitialisation), direction Console :
+   à gauche un panneau clair qui raconte le produit (le village et ses caisses, dessinés d'après le logo),
+   à droite le formulaire sur fond blanc. Sur mobile, le panneau se réduit à une bande avec le logo. #}
+{% extends 'base.html.twig' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/legal.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/securite.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="securite">
+        <aside class="securite__panneau">
+            <div class="securite__panneau-haut">
+                {{ include('composants/logo.html.twig', {taille: 40}) }}
+            </div>
+            <div class="securite__panneau-corps">
+                <span class="surtitre">{{ 'connexion.panneau.surtitre'|trans }}</span>
+                <p class="securite__citation">{{ 'connexion.citation'|trans }}</p>
+                <p class="securite__panneau-texte">{{ 'connexion.panneau.texte'|trans }}</p>
+                <ul class="securite__points">
+                    {% for point, icone in {villes: 'villes', depenses: 'coche', membres: 'comptes'} %}
+                        <li class="securite__point">
+                            <span class="securite__point-icone" aria-hidden="true">{{ icones.icone(icone, 16) }}</span>
+                            <span class="securite__point-texte">
+                                <strong>{{ ('connexion.panneau.points.' ~ point ~ '.titre')|trans }}</strong>
+                                <span>{{ ('connexion.panneau.points.' ~ point ~ '.texte')|trans }}</span>
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {# Le village : des maisons de tailles différentes sur un même socle, comme sur le logo. Décoratif. #}
+            <svg class="securite__village" viewBox="0 0 520 220" aria-hidden="true" focusable="false">
+                <g class="securite__maisons">
+                    <path class="securite__maison" style="--rang: 0" d="M30 180 V120 L58 96 L86 120 V180 Z"/>
+                    <path class="securite__maison securite__maison--claire" style="--rang: 1" d="M96 180 V138 L118 116 L140 138 V180 Z"/>
+                    <path class="securite__maison securite__maison--forte" style="--rang: 2" d="M150 180 V88 L186 56 L222 88 V180 Z"/>
+                    <path class="securite__maison" style="--rang: 3" d="M232 180 V126 L260 102 L288 126 V180 Z"/>
+                    <path class="securite__maison securite__maison--claire" style="--rang: 4" d="M298 180 V148 L318 130 L338 148 V180 Z"/>
+                    <path class="securite__maison securite__maison--forte" style="--rang: 5" d="M348 180 V104 L382 74 L416 104 V180 Z"/>
+                    <path class="securite__maison" style="--rang: 6" d="M426 180 V134 L452 110 L478 134 V180 Z"/>
+                    <rect class="securite__porte" x="176" y="150" width="20" height="30" rx="2"/>
+                    <rect class="securite__porte" x="372" y="154" width="20" height="26" rx="2"/>
+                    <rect class="securite__fenetre" x="48" y="136" width="20" height="14" rx="2"/>
+                    <rect class="securite__fenetre" x="250" y="140" width="20" height="14" rx="2"/>
+                    <rect class="securite__fenetre" x="442" y="146" width="20" height="14" rx="2"/>
+                </g>
+                <line class="securite__socle" x1="16" y1="186" x2="504" y2="186" stroke-width="6" stroke-linecap="round"/>
+                <circle class="securite__soleil" cx="456" cy="44" r="18"/>
+            </svg>
+        </aside>
+
+        <div class="securite__principal">
+            <div class="securite__logo">{{ include('composants/logo.html.twig', {taille: 40}) }}</div>
+
+            <main class="securite__contenu" id="contenu">
+                {% for message in app.flashes('succes') %}
+                    <p class="alerte alerte--succes" role="status">{{ message|trans }}</p>
+                {% endfor %}
+                {% for message in app.flashes('erreur') %}
+                    <p class="alerte alerte--erreur" role="alert">{{ message|trans }}</p>
+                {% endfor %}
+
+                {% block contenu %}{% endblock %}
+            </main>
+
+            <p class="securite__pied">{{ 'app.nom'|trans }} · {{ 'app.village'|trans }} · {{ 'connexion.pied'|trans }}</p>
+            {{ include('composants/pied_legal.html.twig') }}
+        </div>
+    </div>
+{% endblock %}

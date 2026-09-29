@@ -1,0 +1,6 @@
+Bonjour {{ destinataire.prenom }},
+
+Le lien d'invitation envoyé à {{ invitation.email }} ({{ ('role.' ~ invitation.role.value)|trans|lower }}{% if invitation.ville %} de {{ invitation.ville.nom }}{% endif %}) a expiré le {{ invitation.expireLe|format_date('long') }}. La personne demande un nouveau lien.
+
+Renvoyez l'invitation depuis Paramètres › Responsables et rôles : le nouveau lien sera valable 7 jours.
+{{ lien }}

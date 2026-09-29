@@ -1,0 +1,751 @@
+/* Manrope (police variable 200 à 800, licence SIL Open Font License), hébergée avec l'application depuis le
+   29 septembre 2026 pour ne plus appeler Google Fonts. Deux sous-ensembles : latin et latin étendu. */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 200 800;
+    font-display: swap;
+    src: url("../fonts/manrope-latin-wght-normal.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 200 800;
+    font-display: swap;
+    src: url("../fonts/manrope-latin-ext-wght-normal.woff2") format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/*
+ * Direction artistique « Console » (canevas Claude Design du 26 septembre 2026, remplace « Registre ») :
+ * un outil de gestion moderne, dans l'esprit des CRM. Fond vert-gris très clair, surfaces blanches, une seule couleur
+ * d'action (--accent : le vert profond de la direction « Registre », repris le 28 septembre 2026), statuts en teintes sémantiques, Manrope en une seule famille, rayon 10 px pour les blocs
+ * et 8 px pour les contrôles, une ombre à peine visible sur les blocs. Thème clair uniquement (pas de mode sombre).
+ * Les pages n'utilisent que ces variables : pas de couleur en dur.
+ * Ce fichier porte aussi les composants communs : logo, boutons, pastilles, champs, blocs, alertes.
+ */
+:root {
+    color-scheme: light;
+
+    /* Couleur d'action : la seule couleur vive de l'interface. Pour en changer, modifier ces cinq valeurs. */
+    --accent: #21705b;         /* Vert profond (5,9:1 sur blanc : le blanc reste lisible dessus) */
+    --accent-survol: #1a5c4a;
+    --accent-texte: #1b5f4d;   /* Texte accentué sur fond clair (7,5:1 sur blanc) */
+    --accent-doux: #e1f0ea;    /* Fonds légers : badges, ligne sélectionnée, anneau de focus */
+    --sur-accent: #ffffff;
+
+    /* Neutres */
+    --fond: #f5f7f4;           /* Fond de l'application et de la navigation, à peine teinté de vert */
+    --surface: #ffffff;        /* Blocs, champs, en-têtes de page */
+    --surface-2: #eef1ee;      /* Survol, désactivé, chips neutres */
+    --surface-3: #f8faf8;      /* En-têtes de tableau, champs en lecture seule */
+    --texte: #101828;
+    --texte-2: #475467;        /* Texte secondaire, libellés */
+    --texte-3: #667085;        /* Légendes, aides, exemples de saisie (4,6:1 sur blanc) */
+    --desactive: #98a2b3;      /* Texte désactivé, icônes en retrait */
+    --bordure: #e3e8e4;        /* Séparateurs, contour des blocs */
+    --bordure-forte: #cfd7d1;  /* Filets appuyés : survol des boutons, pied de tableau, cadres en pointillé */
+    --bordure-champ: #8b9790;  /* Contour des champs de saisie : 3:1 sur blanc (WCAG 1.4.11), décision du 28 septembre 2026 */
+
+    /* Alias historiques : le bouton principal est la couleur d'action. */
+    --primaire: var(--accent);
+    --primaire-survol: var(--accent-survol);
+    --sur-primaire: var(--sur-accent);
+    --lien: var(--accent-texte);
+
+    /* Statuts : la couleur pleine pour les points et bordures, la teinte texte sur fond doux (AA), le fond doux. */
+    --succes: #12925a;
+    --succes-texte: #0e7548;
+    --succes-doux: #e6f6ee;
+    --succes-bordure: #bfe5cf;
+    --attention: #b45309;
+    --attention-texte: #93400a;
+    --attention-doux: #fef3e2;
+    --attention-bordure: #f5d9a8;
+    --erreur: #d92d20;
+    --erreur-texte: #b42318;
+    --erreur-doux: #feeceb;
+    --erreur-bordure: #fee4e2;
+    --info: #175cd3;
+    --info-texte: #1849a9;
+    --info-doux: #e8f0fe;
+    --focus: var(--accent);
+
+    /* Séries des graphiques (G-01 à G-12) : quatre teintes qui se distinguent aussi par la clarté. */
+    --serie-1: var(--accent);
+    --serie-2: #2f6fdb;        /* Bleu : se distingue du vert de l'accent */
+    --serie-3: #b45309;
+    --serie-4: #6d5be6;
+
+    /* Inverse : panneau sombre de la connexion, barre d'actions groupées. */
+    --inverse-fond: #101828;
+    --inverse-texte: #ffffff;
+    --inverse-texte-2: #98a2b3;
+    --inverse-bordure: #344054;
+    --negatif-fond: var(--inverse-fond);
+    --negatif-texte: var(--inverse-texte);
+    --negatif-texte-2: var(--inverse-texte-2);
+    --negatif-bordure: var(--inverse-bordure);
+
+    /* Formes : rayon 10 px pour les blocs, 8 px pour les contrôles, chips arrondies. Ombre à peine visible. */
+    --rayon: 10px;
+    --rayon-petit: 8px;
+    --rayon-chip: 999px;
+    --ombre: 0 1px 2px rgba(16, 24, 40, 0.05);
+    --ombre-flottante: 0 8px 24px rgba(16, 24, 40, 0.18);
+
+    /* Typographie : Manrope seule, 400 pour le texte, 600 pour les libellés et boutons, 700 pour les titres et chiffres. */
+    --police: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --police-titre: var(--police);
+    --taille-texte: 0.875rem;       /* 14 px */
+    --taille-petit: 0.8125rem;      /* 13 px */
+    --taille-aide: 0.8125rem;       /* 13 px */
+    --taille-libelle: 0.78125rem;   /* 12,5 px */
+    --taille-surtitre: 0.8125rem;   /* 13 px, en bas de casse */
+    --taille-titre-bloc: 1rem;      /* 16 px */
+    --taille-chiffre: 1.75rem;      /* 28 px, chiffres tabulaires */
+    --taille-titre-page: 1.5rem;    /* 24 px */
+    --hauteur-controle: 3rem;       /* 48 px sur mobile, 40 px à partir de 48 rem */
+
+    /* Mouvement : entrées légères et rapides (F-38), jamais de rebond. */
+    --duree-courte: 0.15s;
+    --duree-entree: 0.4s;
+    --courbe-sortie: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (min-width: 48rem) {
+    :root {
+        --hauteur-controle: 2.5rem;
+    }
+}
+
+/* Base */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: var(--police);
+    font-size: var(--taille-texte);
+    line-height: 1.5;
+    color: var(--texte);
+    background: var(--fond);
+    -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    font-family: var(--police-titre);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+a {
+    color: var(--lien);
+    transition: color var(--duree-courte) ease;
+}
+
+a:hover {
+    color: var(--texte);
+}
+
+:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+.chiffre {
+    font-family: var(--police-titre);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Contenu lu par les lecteurs d'écran mais invisible à l'écran. */
+.visuellement-cache {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Sur-titre : une ligne de contexte au-dessus d'un titre, 13 px en bas de casse, jamais de capitales espacées. */
+.surtitre {
+    margin: 0;
+    font-family: var(--police);
+    font-size: var(--taille-surtitre);
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--texte-3);
+}
+
+.surtitre--inverse {
+    color: var(--inverse-texte-2);
+}
+
+/* Logo : quatre maisons blanches sur un carré de la couleur d'action (chaque ville est une caisse,
+   toutes reposent sur le village), « Caisses » en 700 et le village en dessous. */
+.logo {
+    --logo-taille: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--logo-taille) * 0.3);
+    color: var(--texte);
+    text-decoration: none;
+}
+
+.logo__symbole {
+    flex: none;
+    display: block;
+    overflow: visible;
+}
+
+.logo__carre {
+    fill: var(--accent);
+    animation: apparition var(--duree-entree) var(--courbe-sortie) both;
+}
+
+/* À l'arrivée, le socle se trace, puis chaque maison se lève dessus, de gauche à droite. */
+.logo__socle {
+    stroke: var(--sur-accent);
+    stroke-dasharray: 76;
+    stroke-dashoffset: 76;
+    animation: logo-socle 0.5s var(--courbe-sortie) 0.1s both;
+}
+
+.logo__maison {
+    fill: var(--sur-accent);
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: logo-lever var(--duree-entree) var(--courbe-sortie) both;
+    transition: transform var(--duree-courte) var(--courbe-sortie);
+}
+
+.logo__maison--1 { fill-opacity: 0.55; animation-delay: 0.3s; }
+.logo__maison--2 { fill-opacity: 0.8; animation-delay: 0.38s; }
+.logo__maison--3 { fill-opacity: 1; animation-delay: 0.46s; }
+.logo__maison--4 { fill-opacity: 0.65; animation-delay: 0.54s; }
+
+.logo__texte {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--logo-taille) * 0.06);
+    animation: apparition var(--duree-entree) var(--courbe-sortie) 0.35s both;
+}
+
+/* Au survol, les maisons se soulèvent à peine, l'une après l'autre. */
+.logo:hover .logo__maison--1 { transform: translateY(-2px); transition-delay: 0s; }
+.logo:hover .logo__maison--2 { transform: translateY(-2px); transition-delay: 0.04s; }
+.logo:hover .logo__maison--3 { transform: translateY(-2px); transition-delay: 0.08s; }
+.logo:hover .logo__maison--4 { transform: translateY(-2px); transition-delay: 0.12s; }
+
+@keyframes logo-socle {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes logo-lever {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scaleY(0.4);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scaleY(1);
+    }
+}
+
+/* Entrée d'un contenu : léger fondu et remontée de quelques pixels. */
+@keyframes apparition {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.apparition {
+    animation: apparition var(--duree-entree) var(--courbe-sortie) both;
+}
+
+.logo__nom {
+    font-family: var(--police-titre);
+    font-weight: 700;
+    font-size: calc(var(--logo-taille) * 0.45);
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.logo__village {
+    font-size: max(11px, calc(var(--logo-taille) * 0.3));
+    font-weight: 500;
+    line-height: 1;
+    color: var(--texte-3);
+}
+
+/* Sur fond sombre : le carré reste de la couleur d'action, le texte passe en blanc. */
+.logo--sombre {
+    color: var(--inverse-texte);
+}
+
+.logo--sombre .logo__village {
+    color: var(--inverse-texte-2);
+}
+
+/* Boutons : 48 px sur mobile, 40 px sur bureau. Principal en couleur d'action (un par écran),
+   secondaire blanc à filet, discret sans fond, danger en teinte erreur douce. */
+.bouton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: var(--hauteur-controle);
+    padding: 0 0.875rem;
+    border: 1px solid transparent;
+    border-radius: var(--rayon-petit);
+    background: transparent;
+    font-family: var(--police);
+    font-size: var(--taille-texte);
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color var(--duree-courte) ease, border-color var(--duree-courte) ease, color var(--duree-courte) ease, box-shadow var(--duree-courte) ease, transform var(--duree-courte) ease;
+}
+
+.bouton:active {
+    transform: translateY(1px);
+}
+
+.bouton--primaire,
+.bouton--accent {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--sur-accent);
+}
+
+.bouton--primaire:hover,
+.bouton--accent:hover {
+    border-color: var(--accent-survol);
+    background: var(--accent-survol);
+    color: var(--sur-accent);
+}
+
+.bouton--secondaire {
+    border-color: var(--bordure);
+    background: var(--surface);
+    color: var(--texte);
+    box-shadow: var(--ombre);
+}
+
+.bouton--secondaire:hover {
+    border-color: var(--bordure-forte);
+    background: var(--surface-3);
+    color: var(--texte);
+}
+
+.bouton--discret {
+    color: var(--texte-2);
+}
+
+.bouton--discret:hover {
+    background: var(--surface-2);
+    color: var(--texte);
+}
+
+.bouton--danger {
+    border-color: var(--erreur-bordure);
+    background: var(--erreur-doux);
+    color: var(--erreur-texte);
+}
+
+.bouton--danger:hover {
+    border-color: var(--erreur);
+    color: var(--erreur-texte);
+}
+
+.bouton--large {
+    width: 100%;
+    min-height: 3rem;
+}
+
+/* Bouton icône seul : carré, le libellé est porté par aria-label. */
+.bouton--icone {
+    width: 2.25rem;
+    min-height: 2.25rem;
+    padding: 0;
+    color: var(--texte-3);
+}
+
+.bouton--icone:hover {
+    color: var(--texte);
+}
+
+.bouton:disabled,
+.bouton[aria-disabled="true"] {
+    border-color: var(--bordure);
+    background: var(--surface-2);
+    color: var(--desactive);
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+/* Pastilles de statut : point + libellé, jamais la couleur seule. */
+.pastille {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 1.5rem;
+    padding: 0 0.5rem;
+    border: 1px solid transparent;
+    border-radius: var(--rayon-chip);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.pastille::before {
+    content: "";
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.pastille--succes,
+.pastille--active {
+    background: var(--succes-doux);
+    color: var(--succes-texte);
+}
+
+.pastille--succes::before,
+.pastille--active::before {
+    background: var(--succes);
+}
+
+.pastille--info {
+    background: var(--info-doux);
+    color: var(--info-texte);
+}
+
+.pastille--info::before {
+    background: var(--info);
+}
+
+.pastille--erreur {
+    background: var(--erreur-doux);
+    color: var(--erreur-texte);
+}
+
+.pastille--erreur::before {
+    background: var(--erreur);
+}
+
+.pastille--attente {
+    background: var(--attention-doux);
+    color: var(--attention-texte);
+}
+
+.pastille--attente::before {
+    background: var(--attention);
+}
+
+.pastille--brouillon {
+    border-color: var(--desactive);
+    border-style: dashed;
+    background: var(--surface);
+    color: var(--texte-2);
+}
+
+.pastille--brouillon::before {
+    background: transparent;
+    border: 1.5px solid currentColor;
+}
+
+.pastille--archivee {
+    background: var(--surface-2);
+    color: var(--texte-2);
+}
+
+.pastille--archivee::before {
+    background: var(--desactive);
+}
+
+/* Champs : libellé 12,5 px, saisie blanche à filet, anneau de focus en couleur d'action, aide et erreur en dessous. */
+.champ {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.champ__label {
+    font-size: var(--taille-libelle);
+    font-weight: 600;
+    color: var(--texte-2);
+}
+
+.champ__label.required::after {
+    content: " *";
+    color: var(--erreur);
+}
+
+/* Libellé avec un lien à droite, par exemple « Mot de passe · Mot de passe oublié ? » */
+.champ__label--ligne {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+/* Case à cocher : zone cliquable de la hauteur d'un contrôle, coche en couleur d'action. */
+.case {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: var(--hauteur-controle);
+    font-size: var(--taille-texte);
+    color: var(--texte-2);
+    cursor: pointer;
+}
+
+.case input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--accent);
+}
+
+/* Formulaire de déconnexion : un bouton discret, sans marge. */
+.deconnexion {
+    margin: 0;
+}
+
+.champ__saisie {
+    display: block;
+    width: 100%;
+    min-height: var(--hauteur-controle);
+    padding: 0 0.75rem;
+    border: 1px solid var(--bordure-champ);
+    border-radius: var(--rayon-petit);
+    background: var(--surface);
+    color: var(--texte);
+    font-family: var(--police);
+    font-size: var(--taille-texte);
+    box-shadow: var(--ombre);
+    transition: border-color var(--duree-courte) ease, box-shadow var(--duree-courte) ease;
+}
+
+.champ__saisie:hover {
+    border-color: var(--desactive);
+}
+
+.champ__saisie:focus-visible {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-doux);
+}
+
+textarea.champ__saisie {
+    min-height: 5rem;
+    padding: 0.5rem 0.75rem;
+    line-height: 1.5;
+    resize: vertical;
+}
+
+select.champ__saisie {
+    padding-right: 2rem;
+}
+
+.champ__saisie::placeholder {
+    color: var(--texte-3);
+}
+
+.champ__saisie[readonly] {
+    background: var(--surface-3);
+    color: var(--texte-2);
+}
+
+.champ__aide {
+    margin: 0;
+    font-size: var(--taille-aide);
+    color: var(--texte-3);
+}
+
+.champ--erreur .champ__label {
+    color: var(--erreur-texte);
+}
+
+.champ--erreur .champ__saisie {
+    border: 1.5px solid var(--erreur);
+}
+
+.champ--erreur .champ__saisie:focus-visible {
+    box-shadow: 0 0 0 3px var(--erreur-doux);
+}
+
+.champ__erreur {
+    margin: 0;
+    font-size: var(--taille-aide);
+    font-weight: 600;
+    color: var(--erreur-texte);
+}
+
+/* Blocs, alertes, encarts */
+.bloc {
+    padding: 1.25rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+    box-shadow: var(--ombre);
+}
+
+.bloc > h2 {
+    margin: 0 0 0.375rem;
+    font-size: var(--taille-titre-bloc);
+}
+
+.bloc__texte {
+    margin: 0 0 1rem;
+    font-size: var(--taille-texte);
+    color: var(--texte-2);
+}
+
+/* Alertes : fond teinté et filet de la même teinte, texte foncé lisible. */
+.alerte {
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+    font-size: var(--taille-texte);
+    font-weight: 500;
+}
+
+.alerte--succes {
+    border-color: var(--succes-bordure);
+    background: var(--succes-doux);
+    color: var(--succes-texte);
+}
+
+.alerte--erreur {
+    border-color: var(--erreur-bordure);
+    background: var(--erreur-doux);
+    color: var(--erreur-texte);
+}
+
+.alerte--attention {
+    border-color: var(--attention-bordure);
+    background: var(--attention-doux);
+    color: var(--attention-texte);
+}
+
+.encart {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+    font-size: var(--taille-texte);
+}
+
+.encart__titre {
+    flex: none;
+    font-weight: 600;
+    color: var(--accent-texte);
+}
+
+.note {
+    margin: 0;
+    font-size: var(--taille-aide);
+    color: var(--texte-3);
+}
+
+/* Barre de chargement de Turbo entre deux pages : un filet en couleur d'action. */
+.turbo-progress-bar {
+    height: 3px;
+    background: var(--accent);
+}
+
+/* Moins d'animations : tout arrive à son état final immédiatement. */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-delay: 0s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        transition-delay: 0s !important;
+    }
+
+    .logo__socle {
+        stroke-dasharray: none;
+        stroke-dashoffset: 0;
+    }
+}
+
+/* Bandeau d'emprunt d'identité : le super-admin voit l'application comme une autre personne. Toujours visible, en teinte attention. */
+.emprunt {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem 1rem;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--attention-bordure);
+    background: var(--attention-doux);
+    color: var(--attention-texte);
+    font-size: var(--taille-petit);
+    font-weight: 600;
+    text-align: center;
+}
+
+.emprunt__liens {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem 1rem;
+}
+
+.emprunt__lien {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    color: inherit;
+    text-decoration: underline;
+}
+
+.emprunt__lien:hover {
+    color: var(--texte);
+}

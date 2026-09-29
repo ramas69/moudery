@@ -1,0 +1,40 @@
+{# Journal de la plateforme : connexions, comptes créés, invitations acceptées, associations créées, groupés par jour.
+   Variables : evenements (les plus récents d'abord), aujourdhui. #}
+{% extends 'administration/_layout.html.twig' %}
+{% set page = 'activite' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'administration/_macros.html.twig' as macros %}
+
+{% block title %}{{ 'administration.activite.titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block titre_page %}{{ 'administration.activite.titre'|trans }} <span class="compteur">{{ evenements|length }}</span>{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'administration.activite.sous_titre'|trans }}</p>{% endblock %}
+
+{% block contenu %}
+    {% set jourActuel = aujourdhui|date('Y-m-d') %}
+    {% set hier = aujourdhui|date_modify('-1 day')|date('Y-m-d') %}
+    <section class="section" aria-label="{{ 'administration.activite.titre'|trans }}">
+        {% for evenement in evenements %}
+            {% set jour = evenement.quand|date('Y-m-d') %}
+            {% if loop.first or evenements[loop.index0 - 1].quand|date('Y-m-d') != jour %}
+                <h2 class="fil__jour">{% if jour == jourActuel %}{{ 'administration.activite.aujourdhui'|trans }}{% elseif jour == hier %}{{ 'administration.activite.hier'|trans }}{% else %}{{ evenement.quand|format_date('full') }}{% endif %}</h2>
+            {% endif %}
+            <div class="fil__ligne">
+                <span class="fil__avatar fil__avatar--{{ evenement.type }}" aria-hidden="true">
+                    {%- if evenement.compte %}{{ macros.initiales(evenement.compte.prenom, evenement.compte.nom) }}{% else %}{{ icones.icone('associations', 14) }}{% endif -%}
+                </span>
+                <span class="fil__texte">
+                    {% if evenement.type == 'association_creee' %}
+                        {{ 'administration.activite.association_creee'|trans({nom: evenement.association.nom})|raw }}
+                    {% else %}
+                        {% if evenement.compte %}<a class="fil__qui" href="{{ path('administration_compte_fiche', {id: evenement.compte.id}) }}">{{ evenement.compte.nomComplet }}</a>{% else %}<strong>—</strong>{% endif %}
+                        {{ ('administration.activite.' ~ evenement.type)|trans({association: evenement.association ? evenement.association.nom : 'administration.activite.la_plateforme'|trans}) }}
+                    {% endif %}
+                </span>
+                <time class="fil__quand" datetime="{{ evenement.quand|date('c') }}">{{ evenement.quand|format_datetime('none', 'short') }}</time>
+            </div>
+        {% else %}
+            <p class="section__vide">{{ 'administration.activite.rien'|trans }}</p>
+        {% endfor %}
+    </section>
+{% endblock %}

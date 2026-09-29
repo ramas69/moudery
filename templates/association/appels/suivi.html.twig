@@ -1,0 +1,104 @@
+{# Suivi d'un appel lancé (F-14, G-09) : collecté et progression vers l'objectif, contributeurs, reste, part du bureau
+   central ; collecte jour par jour depuis l'ouverture (barres et cumul) ; détail par ville ; message envoyé. Le
+   collecté additionne les échéances payées (paiements manuels aujourd'hui, en ligne demain). Variables : association,
+   appel, suivi (Appels::suivi()). #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'appels' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% macro euros(centimes) %}{{ centimes is null ? '—' : (centimes / 100)|format_currency('EUR', centimes % 100 == 0 ? {fraction_digit: 0} : {}) }}{% endmacro %}
+{% import _self as r %}
+
+{% block title %}{{ appel.objet }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}<span class="console__fil"><a href="{{ path('association_appels', {slug: association.slug}) }}">{{ 'appels_association.titre'|trans }}</a> <span aria-hidden="true">›</span> </span>{{ appel.objet }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'appels_association.suivi.sous_titre'|trans({type: appel.type.nom, date: appel.ouvertLe|format_datetime('long', 'short')}) }}</p>{% endblock %}
+
+{% block actions %}
+    {% if suivi.dues > 0 %}
+        <a class="bouton bouton--secondaire" href="{{ path('association_impayes', {slug: association.slug}) }}">{{ icones.icone('alerte', 15) }}{{ 'appels_association.suivi.impayes'|trans({nombre: suivi.dues}) }}</a>
+    {% endif %}
+{% endblock %}
+
+{% block contenu %}
+    <section class="section appel-suivi" aria-labelledby="appel-progression">
+        <div class="appel-suivi__tete">
+            <div>
+                <h2 class="visuellement-cache" id="appel-progression">{{ 'appels_association.suivi.progression'|trans }}</h2>
+                <p class="appel-suivi__collecte"><span class="appel-suivi__montant">{{ r.euros(suivi.collecte) }}</span>{% if suivi.objectif %} <span class="appel-suivi__sur">{{ 'appels_association.suivi.sur_objectif'|trans({objectif: r.euros(suivi.objectif)|trim}) }}</span>{% endif %}</p>
+                <p class="appel-suivi__detail">{{ 'appels_association.suivi.contributeurs'|trans({nombre: suivi.contributeurs, total: suivi.echeances}) }}</p>
+            </div>
+            {% if suivi.progression is not null %}<span class="appel-suivi__pourcentage">{{ suivi.progression }} %</span>{% endif %}
+        </div>
+        {% if suivi.progression is not null %}
+            <div class="appel-suivi__piste" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ suivi.progression }}" aria-label="{{ 'appels_association.suivi.progression'|trans }}"><span style="width: {{ suivi.progression }}%"></span></div>
+        {% endif %}
+    </section>
+
+    <div class="kpis">
+        <div class="kpi"><span class="kpi__libelle">{{ 'appels_association.suivi.contributeurs_libelle'|trans }}</span><span class="kpi__valeur">{{ suivi.contributeurs }}</span><span class="kpi__detail">{{ 'appels_association.suivi.sur_echeances'|trans({nombre: suivi.echeances}) }}</span></div>
+        <div class="kpi"><span class="kpi__libelle">{{ 'appels_association.suivi.reste'|trans }}</span><span class="kpi__valeur{{ suivi.enRetard > 0 ? ' kpi__valeur--attention' }}">{{ suivi.reste is null ? suivi.dues : r.euros(suivi.reste) }}</span><span class="kpi__detail">{{ suivi.reste is null ? 'appels_association.suivi.dues_libre'|trans : 'appels_association.suivi.dues'|trans({nombre: suivi.dues, retard: suivi.enRetard}) }}</span></div>
+        <div class="kpi"><span class="kpi__libelle">{{ 'appels_association.suivi.part_central'|trans }}</span><span class="kpi__valeur">{{ r.euros(suivi.partCentral) }}</span><span class="kpi__detail">{{ 'appels_association.suivi.taux'|trans({taux: appel.tauxReversement}) }}</span></div>
+        <div class="kpi"><span class="kpi__libelle">{{ 'appels_association.suivi.date_limite'|trans }}</span><span class="kpi__valeur kpi__valeur--texte">{{ appel.dateLimite|format_date('medium') }}</span><span class="kpi__detail">{{ appel.mode.value == 'libre' ? 'appels_association.mode.libre'|trans : 'appels_association.suivi.par_membre'|trans({montant: r.euros(appel.montant)|trim}) }}</span></div>
+    </div>
+
+    <section class="section" aria-labelledby="appel-jours">
+        {% set jours = suivi.parJour %}
+        {% set nbJours = jours|length %}
+        <div class="section__entete section__entete--graphique">
+            <div class="section__titre-groupe">
+                <h2 id="appel-jours">{{ 'appels_association.suivi.jour_par_jour'|trans }}</h2>
+                {% if nbJours > 0 %}<span class="section__sous-titre">{{ 'appels_association.suivi.periode'|trans({du: jours|first.jour|format_date('none', 'd MMMM'), au: jours|last.jour|format_date('none', 'd MMMM'), jours: nbJours}) }}</span>{% endif %}
+            </div>
+        </div>
+        {% set maximum = 1 %}{% for j in jours %}{% set maximum = max(maximum, j.montant) %}{% endfor %}
+        {% set cumulFinal = max(1, jours is empty ? 1 : (jours|last).cumul) %}
+        {% if suivi.collecte == 0 %}
+            <p class="section__vide">{{ 'appels_association.suivi.aucun_paiement'|trans }}</p>
+        {% else %}
+            <div class="appel-suivi__legende" aria-hidden="true">
+                <span class="appel-suivi__cle"><span class="appel-suivi__cle-barre"></span>{{ 'appels_association.suivi.legende_jour'|trans }}</span>
+                <span class="appel-suivi__cle"><span class="appel-suivi__cle-ligne"></span>{{ 'appels_association.suivi.legende_cumul'|trans({total: r.euros(cumulFinal)|trim}) }}</span>
+            </div>
+            <div class="appel-suivi__graphique" role="img" aria-label="{{ 'appels_association.suivi.aria'|trans({jours: nbJours, total: r.euros(suivi.collecte)|trim, maximum: r.euros(maximum)|trim}) }}">
+                <div class="appel-suivi__echelle" aria-hidden="true"><span>{{ r.euros(maximum) }}</span><span>0 €</span></div>
+                <div class="appel-suivi__zone">
+                    <div class="appel-suivi__jours">
+                        {% for j in jours %}<span class="appel-suivi__jour" title="{{ j.jour|format_date('full') }} · {{ r.euros(j.montant)|trim }} · {{ 'appels_association.suivi.cumul'|trans({montant: r.euros(j.cumul)|trim}) }}"><span style="height: {{ (j.montant / maximum * 100)|round(1) }}%"></span></span>{% endfor %}
+                    </div>
+                    {# La courbe du cumul, à l'échelle de sa propre valeur finale (repère à droite). #}
+                    <svg class="appel-suivi__cumul" viewBox="0 0 {{ nbJours }} 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                        <polyline points="{% for j in jours %}{{ loop.index0 + 0.5 }},{{ (100 - j.cumul / cumulFinal * 100)|round(2) }} {% endfor %}" vector-effect="non-scaling-stroke"/>
+                    </svg>
+                    <div class="appel-suivi__dates" aria-hidden="true">
+                        {% for j in jours %}
+                            {% set montrer = loop.first or loop.last or (j.jour|date('N') == '1' and loop.index0 > 1 and loop.revindex0 > 1) %}
+                            <span class="appel-suivi__date">{% if montrer %}<span>{{ j.jour|format_date('none', 'd MMM') }}</span>{% endif %}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <details class="graphique__donnees appel-suivi__donnees">
+                <summary>{{ 'administration.tableau_de_bord.graphiques.donnees'|trans }}</summary>
+                <table class="tableau"><thead><tr><th scope="col">{{ 'appels_association.suivi.jour'|trans }}</th><th scope="col" class="numerique">{{ 'appels_association.suivi.encaisse'|trans }}</th><th scope="col" class="numerique">{{ 'appels_association.suivi.cumul_libelle'|trans }}</th></tr></thead>
+                <tbody>{% for j in suivi.parJour|filter(j => j.montant > 0) %}<tr><td>{{ j.jour|format_date('medium') }}</td><td class="numerique">{{ r.euros(j.montant) }}</td><td class="numerique">{{ r.euros(j.cumul) }}</td></tr>{% endfor %}</tbody></table>
+            </details>
+        {% endif %}
+    </section>
+
+    {% if suivi.parVille|length > 1 or not appel.ville %}
+        <section class="section" aria-labelledby="appel-villes">
+            <div class="section__entete"><h2 id="appel-villes">{{ 'appels_association.suivi.par_ville'|trans }}</h2></div>
+            <div class="tableau">
+                <table>
+                    <thead><tr><th scope="col">{{ 'appels_association.suivi.ville'|trans }}</th><th scope="col" class="numerique">{{ 'appels_association.suivi.contributeurs_libelle'|trans }}</th><th scope="col" class="numerique">{{ 'appels_association.suivi.encaisse'|trans }}</th></tr></thead>
+                    <tbody>
+                        {% for v in suivi.parVille %}<tr><th scope="row">{{ v.ville }}</th><td class="numerique">{{ v.contributeurs }} / {{ v.echeances }}</td><td class="numerique">{{ r.euros(v.collecte) }}</td></tr>{% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    {% endif %}
+
+    {% if appel.message %}
+        <section class="section" aria-labelledby="appel-message"><div class="section__entete"><h2 id="appel-message">{{ 'appels_association.formulaire.message'|trans }}</h2></div><p class="section__texte appel__suivi-message">{{ appel.message }}</p></section>
+    {% endif %}
+{% endblock %}

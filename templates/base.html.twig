@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="{{ app.request ? app.request.locale : 'fr' }}">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="color-scheme" content="light">
+        <meta name="theme-color" content="#21705b">
+        <title>{% block title %}{{ 'app.nom'|trans }}{% endblock %}</title>
+        <link rel="icon" href="{{ asset('images/favicon.svg') }}" type="image/svg+xml">
+
+        {# Typographie « Console » : Manrope seule, hébergée avec l'application (assets/fonts, @font-face en tête de
+           app.css) depuis le 29 septembre 2026 : aucun appel à Google Fonts (RGPD). #}
+        <link rel="preload" href="{{ asset('fonts/manrope-latin-wght-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
+
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+
+        {# Après l'importmap, qui charge app.css : les feuilles des pages s'appuient sur ses variables et composants. #}
+        {% block stylesheets %}
+        {% endblock %}
+
+        {% set frankenphp_hot_reload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
+        {% if frankenphp_hot_reload %}
+        <meta name="frankenphp-hot-reload:url" content="{{ frankenphp_hot_reload }}">
+        <script src="https://cdn.jsdelivr.net/npm/idiomorph"></script>
+        <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
+        {% endif %}
+    </head>
+    <body>
+        {{ include('composants/emprunt.html.twig') }}
+        {% block body %}{% endblock %}
+    </body>
+</html>

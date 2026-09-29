@@ -1,0 +1,21 @@
+{# Mon profil (F-04) : téléphone et accord pour les e-mails ; l'adresse de connexion et le mot de passe se règlent dans
+   les paramètres du compte. Variables : membre, onglet, form. #}
+{% extends 'mon_espace/_layout.html.twig' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+
+{% block title %}{{ 'mon_espace.profil.titre'|trans }} · {{ membre.association.nom }}{% endblock %}
+
+{% block contenu %}
+    <h1 class="espace-membre__titre">{{ 'mon_espace.profil.titre'|trans }}</h1>
+    <dl class="espace-membre__identite">
+        <div><dt>{{ 'mon_espace.profil.nom'|trans }}</dt><dd>{{ membre.nomComplet }}</dd></div>
+        <div><dt>{{ 'mon_espace.profil.ville'|trans }}</dt><dd>{{ membre.ville.nom }}{% if membre.foyer %} · {{ 'mon_espace.profil.foyer'|trans({foyer: membre.foyer.nom}) }}{% endif %}</dd></div>
+        <div><dt>{{ 'mon_espace.profil.email'|trans }}</dt><dd>{{ membre.email ?? app.user.email }}</dd></div>
+    </dl>
+    {{ form_start(form, {attr: {class: 'espace-membre__formulaire', novalidate: 'novalidate'}}) }}
+        {{ formulaire.champ(form.telephone, 'mon_espace.profil.telephone_aide'|trans) }}
+        <label class="espace-membre__case">{{ form_widget(form.consentEmail) }}<span>{{ 'mon_espace.profil.consentement'|trans }}<span class="champ__aide">{{ 'mon_espace.profil.consentement_aide'|trans }}</span></span></label>
+        <button type="submit" class="bouton bouton--primaire">{{ 'mon_espace.profil.enregistrer'|trans }}</button>
+    {{ form_end(form) }}
+    {% if not is_granted('IS_IMPERSONATOR') %}<p class="espace-membre__note-compte">{{ 'mon_espace.profil.compte'|trans }} <a href="{{ path('parametres') }}">{{ 'mon_espace.compte'|trans }}</a></p>{% endif %}
+{% endblock %}

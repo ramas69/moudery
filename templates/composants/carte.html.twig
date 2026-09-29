@@ -1,0 +1,28 @@
+{# G-03 · Carte de France des villes, bulle proportionnelle au montant collecté (ou au nombre d'adhérents tant que rien
+   n'est collecté), calculée par `App\Association\CarteVilles`. Variables : carte, id. #}
+{% macro euros(v) %}{{ (v / 100)|format_currency('EUR', {fraction_digit: 0}) }}{% endmacro %}
+{% import _self as g %}
+<figure class="carte" data-export-png-target="zone">
+    <svg class="carte__svg" viewBox="0 0 {{ carte.largeur }} {{ carte.hauteur }}" role="img" aria-labelledby="{{ id }}-titre">
+        <title id="{{ id }}-titre">{{ ('graphiques.carte.aria_' ~ carte.mesure)|trans({villes: carte.bulles|length}) }}</title>
+        <path class="carte__pays" d="{{ carte.contour }}"></path>
+        <path class="carte__pays" d="{{ carte.corse }}"></path>
+        {% for b in carte.bulles %}
+            <g class="carte__bulle">
+                <circle cx="{{ b.x }}" cy="{{ b.y }}" r="{{ b.r }}"><title>{{ b.ville }} · {{ carte.mesure == 'collecte' ? g.euros(b.valeur) : 'graphiques.carte.membres'|trans({nombre: b.membres}) }}</title></circle>
+                <text x="{{ b.x }}" y="{{ b.y - b.r - 4 }}" text-anchor="middle">{{ b.ville }}</text>
+            </g>
+        {% endfor %}
+    </svg>
+    <figcaption class="section__aide">
+        {{ ('graphiques.carte.legende_' ~ carte.mesure)|trans }}
+        {% if carte.absentes is not empty %}{{ 'graphiques.carte.absentes'|trans({villes: carte.absentes|join(', '), nombre: carte.absentes|length}) }}{% endif %}
+    </figcaption>
+</figure>
+<details class="graphique__donnees">
+    <summary>{{ 'administration.tableau_de_bord.graphiques.donnees'|trans }}</summary>
+    <table>
+        <thead><tr><th scope="col">{{ 'espace.villes.colonne.ville'|trans }}</th><th scope="col" class="numerique">{{ 'graphiques.carte.collecte'|trans }}</th><th scope="col" class="numerique">{{ 'graphiques.carte.adherents'|trans }}</th></tr></thead>
+        <tbody>{% for b in carte.bulles %}<tr><th scope="row">{{ b.ville }}</th><td class="numerique">{{ g.euros(b.valeur) }}</td><td class="numerique">{{ b.membres }}</td></tr>{% endfor %}</tbody>
+    </table>
+</details>

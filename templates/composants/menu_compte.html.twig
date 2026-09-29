@@ -1,0 +1,25 @@
+{# Menu du compte connecté, en bas de la barre latérale Console : Paramètres et Se déconnecter.
+   Sous emprunt d'identité, Paramètres disparaît : on ne modifie pas le compte d'une autre personne à sa place.
+   Variable : role, le libellé affiché sous le nom (« Super-admin », « Bureau central »…). #}
+{% import 'composants/icones.html.twig' as icones %}
+<div class="console__compte">
+    <details class="menu console__menu-compte" data-controller="menu" data-action="toggle->menu#ouvrir">
+        <summary class="console__compte-resume" title="{{ 'menu_compte.ouvrir'|trans }}">
+            <span class="console__avatar" aria-hidden="true">{{ app.user.prenom|slice(0, 1)|upper }}{{ app.user.nom|slice(0, 1)|upper }}</span>
+            <span class="console__identite">
+                <span class="console__nom">{{ app.user.nomComplet }}</span>
+                <span class="console__role">{{ role }}</span>
+            </span>
+            <span class="console__compte-chevron" aria-hidden="true">{{ icones.icone('chevron', 14) }}</span>
+        </summary>
+        <div class="menu__liste">
+            {% if not is_granted('IS_IMPERSONATOR') %}
+                <a class="menu__item" href="{{ path('parametres') }}">{{ icones.icone('reglages', 15) }}{{ 'menu_compte.parametres'|trans }}</a>
+            {% endif %}
+            <form method="post" action="{{ path('deconnexion') }}" class="menu__form deconnexion">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" data-controller="csrf-protection">
+                <button type="submit" class="menu__item menu__item--danger">{{ icones.icone('deconnexion', 15) }}{{ 'connexion.deconnexion'|trans }}</button>
+            </form>
+        </div>
+    </details>
+</div>

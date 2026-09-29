@@ -1,0 +1,39 @@
+{# Modification d'une ville : son nom et son statut. La création reste au bureau central, dans l'assistant. Variables : form, ville. #}
+{% extends 'administration/_layout.html.twig' %}
+{% set page = 'villes' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'administration/_macros.html.twig' as macros %}
+
+{% block title %}{{ 'administration.ville.titre_modifier'|trans }} · {{ ville.nom }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block titre_page %}{{ ville.nom }}{% endblock %}
+{% block sous_titre %}
+    <p class="console__sous-titre">{{ ville.association.nom }} · {{ ('assistant_ville.statut.' ~ ville.statut.value)|trans }} · {{ 'administration.villes.etape'|trans({numero: ville.etapeAssistant.numero, libelle: ('assistant_ville.etapes.' ~ ville.etapeAssistant.value)|trans}) }}</p>
+{% endblock %}
+
+{% block actions %}
+    <a class="bouton bouton--secondaire" href="{{ path('administration_association_fiche', {id: ville.association.id}) }}">{{ icones.icone('associations', 15) }}{{ ville.association.nom }}</a>
+    {% if ville.estBrouillon() %}
+        <a class="bouton bouton--primaire" href="{{ path('ville_assistant_reprendre', {slug: ville.association.slug, id: ville.id}) }}">{{ icones.icone('externe', 15) }}{{ 'administration.ville.ouvrir_assistant'|trans }}</a>
+    {% endif %}
+{% endblock %}
+
+{% block contenu %}
+    {{ form_start(form, {attr: {class: 'formulaire formulaire--etroit', novalidate: 'novalidate'}}) }}
+        {% if form.vars.submitted and not form.vars.valid %}
+            <div class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</div>
+        {% endif %}
+        {{ form_errors(form) }}
+        {{ formulaire.champ(form.association, 'administration.ville.association.aide'|trans) }}
+        {{ formulaire.champ(form.nom, 'administration.ville.nom.aide'|trans) }}
+        <div class="formulaire__section">
+            <h2 class="formulaire__sous-titre">{{ 'administration.ville.statut.titre'|trans }}</h2>
+            {{ formulaire.champ(form.statut, 'administration.ville.statut.aide'|trans) }}
+        </div>
+        <div class="formulaire__actions">
+            <a class="bouton bouton--secondaire" href="{{ path('administration_villes') }}">{{ 'administration.ville.annuler'|trans }}</a>
+            <button type="submit" class="bouton bouton--primaire">{{ 'administration.ville.enregistrer'|trans }}</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

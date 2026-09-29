@@ -1,0 +1,24 @@
+{# Fiche de l'invitation (maquettes Console « Activation de compte » et « Invitation expirée ») : la personne, son rôle,
+   son périmètre (avec le nombre de membres d'une ville), qui l'invite, et jusqu'à quand le lien vaut. #}
+{% macro fiche(invitation, expiree, membres = null) %}
+    {% set local = invitation.email|split('@')|first|replace({'.': ' ', '_': ' ', '-': ' '}) %}
+    {% set mots = local|split(' ')|filter(m => m != '') %}
+    {% set initiales = mots|length > 1 ? (mots[0]|slice(0, 1) ~ mots[1]|slice(0, 1)) : local|slice(0, 2) %}
+    {% set inviteur = invitation.inviteePar %}
+    <div class="fiche">
+        <div class="fiche__personne">
+            <span class="fiche__avatar" aria-hidden="true">{{ initiales|upper }}</span>
+            <span class="fiche__email">{{ invitation.email }}</span>
+        </div>
+        <dl class="fiche__lignes">
+            <div class="fiche__ligne"><dt>{{ 'invitation.fiche.role'|trans }}</dt><dd><span class="etiquette">{{ ('role.' ~ invitation.role.value)|trans }}</span></dd></div>
+            <div class="fiche__ligne"><dt>{{ 'invitation.fiche.perimetre'|trans }}</dt><dd>{{ invitation.ville ? invitation.ville.nom : invitation.association.nom }}{% if invitation.ville and membres is not null %} · {{ 'invitation.fiche.membres'|trans({nombre: membres}) }}{% endif %}</dd></div>
+            {% if inviteur %}
+                <div class="fiche__ligne"><dt>{{ 'invitation.fiche.invitee_par'|trans }}</dt><dd>{{ inviteur.nomComplet }}{% if inviteur.aLeRole(constant('App\\Security\\Role::BureauCentral')) %}{{ 'invitation.fiche.du_bureau_central'|trans }}{% endif %}</dd></div>
+            {% endif %}
+            {% if not expiree %}
+                <div class="fiche__ligne"><dt>{{ 'invitation.fiche.valable'|trans }}</dt><dd>{{ 'invitation.fiche.jusquau'|trans({date: invitation.expireLe|format_date('medium')}) }}</dd></div>
+            {% endif %}
+        </dl>
+    </div>
+{% endmacro %}

@@ -1,0 +1,195 @@
+{# Enregistrement d'un paiement manuel (F-17). Sans membre choisi : la liste des membres du périmètre avec ce que chacun
+   doit, à cocher pour un paiement groupé (les mêmes mois ou appels, le même moyen, la même date) ; « Détail » ouvre
+   la saisie fine d'un membre (ses échéances une à une, montants libres). Variables : association, ville (périmètre), q,
+   resultats, dues (par membre), cotisation (de l'année, ou null), appels (ouverts), moisCourant, membre (ou null),
+   echeances, form (ou null), aujourdhui. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'paiements' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% macro euros(centimes) %}{{ (centimes / 100)|format_currency('EUR') }}{% endmacro %}
+
+{% block title %}{{ 'paiements_association.nouveau.titre'|trans }} · {{ association.nom }}{% endblock %}
+{% block titre_page %}<span class="console__fil"><a href="{{ path('association_paiements', {slug: association.slug}) }}">{{ 'paiements_association.titre'|trans }}</a> <span aria-hidden="true">›</span> </span>{{ 'paiements_association.nouveau.titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'paiements_association.nouveau.sous_titre'|trans }}</p>{% endblock %}
+
+{% block contenu %}
+    {% if membre is null %}
+        {# Paiement groupé (demande de Rama du 29 septembre 2026) : la liste des membres s'affiche d'emblée, un filtre
+           instantané, des cases à cocher, ce qu'ils règlent (mois de la cotisation, appels ouverts), un seul envoi. #}
+        <form method="post" action="{{ path('association_paiement_groupe', {slug: association.slug}) }}" class="paiement-groupe" data-controller="paiement-groupe">
+            <input type="hidden" name="_token" value="{{ csrf_token('paiement-groupe') }}">
+            <div class="paiement-groupe__reglages">
+                <section class="section" aria-labelledby="cibles-titre">
+                    <div class="section__entete"><h2 id="cibles-titre">{{ 'paiements_association.groupe.cibles'|trans }}</h2></div>
+                    {% if cotisation is null and appels is empty %}
+                        <p class="section__vide">{{ (ville ? 'paiements_association.groupe.aucune_cible' : 'paiements_association.groupe.choisir_ville')|trans }}{% if ville and is_granted(constant('App\\Security\\Permission::PAIEMENT_SAISIR'), ville) %} <a href="{{ path('association_cotisation_ouvrir', {slug: association.slug, annee: 'now'|date('Y')}) }}">{{ 'paiements_association.groupe.ouvrir_cotisations'|trans }}</a>{% endif %}</p>
+                    {% else %}
+                        <div class="paiement-groupe__cibles">
+                            {% if cotisation %}
+                                <p class="paiement-groupe__legende">{{ 'paiements_association.groupe.mois_de'|trans({annee: cotisation.annee, montant: (cotisation.montantMensuel / 100)|format_currency('EUR')}) }}</p>
+                                <div class="paiement-groupe__mois">
+                                    {% set debutExercice = association.debutExerciceMois %}
+                                    {% for m in (debutExercice <= 1 ? range(1, 12) : range(debutExercice, 12)|merge(range(1, debutExercice - 1))) %}
+                                        <label class="chip-case"><input type="checkbox" name="cibles[]" value="cotisation:{{ cotisation.id }}:{{ m }}"{% if m == moisCourant %} checked{% endif %} data-action="change->paiement-groupe#compter"><span>{{ ('membres_association.mois.' ~ m)|trans }}</span></label>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            {% if appels is not empty %}
+                                <p class="paiement-groupe__legende">{{ 'paiements_association.groupe.appels'|trans }}</p>
+                                <div class="paiement-groupe__mois">
+                                    {% for a in appels %}
+                                        <label class="chip-case"><input type="checkbox" name="cibles[]" value="appel:{{ a.id }}" data-action="change->paiement-groupe#compter"><span>{{ a.objet }}{% if a.montant %} · {{ (a.montant / 100)|format_currency('EUR') }}{% endif %}</span></label>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </section>
+                <section class="section" aria-labelledby="comment-titre">
+                    <div class="section__entete"><h2 id="comment-titre">{{ 'paiements_association.groupe.comment'|trans }}</h2></div>
+                    <div class="paiement-groupe__champs">
+                        <div class="champ">
+                            <label class="champ__label" for="groupe-moyen">{{ 'paiements_association.formulaire.moyen'|trans }}</label>
+                            <select class="champ__saisie" id="groupe-moyen" name="moyen">
+                                {% for m in ['especes', 'virement', 'cheque', 'carte'] %}<option value="{{ m }}">{{ ('paiements_association.moyen.' ~ m)|trans }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <div class="champ">
+                            <label class="champ__label" for="groupe-date">{{ 'paiements_association.formulaire.recu_le'|trans }}</label>
+                            <input class="champ__saisie" id="groupe-date" type="date" name="recuLe" value="{{ aujourdhui|date('Y-m-d') }}" max="{{ aujourdhui|date('Y-m-d') }}" required>
+                        </div>
+                        <div class="champ">
+                            <label class="champ__label" for="groupe-reference">{{ 'paiements_association.formulaire.reference'|trans }}</label>
+                            <input class="champ__saisie" id="groupe-reference" type="text" name="reference" maxlength="80" autocomplete="off" placeholder="{{ 'paiements_association.groupe.reference_exemple'|trans }}">
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <section class="section" aria-labelledby="membres-titre">
+                <div class="section__entete">
+                    <h2 id="membres-titre">{{ 'paiements_association.groupe.qui'|trans }} <span class="compteur">{{ resultats|length }}</span></h2>
+                    <label class="recherche paiement-groupe__filtre">
+                        <span class="visuellement-cache">{{ 'paiements_association.nouveau.rechercher'|trans }}</span>
+                        {{ icones.icone('recherche', 15) }}
+                        <input class="recherche__saisie" type="search" name="q" value="{{ q }}" placeholder="{{ 'paiements_association.groupe.filtrer'|trans }}" autocomplete="off" data-paiement-groupe-target="filtre" data-action="input->paiement-groupe#filtrer" form="paiement-groupe-filtre">
+                    </label>
+                </div>
+                {% if resultats is empty %}
+                    <p class="section__vide">{{ (q != '' ? 'paiements_association.nouveau.aucun_resultat' : 'paiements_association.groupe.aucun_membre')|trans }}</p>
+                {% else %}
+                    <div class="tableau tableau--serre tableau--paiement-groupe">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="impayes__case"><input type="checkbox" aria-label="{{ 'impayes_association.tout_cocher'|trans }}" data-paiement-groupe-target="toutCocher" data-action="change->paiement-groupe#toutCocher"></th>
+                                    <th scope="col">{{ 'paiements_association.colonne.membre'|trans }}</th>
+                                    <th scope="col" class="tableau__tertiaire">{{ 'paiements_association.groupe.doit'|trans }}</th>
+                                    <th scope="col"><span class="visuellement-cache">{{ 'paiements_association.colonne.actions'|trans }}</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for m in resultats %}
+                                    {% set du = dues[m.id]|default({nombre: 0, montant: 0, retard: 0}) %}
+                                    <tr data-paiement-groupe-target="ligne" data-texte="{{ (m.nomComplet ~ ' ' ~ (m.email ?? '') ~ ' ' ~ (m.telephoneAffiche ?? '') ~ ' ' ~ (m.localite ?? '') ~ ' ' ~ (m.foyer ? m.foyer.nom : ''))|lower }}">
+                                        <td class="impayes__case"><input type="checkbox" name="membres[]" value="{{ m.id }}" aria-label="{{ m.nomComplet }}"{% if du.nombre == 0 %} disabled title="{{ 'paiements_association.groupe.rien_du'|trans }}"{% elseif m.id in precoches %} checked{% endif %} data-action="change->paiement-groupe#compter"></td>
+                                        <td>
+                                            <span class="entite">
+                                                <span class="entite__initiales" aria-hidden="true">{{ m.prenom|slice(0, 1)|upper }}{{ m.nom|slice(0, 1)|upper }}</span>
+                                                <span class="entite__texte">
+                                                    <span class="entite__nom">{{ m.nomComplet }}</span>
+                                                    <span class="entite__detail">{% if not ville %}{{ m.ville.nom }}{% if m.foyer %} · {% endif %}{% endif %}{% if m.foyer %}{{ m.foyer.nom }}{% endif %}</span>
+                                                </span>
+                                            </span>
+                                        </td>
+                                        <td class="tableau__tertiaire">
+                                            {% if du.nombre == 0 %}
+                                                <span class="tableau__precision tableau__precision--neutre">{{ 'paiements_association.groupe.a_jour'|trans }}</span>
+                                            {% else %}
+                                                {{ 'paiements_association.groupe.dues'|trans({nombre: du.nombre, montant: (du.montant / 100)|format_currency('EUR')}) }}
+                                                {% if du.retard > 0 %}<span class="tableau__precision">{{ 'paiements_association.groupe.retard'|trans({nombre: du.retard}) }}</span>{% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td class="tableau__menu"><a class="bouton bouton--discret bouton--petit" href="{{ path('association_paiement_nouveau', {slug: association.slug, membre: m.id}) }}">{{ 'paiements_association.groupe.detail'|trans }}{{ icones.icone('chevron', 14) }}</a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </section>
+
+            <div class="paiement-groupe__barre">
+                <span class="paiement-groupe__resume" data-paiement-groupe-target="resume">{{ 'paiements_association.groupe.aucun_coche'|trans }}</span>
+                <button type="submit" class="bouton bouton--primaire" data-paiement-groupe-target="bouton" disabled>{{ icones.icone('coche', 15) }}<span data-paiement-groupe-target="libelle" data-un="{{ 'paiements_association.groupe.valider'|trans({nombre: 1}) }}" data-plusieurs="{{ 'paiements_association.groupe.valider'|trans({nombre: 999}) }}">{{ 'paiements_association.groupe.valider'|trans({nombre: 0}) }}</span></button>
+            </div>
+        </form>
+        {# Le filtre fonctionne aussi sans JavaScript : un formulaire GET séparé porte le champ. #}
+        <form method="get" action="{{ path('association_paiement_nouveau', {slug: association.slug}) }}" id="paiement-groupe-filtre" class="visuellement-cache"><button type="submit">{{ 'paiements_association.nouveau.chercher'|trans }}</button></form>
+    {% else %}
+        <div class="depense-saisie paiement-saisie">
+            {% if echeances is empty %}
+                <section class="section">
+                    <p class="section__vide">{{ 'paiements_association.nouveau.membre_sans_echeance'|trans({membre: membre.nomComplet}) }}</p>
+                    <div class="section__actions"><a class="bouton bouton--secondaire" href="{{ path('association_paiement_nouveau', {slug: association.slug}) }}">{{ 'paiements_association.nouveau.changer_membre'|trans }}</a></div>
+                </section>
+            {% else %}
+                {{ form_start(form, {attr: {class: 'section depense-saisie__formulaire', novalidate: 'novalidate'}}) }}
+                    <input type="hidden" name="membre" value="{{ membre.id }}">
+                    {% if form.vars.submitted and not form.vars.valid %}<p class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</p>{% endif %}
+                    {% for e in form.vars.errors %}<p class="alerte alerte--erreur" role="alert">{{ e.message }}</p>{% endfor %}
+                    <div class="champ{{ form.echeances.vars.errors|length ? ' champ--erreur' }}">
+                        <span class="champ__label" id="echeances-libelle">{{ 'paiements_association.nouveau.echeances_de'|trans({membre: membre.nomComplet}) }}</span>
+                        <ul class="paiement-echeances" aria-labelledby="echeances-libelle" data-controller="paiement">
+                            {% for choix in form.echeances %}
+                                {% set e = echeances|filter(x => (x.id ~ '') == choix.vars.value)|first %}
+                                <li class="paiement-echeances__ligne{{ e.estEnRetard(aujourdhui) ? ' paiement-echeances__ligne--retard' }}">
+                                    <label class="paiement-echeances__choix">
+                                        {{ form_widget(choix, {attr: {'data-action': 'change->paiement#recalculer', 'data-montant': e.montant ?? 0}}) }}
+                                        <span class="paiement-echeances__texte">
+                                            <span class="paiement-echeances__libelle">{% if e.appel %}{{ 'paiements_association.echeance.appel'|trans({objet: e.appel.objet}) }}{% else %}{{ 'paiements_association.echeance.cotisation'|trans({mois: ('membres_association.mois.' ~ e.mois)|trans, annee: e.annee}) }}{% endif %}</span>
+                                            <span class="paiement-echeances__detail">{% if e.estEnRetard(aujourdhui) %}{{ 'paiements_association.echeance.retard'|trans({jours: ((aujourdhui|date('U') - e.dateLimite|date('U')) / 86400)|round(0, 'floor')}) }}{% else %}{{ 'paiements_association.echeance.due_le'|trans({date: e.dateLimite|format_date('medium')}) }}{% endif %}</span>
+                                        </span>
+                                    </label>
+                                    <span class="paiement-echeances__montant">
+                                        {% if e.montant is null %}
+                                            <label class="visuellement-cache" for="montant-libre-{{ e.id }}">{{ 'paiements_association.nouveau.montant_libre'|trans }}</label>
+                                            <span class="appel__euro"><input class="champ__saisie" id="montant-libre-{{ e.id }}" type="text" name="montant_libre[{{ e.id }}]" inputmode="decimal" placeholder="0,00" data-action="input->paiement#recalculer" data-libre="{{ e.id }}"><span class="appel__euro-signe" aria-hidden="true">€</span></span>
+                                        {% else %}
+                                            {{ _self.euros(e.montant) }}
+                                        {% endif %}
+                                    </span>
+                                </li>
+                            {% endfor %}
+                            <li class="paiement-echeances__total"><span>{{ 'paiements_association.nouveau.total'|trans }}</span><strong data-paiement-target="total">—</strong></li>
+                        </ul>
+                        {% for err in form.echeances.vars.errors %}<p class="champ__erreur" role="alert">{{ err.message }}</p>{% endfor %}
+                    </div>
+                    <div class="depense-saisie__grille depense-saisie__grille--2">
+                        {{ formulaire.champ(form.moyen, null) }}
+                        {{ formulaire.champ(form.recuLe, null) }}
+                    </div>
+                    {{ formulaire.champ(form.reference, 'paiements_association.formulaire.reference_aide'|trans) }}
+                    {{ formulaire.champ(form.note, null) }}
+                    <div class="depense-saisie__actions">
+                        <button type="submit" class="bouton bouton--primaire">{{ icones.icone('coche', 15) }}{{ 'paiements_association.nouveau.valider'|trans }}</button>
+                        <a class="bouton bouton--discret" href="{{ path('association_paiement_nouveau', {slug: association.slug}) }}">{{ 'paiements_association.nouveau.changer_membre'|trans }}</a>
+                    </div>
+                {{ form_end(form) }}
+            {% endif %}
+            <aside class="depense-saisie__cote">
+                <section class="section" aria-labelledby="membre-cote-titre">
+                    <div class="section__entete"><h2 id="membre-cote-titre">{{ membre.nomComplet }}</h2></div>
+                    <dl class="appel__chiffres">
+                        <div><dt>{{ 'paiements_association.colonne.ville'|trans }}</dt><dd>{{ membre.ville.nom }}</dd></div>
+                        {% if membre.foyer %}<div><dt>{{ 'paiements_association.nouveau.foyer'|trans }}</dt><dd>{{ membre.foyer.nom }}</dd></div>{% endif %}
+                        <div><dt>{{ 'paiements_association.nouveau.echeances_de'|trans({membre: ''})|trim }}</dt><dd>{{ _self.euros(echeances|reduce((s, e) => s + (e.montant ?? 0), 0)) }}</dd></div>
+                    </dl>
+                    <p class="section__aide">{{ 'paiements_association.nouveau.recu_envoye'|trans }}</p>
+                </section>
+            </aside>
+        </div>
+    {% endif %}
+{% endblock %}

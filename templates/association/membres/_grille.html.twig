@@ -1,0 +1,49 @@
+{# Les cellules du classeur pour une adhésion : douze mois (montant en euros, ou le code tel que saisi), rapatriement,
+   projet, total et reste. Sans historique connu, les cases restent vides et le total est un tiret.
+   Le total et le reste sont calculés par l'entité, jamais importés.
+   Les colonnes suivent l'exercice de l'association (`debut` = premier mois, 1 pour janvier) : pour un exercice
+   d'octobre à septembre, la ligne « 2026 » se lit d'octobre 2026 à septembre 2027 (29 septembre 2026). Avec `annee`,
+   l'en-tête précise l'année civile de chaque mois quand l'exercice chevauche deux années. #}
+{% macro ordre(debut) -%}
+    {{- (debut|default(1) <= 1 ? range(1, 12) : range(debut, 12)|merge(range(1, debut - 1)))|join(',') -}}
+{%- endmacro %}
+
+{% macro entetes(debut, annee) %}
+    {% set debut = debut|default(1) %}
+    {% for m in _self.ordre(debut)|split(',') %}
+        <th scope="col" class="grille__mois">{{ ('membres_association.mois.' ~ m)|trans }}{% if debut > 1 and annee|default(null) %}<span class="grille__annee">{{ m >= debut ? annee : annee + 1 }}</span>{% endif %}</th>
+    {% endfor %}
+    <th scope="col" class="grille__mois grille__annuel">{{ 'membres_association.tableau.rapatriement'|trans }}</th>
+    <th scope="col" class="grille__mois grille__annuel">{{ 'membres_association.tableau.projet'|trans }}</th>
+    <th scope="col" class="grille__mois grille__total">{{ 'membres_association.tableau.total'|trans }}</th>
+    <th scope="col" class="grille__mois grille__total">{{ 'membres_association.tableau.reste'|trans }}</th>
+{% endmacro %}
+
+{% macro euros(centimes) -%}
+    {{- centimes is null ? '' : (centimes % 100 == 0 ? (centimes // 100) : (centimes / 100)|number_format(2, ',', ' ')) -}}
+{%- endmacro %}
+
+{% macro cellules(adhesion, debut) %}
+    {% if adhesion is null or not adhesion.aUnHistorique %}
+        {% for m in 1..12 %}<td class="grille__mois"></td>{% endfor %}
+        <td class="grille__mois grille__annuel"></td>
+        <td class="grille__mois grille__annuel"></td>
+        <td class="grille__mois grille__total"><span class="grille__vide">{{ 'membres_association.tableau.sans_historique'|trans }}</span></td>
+        <td class="grille__mois grille__total"></td>
+    {% else %}
+        {% for m in _self.ordre(debut)|split(',') %}
+            {% set m = m + 0 %}
+            {% set montant = adhesion.montantMois(m) %}
+            {% set code = adhesion.codeMois(m) %}
+            <td class="grille__mois{{ montant is not null and montant == 0 ? ' grille__mois--zero' }}">
+                {%- if montant is not null %}{{ _self.euros(montant) }}{% elseif code %}<span class="grille__code" title="{{ 'membres_association.tableau.code_aide'|trans({code: code}) }}">{{ code }}</span>{% endif -%}
+            </td>
+        {% endfor %}
+        <td class="grille__mois grille__annuel">{{ _self.euros(adhesion.rapatriement) }}</td>
+        <td class="grille__mois grille__annuel">{{ _self.euros(adhesion.projet) }}</td>
+        <td class="grille__mois grille__total">{{ (adhesion.total / 100)|format_currency('EUR') }}</td>
+        <td class="grille__mois grille__total{{ adhesion.reste > 0 ? ' grille__reste--du' }}">
+            {%- if adhesion.reste is null %}<span class="grille__vide" title="{{ 'membres_association.tableau.reste_inconnu'|trans }}">{{ 'membres_association.tableau.sans_historique'|trans }}</span>{% else %}{{ (adhesion.reste / 100)|format_currency('EUR') }}{% endif -%}
+        </td>
+    {% endif %}
+{% endmacro %}

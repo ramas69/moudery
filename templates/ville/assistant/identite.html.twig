@@ -1,0 +1,80 @@
+{# Étape 1 de l'assistant : identité de la ville et responsables à inviter (F-40).
+   Maquette : « Assistant ville », écran 04.1. #}
+{% extends 'ville/assistant/_layout.html.twig' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+
+{% block title %}{{ 'assistant_ville.identite.titre'|trans }} · {{ association.nom }}{% endblock %}
+
+{# Une ligne « responsable » : le rôle, l'adresse, et l'état de l'invitation quand la ville existe déjà. #}
+{% macro responsable(champ, aide, invitation) %}
+    {% set enErreur = champ.vars.errors|length > 0 %}
+    {% set idAide = champ.vars.id ~ '_aide' %}
+    {% set idErreur = champ.vars.id ~ '_erreur' %}
+    {% set decritPar = (idAide ~ ' ' ~ (enErreur ? idErreur : ''))|trim %}
+    <div class="responsable{{ enErreur ? ' responsable--erreur' }}">
+        {{ form_label(champ, null, {label_attr: {class: 'champ__label responsable__role'}}) }}
+        <div class="champ{{ enErreur ? ' champ--erreur' }} responsable__saisie">
+            {{ form_widget(champ, {attr: champ.vars.attr|merge({
+                class: 'champ__saisie',
+                'aria-describedby': decritPar,
+                'aria-invalid': enErreur ? 'true' : false,
+            })}) }}
+            <p class="champ__aide" id="{{ idAide }}">{{ aide }}</p>
+            {% if enErreur %}
+                <p class="champ__erreur" id="{{ idErreur }}">
+                    {%- for erreur in champ.vars.errors %}{{ erreur.message }}{% if not loop.last %} {% endif %}{% endfor -%}
+                </p>
+            {% endif %}
+        </div>
+        {% if invitation is not null %}
+            {% set etat = invitation.accepteeLe is not null ? 'acceptee' : (invitation.estEnvoyee() ? 'envoyee' : 'a_envoyer') %}
+            <span class="pastille {{ etat == 'acceptee' ? 'pastille--succes' : 'pastille--attente' }} responsable__statut">{{ ('assistant_ville.identite.invitation.' ~ etat)|trans }}</span>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% block contenu %}
+    {% set villeExiste = ville is not null and ville.id is not null %}
+    {% set invitationTresorier = villeExiste ? (ville.invitations|filter(i => i.role.value == 'tresorier')|first ?: null) : null %}
+    {% set invitationPresident = villeExiste ? (ville.invitations|filter(i => i.role.value == 'president')|first ?: null) : null %}
+    {% set invitationSecretaire = villeExiste ? (ville.invitations|filter(i => i.role.value == 'secretaire')|first ?: null) : null %}
+
+    <div class="etape__entete">
+        <h1 class="etape__titre">{{ 'assistant_ville.identite.titre'|trans }}</h1>
+        <p class="etape__intro">{{ 'assistant_ville.identite.intro'|trans }}</p>
+    </div>
+
+    {# L'identifiant du formulaire permet au bouton du pied de page de le soumettre (attribut form). #}
+    {{ form_start(form, {attr: {
+        id: form.vars.id,
+        class: 'formulaire',
+        novalidate: 'novalidate',
+        'data-controller': 'ville-identite',
+        'data-ville-identite-confirmation-value': 'assistant_ville.identite.quitter_confirmation'|trans,
+        'data-action': 'submit->ville-identite#marquerEnregistre',
+    }}) }}
+        {% if form.vars.submitted and not form.vars.valid %}
+            <div class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</div>
+        {% endif %}
+        {{ form_errors(form) }}
+
+        <div class="formulaire__grille">
+            {{ formulaire.champ(form.nom, 'assistant_ville.identite.nom.aide'|trans) }}
+        </div>
+
+        <section class="formulaire__section" aria-labelledby="section-responsables">
+            <h2 class="etape__sous-titre" id="section-responsables">{{ 'assistant_ville.identite.section_responsables'|trans }}</h2>
+            <p class="etape__aide">{{ 'assistant_ville.identite.responsables_aide'|trans }}</p>
+            <div class="responsables">
+                {{ _self.responsable(form.emailTresorier, 'assistant_ville.identite.tresorier.aide'|trans, invitationTresorier) }}
+                {{ _self.responsable(form.emailPresident, 'assistant_ville.identite.president.aide'|trans, invitationPresident) }}
+                {{ _self.responsable(form.emailSecretaire, 'assistant_ville.identite.secretaire.aide'|trans, invitationSecretaire) }}
+            </div>
+            <p class="note" data-ville-identite-target="cumul" aria-live="polite" hidden>{{ 'assistant_ville.identite.cumul'|trans }}</p>
+        </section>
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block actions %}
+    <button type="submit" form="{{ form.vars.id }}" class="bouton bouton--primaire">{{ 'assistant_ville.identite.enregistrer'|trans }}</button>
+{% endblock %}

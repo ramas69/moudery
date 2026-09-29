@@ -1,0 +1,261 @@
+{# Impayés et relances (F-24, F-25, G-06 ; 29 septembre 2026, d'après l'artboard « Impayés et relances » du canevas
+   Console) : quatre chiffres (montant dû, plus de 60 jours, sans adresse e-mail, prochaine relance automatique),
+   l'ancienneté du retard en une barre empilée (les cartes sont en euros entiers, le tableau garde les centimes),
+   recherche instantanée, chips et sélecteur d'origine, une ligne par
+   membre (ce qu'il doit, montant, retard, dernière relance) et une sélection multiple : relancer par e-mail,
+   enregistrer un paiement, marquer comme appelé. Variables : association, ville (périmètre), aujourdhui, lignes
+   (membre, echeances, sources, montant, retard, plusAncienne, derniereRelance, rappels, joignable, motif), total,
+   pagination, compteurs, sources, filtre, q, source, anciennete, totalMontant, totalEcheances, joignables,
+   prochaines, calendrier, peutRelancer, pilote. #}
+{% extends 'association/_layout.html.twig' %}
+{% set page = 'impayes' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'composants/selecteur.html.twig' as selecteur %}
+
+{% macro euros(centimes) %}{{ (centimes / 100)|format_currency('EUR') }}{% endmacro %}
+{% set params = {slug: association.slug}|merge(q != '' ? {q: q} : {})|merge(filtre != 'tous' ? {filtre: filtre} : {})|merge(source != 'toutes' ? {echeance: source} : {}) %}
+{% set libelleCalendrier = calendrier|map(j => 'impayes_association.calendrier'|trans({jours: j}))|join(', ') %}
+{% set tranches = {'0_30': 'info', '31_60': 'attention', '61': 'erreur'} %}
+
+{% block title %}{{ 'impayes_association.titre'|trans }} · {% if ville %}{{ ville.nom }} · {% endif %}{{ association.nom }}{% endblock %}
+{% block titre_page %}{{ 'impayes_association.titre'|trans }} <span class="compteur{{ compteurs.tous > 0 ? ' compteur--erreur' }}">{{ compteurs.tous }}</span>{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ (ville ? 'impayes_association.sous_titre_ville' : 'impayes_association.sous_titre')|trans({ville: ville ? ville.nom : '', calendrier: libelleCalendrier}) }}</p>{% endblock %}
+
+{% block actions %}
+    <details class="menu" data-controller="menu" data-action="toggle->menu#ouvrir">
+        <summary class="bouton bouton--secondaire">{{ icones.icone('export', 15) }}{{ 'impayes_association.exporter'|trans }}{{ icones.icone('chevron', 14) }}</summary>
+        <div class="menu__liste">
+            <a class="menu__item" href="{{ path('association_impayes_export', params|merge({format: 'csv'})) }}">{{ icones.icone('export', 15) }}{{ 'impayes_association.exporter_csv'|trans }}</a>
+            <a class="menu__item" href="{{ path('association_impayes_export', params|merge({format: 'xlsx'})) }}">{{ icones.icone('export', 15) }}{{ 'impayes_association.exporter_xlsx'|trans }}</a>
+        </div>
+    </details>
+    {# Le calendrier des relances automatiques et les prochains envois du périmètre, sans quitter la page. #}
+    <details class="menu calendrier-relances" data-controller="menu" data-action="toggle->menu#ouvrir">
+        <summary class="bouton bouton--secondaire">{{ icones.icone('calendrier', 15) }}{{ 'impayes_association.calendrier_bouton'|trans }}</summary>
+        <div class="menu__liste calendrier-relances__panneau">
+            <p class="calendrier-relances__titre">{{ 'impayes_association.calendrier_panneau.titre'|trans }}</p>
+            {% if calendrier is empty %}
+                <p class="calendrier-relances__vide">{{ 'impayes_association.calendrier_panneau.aucune_regle'|trans }}</p>
+            {% else %}
+                <ul class="calendrier-relances__regles">
+                    {% for j in calendrier %}<li>{{ icones.icone('envoyer', 14) }}<span>{{ 'impayes_association.calendrier_panneau.regle'|trans({jours: j|abs, sens: j < 0 ? 'avant' : 'apres'}) }}</span></li>{% endfor %}
+                </ul>
+            {% endif %}
+            <p class="calendrier-relances__titre">{{ 'impayes_association.calendrier_panneau.prochaines'|trans }}</p>
+            {% if prochaines is empty %}
+                <p class="calendrier-relances__vide">{{ 'impayes_association.calendrier_panneau.aucune_prochaine'|trans }}</p>
+            {% else %}
+                <ul class="calendrier-relances__prochaines">
+                    {% for p in prochaines %}<li><strong>{{ p.date|format_date('medium') }}</strong><span>{{ 'impayes_association.calendrier_panneau.prochaine'|trans({jours: p.jours, membres: p.membres, injoignables: p.injoignables}) }}</span></li>{% endfor %}
+                </ul>
+            {% endif %}
+            <p class="calendrier-relances__note">{{ 'impayes_association.calendrier_panneau.note'|trans }}</p>
+            {% if pilote %}<a class="menu__item" href="{{ path('association_parametres', {slug: association.slug}) }}">{{ icones.icone('modifier', 15) }}{{ 'impayes_association.calendrier_panneau.modifier'|trans }}</a>{% endif %}
+        </div>
+    </details>
+    {% if peutRelancer and joignables > 0 %}
+        <form method="post" action="{{ path('association_impayes_relancer', {slug: association.slug}) }}" data-turbo-confirm="{{ 'impayes_association.relancer_tous_confirmer'|trans({nombre: joignables}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('impayes-relancer') }}">
+            <input type="hidden" name="tous" value="1">
+            <button type="submit" class="bouton bouton--primaire">{{ icones.icone('envoyer', 15) }}{{ 'impayes_association.relancer_tous'|trans({nombre: joignables}) }}</button>
+        </form>
+    {% endif %}
+{% endblock %}
+
+{% block contenu %}
+    <div class="kpis">
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'impayes_association.kpi.montant'|trans }}</span>
+            <span class="kpi__valeur{{ totalMontant > 0 ? ' kpi__valeur--erreur' }}">{{ (totalMontant / 100)|format_currency('EUR', {fraction_digit: 0}) }}</span>
+            <span class="kpi__detail">{{ 'impayes_association.kpi.montant_detail'|trans({membres: compteurs.tous, echeances: totalEcheances}) }}</span>
+        </div>
+        <a class="kpi kpi--lien" href="{{ path('association_impayes', {slug: association.slug, filtre: 'plus_60'}) }}">
+            <span class="kpi__libelle">{{ 'impayes_association.kpi.plus_60'|trans }}</span>
+            <span class="kpi__valeur">{{ (anciennete['61'].montant / 100)|format_currency('EUR', {fraction_digit: 0}) }}</span>
+            <span class="kpi__detail">{{ 'impayes_association.kpi.plus_60_detail'|trans({membres: compteurs.plus_60}) }}</span>
+        </a>
+        <a class="kpi kpi--lien" href="{{ path('association_impayes', {slug: association.slug, filtre: 'sans_email'}) }}">
+            <span class="kpi__libelle">{{ 'impayes_association.kpi.sans_email'|trans }}</span>
+            <span class="kpi__valeur">{{ compteurs.sans_email }}</span>
+            <span class="kpi__detail">{{ 'impayes_association.kpi.sans_email_detail'|trans }}</span>
+        </a>
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'impayes_association.kpi.prochaine'|trans }}</span>
+            {% if prochaines is not empty %}
+                <span class="kpi__valeur">{{ prochaines[0].date|format_date(pattern='d MMM') }}</span>
+                <span class="kpi__detail">{{ 'impayes_association.kpi.prochaine_detail'|trans({jours: prochaines[0].jours, membres: prochaines[0].membres}) }}</span>
+            {% else %}
+                <span class="kpi__valeur">{{ 'impayes_association.kpi.prochaine_aucune'|trans }}</span>
+                <span class="kpi__detail">{{ 'impayes_association.kpi.prochaine_aucune_detail'|trans }}</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {# G-06 « Par ancienneté du retard » : une barre empilée, la légende en membres et en euros, le tableau de données. #}
+    <section class="section anciennete" aria-labelledby="anciennete-titre">
+        <div class="section__entete"><h2 id="anciennete-titre">{{ 'impayes_association.anciennete.titre'|trans }}</h2></div>
+        {% if totalMontant == 0 %}
+            <p class="section__vide">{{ 'impayes_association.vide'|trans }}</p>
+        {% else %}
+            {% set legendes = [] %}
+            {% for cle in tranches|keys %}
+                {% set legendes = legendes|merge(['impayes_association.anciennete.legende'|trans({tranche: ('impayes_association.anciennete.tranche_' ~ cle)|trans, membres: anciennete[cle].membres, montant: _self.euros(anciennete[cle].montant)})]) %}
+            {% endfor %}
+            <div class="anciennete__barre" role="img" aria-label="{{ 'impayes_association.anciennete.description'|trans({detail: legendes|join(' ; ')}) }}">
+                {% for cle, classe in tranches %}{% if anciennete[cle].montant > 0 %}<span class="anciennete__segment impayes__segment--{{ classe }}" style="flex-grow: {{ anciennete[cle].montant }}"></span>{% endif %}{% endfor %}
+            </div>
+            <div class="graphique__legende anciennete__legende">
+                {% for cle, classe in tranches %}<span class="graphique__cle"><span class="graphique__pastille impayes__segment--{{ classe }}" aria-hidden="true"></span>{{ legendes[loop.index0] }}</span>{% endfor %}
+                <details class="graphique__donnees">
+                    <summary>{{ 'impayes_association.anciennete.donnees'|trans }}</summary>
+                    <table>
+                        <thead><tr><th scope="col"></th><th scope="col" class="numerique">{{ 'impayes_association.anciennete.membres'|trans }}</th><th scope="col" class="numerique">{{ 'impayes_association.colonne.echeances'|trans }}</th><th scope="col" class="numerique">{{ 'impayes_association.colonne.montant'|trans }}</th></tr></thead>
+                        <tbody>
+                            {% for cle in tranches|keys %}<tr><th scope="row">{{ ('impayes_association.anciennete.tranche_' ~ cle)|trans }}</th><td class="numerique">{{ anciennete[cle].membres }}</td><td class="numerique">{{ anciennete[cle].echeances }}</td><td class="numerique">{{ _self.euros(anciennete[cle].montant) }}</td></tr>{% endfor %}
+                        </tbody>
+                    </table>
+                </details>
+            </div>
+        {% endif %}
+    </section>
+
+    {# Frame Turbo : la recherche instantanée (contrôleur `recherche`), les chips, « Effacer » et la pagination ne
+       rechargent que la liste ; tout autre lien ou formulaire de la frame conduit la page entière (target="_top"). #}
+    <turbo-frame id="impayes-liste" class="frame-liste" target="_top" data-turbo-action="advance">
+    <div class="barre-outils">
+        <form method="get" action="{{ path('association_impayes', {slug: association.slug}) }}" class="barre-outils__form" role="search" data-turbo-frame="impayes-liste" data-controller="recherche" data-recherche-valeur-value="{{ q }}" data-action="input->recherche#saisir submit->recherche#annuler">
+            <label class="recherche" id="recherche-impayes" data-turbo-permanent>
+                <span class="visuellement-cache">{{ 'impayes_association.rechercher'|trans }}</span>
+                {{ icones.icone('recherche', 15) }}
+                <input class="recherche__saisie" type="search" name="q" value="{{ q }}" placeholder="{{ 'impayes_association.recherche_placeholder'|trans }}" autocomplete="off">
+            </label>
+            {% if filtre != 'tous' %}<input type="hidden" name="filtre" value="{{ filtre }}">{% endif %}
+            {% if source != 'toutes' %}<input type="hidden" name="echeance" value="{{ source }}">{% endif %}
+            <button type="submit" class="visuellement-cache">{{ 'impayes_association.rechercher'|trans }}</button>
+        </form>
+        <div class="filtres" role="group" aria-label="{{ 'impayes_association.filtre'|trans }}">
+            {% for f in ['tous', 'plus_60', 'sans_email'] %}
+                <a class="filtre" href="{{ path('association_impayes', params|filter((v, k) => k != 'filtre')|merge(f == 'tous' ? {} : {filtre: f})) }}" data-turbo-frame="impayes-liste"{% if filtre == f %} aria-current="true"{% endif %}>{{ ('impayes_association.filtres.' ~ f)|trans }} · {{ compteurs[f] }}</a>
+            {% endfor %}
+        </div>
+        {% set optionsEcheance = [{valeur: 'toutes', libelle: 'impayes_association.echeance_toutes'|trans, href: path('association_impayes', params|filter((v, k) => k != 'echeance'))}] %}
+        {% for cle, s in sources %}
+            {% set optionsEcheance = optionsEcheance|merge([{valeur: cle, libelle: s.libelle, detail: 'impayes_association.echeance_membres'|trans({nombre: s.membres}), href: path('association_impayes', params|merge({echeance: cle}))}]) %}
+        {% endfor %}
+        {{ selecteur.annee('impayes_association.echeance'|trans, optionsEcheance, source, 'selecteur-echeance') }}
+        {% if q != '' or filtre != 'tous' or source != 'toutes' %}
+            <a class="bouton bouton--discret" href="{{ path('association_impayes', {slug: association.slug}) }}" data-turbo-frame="impayes-liste">{{ icones.icone('croix', 15) }}{{ 'impayes_association.effacer'|trans }}</a>
+        {% endif %}
+        <span class="barre-outils__fin tableau__precision tableau__precision--neutre">{{ 'impayes_association.tri'|trans }}</span>
+    </div>
+
+    <section class="section" aria-labelledby="impayes-liste-titre" data-controller="selection">
+        <h2 class="visuellement-cache" id="impayes-liste-titre">{{ 'impayes_association.titre'|trans }}</h2>
+        {% if lignes is empty %}
+            <p class="section__vide">{{ (compteurs.tous == 0 ? 'impayes_association.vide' : 'impayes_association.vide_filtre')|trans }}</p>
+        {% else %}
+            <div class="tableau tableau--menus tableau--serre tableau--impayes">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col" class="impayes__case"><input type="checkbox" aria-label="{{ 'impayes_association.tout_cocher'|trans }}" data-selection-target="toutCocher" data-action="change->selection#toutCocher"></th>
+                            <th scope="col">{{ 'impayes_association.colonne.membre'|trans }}</th>
+                            <th scope="col" class="tableau__tertiaire">{{ 'impayes_association.colonne.du'|trans }}</th>
+                            <th scope="col" class="numerique">{{ 'impayes_association.colonne.montant'|trans }}</th>
+                            <th scope="col" class="numerique">{{ 'impayes_association.colonne.retard'|trans }}</th>
+                            <th scope="col" class="tableau__secondaire">{{ 'impayes_association.colonne.derniere_relance'|trans }}</th>
+                            <th scope="col"><span class="visuellement-cache">{{ 'impayes_association.colonne.actions'|trans }}</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in lignes %}
+                            {% set m = i.membre %}
+                            <tr data-selection-target="ligne">
+                                <td class="impayes__case"><input type="checkbox" name="membres[]" value="{{ m.id }}" aria-label="{{ m.nomComplet }}" data-du="{{ i.montant }}" data-injoignable="{{ i.joignable ? '0' : '1' }}" data-action="change->selection#compter"></td>
+                                <td>
+                                    <span class="entite">
+                                        <span class="entite__initiales entite__initiales--rond" aria-hidden="true">{{ m.initiales }}</span>
+                                        <span class="entite__texte">
+                                            <a class="entite__nom" href="{{ path('association_membre', {slug: association.slug, id: m.id}) }}">{{ m.nomComplet }}</a>
+                                            <span class="entite__detail{{ not i.joignable ? ' entite__detail--attention' }}">{% if i.joignable %}{{ m.email }}{% else %}{{ ('impayes_association.' ~ i.motif)|trans }}{% endif %}{% if not ville %} · {{ m.ville.nom }}{% endif %}</span>
+                                        </span>
+                                    </span>
+                                </td>
+                                <td class="tableau__tertiaire">
+                                    <ul class="impayes__sources">
+                                        {% for s in i.sources %}
+                                            <li>
+                                                <span class="impayes__source">{% if s.type == 'cotisation' %}{{ 'impayes_association.source.cotisation'|trans({libelle: s.libelle, nombre: s.nombre}) }}{% else %}{{ s.libelle }}{% endif %}</span>
+                                                <span class="tableau__precision tableau__precision--neutre">{{ (s.type == 'appel' ? 'impayes_association.source.appel_avant' : 'impayes_association.source.cotisation_depuis')|trans({date: s.plusAncienne|format_date('medium')}) }}</span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                                <td class="numerique"><strong>{{ _self.euros(i.montant) }}</strong></td>
+                                <td class="numerique"><span class="pastille pastille--{{ i.retard > 60 ? 'erreur' : (i.retard > 30 ? 'attente' : 'brouillon') }}" title="{{ 'impayes_association.retard_jours_long'|trans({jours: i.retard}) }}">{{ 'impayes_association.retard_jours'|trans({jours: i.retard}) }}</span></td>
+                                <td class="tableau__secondaire">
+                                    {% if i.derniereRelance %}
+                                        {{ 'impayes_association.relance_le'|trans({date: i.derniereRelance.envoyeeLe|format_date('medium'), canal: i.derniereRelance.estUnAppel ? 'telephone' : 'email', automatique: i.derniereRelance.estAutomatique ? 'oui' : 'non', rang: i.rappels}) }}
+                                    {% else %}
+                                        <span class="tableau__precision tableau__precision--neutre">{{ 'impayes_association.jamais_relance'|trans }}{% if not i.joignable %} · {{ 'impayes_association.a_appeler'|trans }}{% endif %}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="tableau__menu">
+                                    {% if peutRelancer %}
+                                        <details class="menu" data-controller="menu" data-action="toggle->menu#ouvrir">
+                                            <summary class="bouton bouton--discret bouton--icone" aria-label="{{ 'membres_association.ville.actions_de'|trans({nom: m.nomComplet}) }}">{{ icones.icone('menu', 16) }}</summary>
+                                            <div class="menu__liste">
+                                                {% if i.joignable %}<button type="submit" class="menu__item" form="impayes-relancer-ligne" name="membres[]" value="{{ m.id }}">{{ icones.icone('envoyer', 15) }}{{ 'impayes_association.menu.relancer'|trans }}</button>{% endif %}
+                                                <button type="submit" class="menu__item" form="impayes-appeler-ligne" name="membres[]" value="{{ m.id }}">{{ icones.icone('telephone', 15) }}{{ 'impayes_association.menu.appeler'|trans }}</button>
+                                                <a class="menu__item" href="{{ path('association_paiement_nouveau', {slug: association.slug, membre: m.id}) }}">{{ icones.icone('paiement', 15) }}{{ 'impayes_association.menu.paiement'|trans }}</a>
+                                                <a class="menu__item" href="{{ path('association_membre', {slug: association.slug, id: m.id}) }}">{{ icones.icone('comptes', 15) }}{{ 'impayes_association.menu.fiche'|trans }}</a>
+                                            </div>
+                                        </details>
+                                    {% else %}
+                                        <a class="bouton bouton--discret bouton--petit" href="{{ path('association_membre', {slug: association.slug, id: m.id}) }}">{{ 'impayes_association.menu.fiche'|trans }}</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <nav class="pagination" aria-label="{{ 'membres_association.pagination.titre'|trans }}">
+                <span class="pagination__resume" aria-live="polite">{{ 'membres_association.pagination.resume'|trans({de: pagination.de, a: pagination.a, total: total}) }}</span>
+                {% if pagination.pages > 1 %}
+                    <span class="pagination__pages">
+                        {% if pagination.page > 1 %}<a class="bouton bouton--secondaire bouton--petit" href="{{ path('association_impayes', params|merge({page: pagination.page - 1})) }}" data-turbo-frame="impayes-liste">{{ icones.icone('chevron-gauche', 14) }}{{ 'membres_association.pagination.precedente'|trans }}</a>{% endif %}
+                        <span class="pagination__position">{{ 'membres_association.pagination.position'|trans({page: pagination.page, pages: pagination.pages}) }}</span>
+                        {% if pagination.page < pagination.pages %}<a class="bouton bouton--secondaire bouton--petit" href="{{ path('association_impayes', params|merge({page: pagination.page + 1})) }}" data-turbo-frame="impayes-liste">{{ 'membres_association.pagination.suivante'|trans }}{{ icones.icone('chevron', 14) }}</a>{% endif %}
+                    </span>
+                {% endif %}
+            </nav>
+        {% endif %}
+
+        {# La barre de sélection (JavaScript) : relancer par e-mail, enregistrer un paiement, marquer comme appelé. #}
+        {% if peutRelancer and lignes is not empty %}
+            <div class="selection-barre" data-selection-target="barre" hidden>
+                <span class="selection-barre__resume"><strong data-selection-target="nombre">0</strong> <span data-selection-target="texte"></span> <span class="selection-barre__alerte" data-selection-target="sansEmail" hidden></span></span>
+                <div class="selection-barre__actions">
+                    <form method="post" action="{{ path('association_impayes_relancer', {slug: association.slug}) }}" data-selection-target="formRelancer">
+                        <input type="hidden" name="_token" value="{{ csrf_token('impayes-relancer') }}">
+                        <button type="submit" class="bouton bouton--primaire bouton--petit">{{ icones.icone('envoyer', 14) }}<span class="selection-barre__long">{{ 'impayes_association.barre.relancer'|trans }}</span><span class="selection-barre__court">{{ 'impayes_association.barre.relancer_court'|trans }}</span></button>
+                    </form>
+                    <a class="bouton bouton--secondaire bouton--petit" href="{{ path('association_paiement_nouveau', {slug: association.slug}) }}" data-selection-target="lienPaiement">{{ icones.icone('paiement', 14) }}<span class="selection-barre__long">{{ 'impayes_association.barre.paiement'|trans }}</span><span class="selection-barre__court">{{ 'impayes_association.barre.paiement_court'|trans }}</span></a>
+                    <form method="post" action="{{ path('association_impayes_appeler', {slug: association.slug}) }}" data-selection-target="formAppeler">
+                        <input type="hidden" name="_token" value="{{ csrf_token('impayes-appeler') }}">
+                        <button type="submit" class="bouton bouton--secondaire bouton--petit">{{ icones.icone('telephone', 14) }}<span class="selection-barre__long">{{ 'impayes_association.barre.appeler'|trans }}</span><span class="selection-barre__court">{{ 'impayes_association.barre.appeler_court'|trans }}</span></button>
+                    </form>
+                </div>
+                <button type="button" class="bouton bouton--discret bouton--icone selection-barre__fermer" aria-label="{{ 'impayes_association.barre.fermer'|trans }}" data-action="selection#vider">{{ icones.icone('croix', 15) }}</button>
+            </div>
+        {% endif %}
+    </section>
+    </turbo-frame>
+
+    {# Les boutons du menu de chaque ligne s'appuient sur ces deux formulaires (hors de la frame : ils conduisent la page). #}
+    {% if peutRelancer %}
+        <form id="impayes-relancer-ligne" method="post" action="{{ path('association_impayes_relancer', {slug: association.slug}) }}" hidden><input type="hidden" name="_token" value="{{ csrf_token('impayes-relancer') }}"></form>
+        <form id="impayes-appeler-ligne" method="post" action="{{ path('association_impayes_appeler', {slug: association.slug}) }}" hidden><input type="hidden" name="_token" value="{{ csrf_token('impayes-appeler') }}"></form>
+    {% endif %}
+{% endblock %}

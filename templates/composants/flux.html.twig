@@ -1,0 +1,37 @@
+{# G-02 · Flux de l'argent (diagramme de Sankey en SVG), calculé par `App\Association\FluxArgent`. Réutilisé par le
+   tableau de bord et le rapport d'AG. Variables : flux, id (préfixe unique), compact (facultatif, pour l'impression). #}
+{% macro euros(v) %}{{ (v / 100)|format_currency('EUR', {fraction_digit: 0}) }}{% endmacro %}
+{% import _self as g %}
+{% if flux.noeuds is empty %}
+    <p class="graphique__vide">{{ 'graphiques.flux.vide'|trans }}</p>
+{% else %}
+    <figure class="flux" data-export-png-target="zone">
+        <svg class="flux__svg" viewBox="0 0 {{ flux.largeur }} {{ flux.hauteur }}" role="img" aria-labelledby="{{ id }}-titre" preserveAspectRatio="xMidYMid meet">
+            <title id="{{ id }}-titre">{{ 'graphiques.flux.aria'|trans({total: g.euros(flux.total)}) }}</title>
+            <g class="flux__liens">
+                {% for l in flux.liens %}
+                    <path class="flux__lien {{ l.classe }}" d="{{ l.chemin }}"><title>{{ l.source == 'cotisations' or l.source == 'ponctuelles' ? ('graphiques.flux.noeud.' ~ l.source)|trans : l.source }} → {{ l.cible in ['depense', 'du', 'reste'] ? ('graphiques.flux.noeud.' ~ l.cible)|trans : l.cible }} · {{ g.euros(l.valeur) }}</title></path>
+                {% endfor %}
+            </g>
+            <g class="flux__noeuds">
+                {% for n in flux.noeuds %}
+                    <rect class="flux__noeud flux__noeud--{{ n.colonne == 1 ? 'ville' : n.cle }}" x="{{ n.x }}" y="{{ n.y }}" width="14" height="{{ n.h }}" rx="2"></rect>
+                    {% set gauche = n.colonne == 0 %}
+                    <text class="flux__texte" x="{{ gauche ? n.x - 6 : n.x + 20 }}" y="{{ n.y + n.h / 2 }}" text-anchor="{{ gauche ? 'end' : 'start' }}" dominant-baseline="middle"><tspan class="flux__nom">{{ n.colonne == 1 ? n.cle : ('graphiques.flux.noeud.' ~ n.cle)|trans }}</tspan><tspan class="flux__montant" x="{{ gauche ? n.x - 6 : n.x + 20 }}" dy="14">{{ g.euros(n.valeur) }}</tspan></text>
+                {% endfor %}
+            </g>
+        </svg>
+        {% if not flux.sorties %}<figcaption class="section__aide">{{ 'graphiques.flux.sans_sorties'|trans }}</figcaption>{% endif %}
+    </figure>
+    {% if not compact|default(false) %}
+        <details class="graphique__donnees">
+            <summary>{{ 'administration.tableau_de_bord.graphiques.donnees'|trans }}</summary>
+            <table>
+                <thead><tr><th scope="col">{{ 'espace.villes.colonne.ville'|trans }}</th>{% for c in ['cotisations', 'ponctuelles', 'depense', 'du', 'reste'] %}<th scope="col" class="numerique">{{ ('graphiques.flux.noeud.' ~ c)|trans }}</th>{% endfor %}</tr></thead>
+                <tbody>
+                    {% for l in flux.lignes %}<tr><th scope="row">{{ l.ville }}</th>{% for c in ['cotisations', 'ponctuelles', 'depense', 'du', 'reste'] %}<td class="numerique">{{ g.euros(l[c]) }}</td>{% endfor %}</tr>{% endfor %}
+                </tbody>
+            </table>
+        </details>
+    {% endif %}
+{% endif %}

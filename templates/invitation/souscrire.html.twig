@@ -1,0 +1,77 @@
+{# Souscription d'une association par son bureau central : l'offre, puis le compte, en une seule page.
+   Variables : invitation, form, offres (par code), economie, joursPremierPaiement. #}
+{% extends 'invitation/_layout.html.twig' %}
+{% import 'invitation/_fiche.html.twig' as fiche %}
+
+{% block title %}{{ 'souscription.titre'|trans }} · {{ invitation.association.nom }}{% endblock %}
+
+{% block contenu %}
+    <div class="invitation__presentation">
+        <div class="invitation__entete-texte">
+            <span class="invitation__surtitre">{{ 'souscription.surtitre'|trans }}</span>
+            <h1 class="invitation__titre">{{ 'souscription.titre'|trans }}</h1>
+            <p class="invitation__intro">
+                {% if invitation.inviteePar %}
+                    {{ 'souscription.intro_par'|trans({personne: invitation.inviteePar.nomComplet, association: invitation.association.nom}) }}
+                {% else %}
+                    {{ 'souscription.intro'|trans({association: invitation.association.nom}) }}
+                {% endif %}
+            </p>
+        </div>
+        {{ fiche.fiche(invitation, false) }}
+        <p class="invitation__note">{{ 'souscription.suite'|trans({association: invitation.association.nom, jours: joursPremierPaiement}) }}</p>
+    </div>
+
+    {{ form_start(form, {attr: {class: 'invitation__formulaire bloc', novalidate: 'novalidate'}}) }}
+        {% if form.vars.submitted and not form.vars.valid %}
+            <div class="alerte alerte--erreur" role="alert">{{ 'formulaire.erreurs'|trans }}</div>
+        {% endif %}
+        {{ form_errors(form) }}
+
+        {% set offreEnErreur = form.offre.vars.errors|length > 0 %}
+        <fieldset class="offres{{ offreEnErreur ? ' offres--erreur' }}" aria-describedby="offres-aide{{ offreEnErreur ? ' offres-erreur' }}">
+            <legend class="champ__label">{{ 'souscription.offre.label'|trans }}</legend>
+            <div class="offres__liste">
+                {% for choix in form.offre %}
+                    {% set offre = offres[choix.vars.value] %}
+                    {% set annuelle = offre.periodicite.value == 'annuelle' %}
+                    <label class="offre" for="{{ choix.vars.id }}">
+                        {{ form_widget(choix, {attr: {class: 'offre__radio'}}) }}
+                        <span class="offre__corps">
+                            <span class="offre__nom">{{ offre.formule }} · {{ ('periodicite.' ~ offre.periodicite.value)|trans }}</span>
+                            <span class="offre__prix">{{ (offre.montant / 100)|format_currency('EUR') }} <span class="offre__periode">{{ ('periodicite.par.' ~ offre.periodicite.value)|trans }}</span></span>
+                            <span class="offre__detail">
+                                {%- if annuelle -%}
+                                    {{ 'souscription.offre.annuel_detail'|trans({mensuel: (offre.montantMensuel / 100)|format_currency('EUR'), economie: (economie / 100)|format_currency('EUR')}) }}
+                                {%- else -%}
+                                    {{ 'souscription.offre.mensuel_detail'|trans }}
+                                {%- endif -%}
+                            </span>
+                        </span>
+                    </label>
+                {% endfor %}
+            </div>
+            <p class="champ__aide" id="offres-aide">{{ 'souscription.offre.aide'|trans({jours: joursPremierPaiement}) }}</p>
+            {% if offreEnErreur %}
+                <p class="champ__erreur" id="offres-erreur">{% for erreur in form.offre.vars.errors %}{{ erreur.message }}{% if not loop.last %} {% endif %}{% endfor %}</p>
+            {% endif %}
+        </fieldset>
+
+        {{ include('invitation/_champs_compte.html.twig') }}
+
+        {% set conditionsEnErreur = form.conditions.vars.errors|length > 0 %}
+        <div class="champ{{ conditionsEnErreur ? ' champ--erreur' }}">
+            <label class="case" for="{{ form.conditions.vars.id }}">
+                {{ form_widget(form.conditions, {attr: {'aria-describedby': conditionsEnErreur ? form.conditions.vars.id ~ '_erreur' : false, 'aria-invalid': conditionsEnErreur ? 'true' : false}}) }}
+                <span>{{ 'souscription.conditions.label'|trans({association: invitation.association.nom}) }}</span>
+            </label>
+            {% if conditionsEnErreur %}
+                <p class="champ__erreur" id="{{ form.conditions.vars.id }}_erreur">{% for erreur in form.conditions.vars.errors %}{{ erreur.message }}{% if not loop.last %} {% endif %}{% endfor %}</p>
+            {% endif %}
+        </div>
+
+        <div class="invitation__actions">
+            <button type="submit" class="bouton bouton--primaire">{{ 'souscription.souscrire'|trans({association: invitation.association.nom}) }}</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

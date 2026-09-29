@@ -1,0 +1,27 @@
+{# Accueil d'un compte sans rôle de bureau central : l'espace membre (F-26) n'est pas encore livré. #}
+{% extends 'base.html.twig' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/accueil.css') }}">
+{% endblock %}
+
+{% block title %}{{ 'app.nom'|trans }}{% endblock %}
+
+{% block body %}
+    <div class="accueil">
+        <header class="accueil__entete">
+            {{ include('composants/logo.html.twig', {taille: 36, permanent: true, lien: path('accueil')}) }}
+            <div class="accueil__compte">
+                <span class="accueil__utilisateur">{{ app.user.nomComplet }}</span>
+                {% if not is_granted('IS_IMPERSONATOR') %}<a class="bouton bouton--discret" href="{{ path('parametres') }}">{{ 'menu_compte.parametres'|trans }}</a>{% endif %}
+                {{ formulaire.deconnexion() }}
+            </div>
+        </header>
+        <main class="accueil__contenu" id="contenu">
+            <span class="surtitre">{{ app.user.association ? app.user.association.nom : 'accueil.plateforme'|trans }}</span>
+            <h1 class="accueil__titre">{{ 'accueil.titre'|trans({prenom: app.user.prenom}) }}</h1>
+            <p class="accueil__texte">{{ 'accueil.texte'|trans }}</p>
+        </main>
+    </div>
+{% endblock %}

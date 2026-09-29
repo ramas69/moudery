@@ -1,0 +1,6 @@
+<p>Bonjour {{ compte.prenom }},</p>
+<p>{% if par %}{{ par.nomComplet }} vous a ajouté{% else %}Vous avez été ajouté{% endif %} à l’équipe d’administration de {{ 'app.nom'|trans }}, comme super-admin de la plateforme : vous pourrez y consulter et modifier toutes les associations, leurs villes et leurs comptes.</p>
+<p>Choisissez votre mot de passe en ouvrant ce lien, valable jusqu’au {{ expireLe|format_datetime('long', 'short') }} et une seule fois :</p>
+<p><a href="{{ lien }}">{{ lien }}</a></p>
+<p>Vous vous connecterez ensuite avec l’adresse {{ compte.email }}.</p>
+<p>Si vous n’attendiez pas ce message, ignorez-le et prévenez la personne qui vous l’a envoyé.</p>

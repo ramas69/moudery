@@ -1,0 +1,28 @@
+{# Logo « Caisses » : quatre maisons blanches sur un carré de la couleur d'action (chaque ville est une caisse,
+   toutes reposent sur le village), le nom en 700 et le village en dessous.
+   Paramètres : taille (px, 40 par défaut), village (« Moudery » par défaut),
+   variante (« complet » par défaut, ou « symbole » sans texte), ton (« clair » par défaut, ou « sombre » sur fond sombre),
+   permanent (false par défaut : true dans un en-tête, pour que Turbo garde le logo d'une page à l'autre sans rejouer son animation),
+   lien (aucun par défaut : l'adresse vers laquelle le logo mène ; dans un en-tête, l'accueil, qui conduit chacun à son tableau de bord). #}
+{% set taille = taille|default(40) %}
+{% set village = village|default('app.village'|trans) %}
+{% set variante = variante|default('complet') %}
+{% set ton = ton|default('clair') %}
+{% set lien = lien|default(null) %}
+{% set balise = lien ? 'a' : 'span' %}
+<{{ balise }} class="logo{{ ton == 'sombre' ? ' logo--sombre' }}"{% if lien %} href="{{ lien }}"{% endif %} style="--logo-taille: {{ taille }}px"{% if permanent|default(false) %} id="logo-entete" data-turbo-permanent{% endif %}>
+    <svg class="logo__symbole" viewBox="0 0 100 100" width="{{ taille }}" height="{{ taille }}" aria-hidden="true" focusable="false">
+        <rect class="logo__carre" x="0" y="0" width="100" height="100" rx="22"/>
+        <path class="logo__maison logo__maison--1" d="M14 78 V54 L23 46 L32 54 V78 Z"/>
+        <path class="logo__maison logo__maison--2" d="M35 78 V40 L44 32 L53 40 V78 Z"/>
+        <path class="logo__maison logo__maison--3" d="M56 78 V28 L65 20 L74 28 V78 Z"/>
+        <path class="logo__maison logo__maison--4" d="M77 78 V50 L86 42 L95 50 V78 Z"/>
+        <line class="logo__socle" x1="12" y1="84" x2="88" y2="84" stroke-width="5" stroke-linecap="round"/>
+    </svg>
+    {% if variante == 'complet' %}
+        <span class="logo__texte">
+            <span class="logo__nom">{{ 'app.nom'|trans }}</span>
+            <span class="logo__village">{{ village }}</span>
+        </span>
+    {% endif %}
+</{{ balise }}>

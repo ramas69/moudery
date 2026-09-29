@@ -1,0 +1,102 @@
+{# Vue d'ensemble des abonnements : revenu récurrent, répartition, échéances. Variables : abonnements, synthese, aujourdhui. #}
+{% extends 'administration/_layout.html.twig' %}
+{% set page = 'abonnements' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'administration/_macros.html.twig' as macros %}
+
+{% block title %}{{ 'administration.abonnements.titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block titre_page %}{{ 'administration.abonnements.titre'|trans }} <span class="compteur">{{ abonnements|length }}</span>{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'administration.abonnements.sous_titre'|trans }}</p>{% endblock %}
+
+{% block contenu %}
+    <section class="kpis" aria-label="{{ 'administration.abonnements.en_chiffres'|trans }}">
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'administration.abonnements.kpi.mensuel'|trans }}</span>
+            <span class="kpi__valeur">{{ (synthese.mensuel / 100)|format_currency('EUR') }}</span>
+            <span class="kpi__detail">{{ 'administration.abonnements.kpi.annuel'|trans({montant: (synthese.annuel / 100)|format_currency('EUR')}) }}</span>
+        </div>
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'administration.abonnements.kpi.actifs'|trans }}</span>
+            <span class="kpi__valeur">{{ synthese.actifs }}</span>
+            <span class="kpi__detail">
+                {% if synthese.aSouscrire > 0 %}<span class="kpi__chip kpi__chip--attente">{{ 'administration.abonnements.kpi.a_souscrire'|trans({nombre: synthese.aSouscrire}) }}</span>{% endif %}
+                {{ 'administration.abonnements.kpi.offerts'|trans({nombre: synthese.offerts}) }}
+            </span>
+        </div>
+        <div class="kpi">
+            <span class="kpi__libelle">{{ 'administration.abonnements.kpi.en_retard'|trans }}</span>
+            <span class="kpi__valeur{{ synthese.enRetard > 0 ? ' kpi__valeur--erreur' }}">{{ synthese.enRetard }}</span>
+            <span class="kpi__detail">
+                {% if synthese.echeancesProches > 0 %}<span class="kpi__chip kpi__chip--attente">{{ 'administration.abonnements.kpi.echeances_proches'|trans({nombre: synthese.echeancesProches}) }}</span>{% endif %}
+                {{ 'administration.abonnements.kpi.resilies'|trans({nombre: synthese.resilies}) }}
+            </span>
+        </div>
+    </section>
+
+    <section class="section" aria-label="{{ 'administration.abonnements.titre'|trans }}">
+        <div class="tableau tableau--menus">
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">{{ 'administration.abonnements.colonne.association'|trans }}</th>
+                        <th scope="col">{{ 'administration.abonnements.colonne.statut'|trans }}</th>
+                        <th scope="col" class="tableau__tertiaire">{{ 'administration.abonnements.colonne.formule'|trans }}</th>
+                        <th scope="col" class="numerique tableau__tertiaire">{{ 'administration.abonnements.colonne.montant'|trans }}</th>
+                        <th scope="col" class="tableau__tertiaire">{{ 'administration.abonnements.colonne.echeance'|trans }}</th>
+                        <th scope="col" class="tableau__tres-large">{{ 'administration.abonnements.colonne.dernier_paiement'|trans }}</th>
+                        <th scope="col" class="tableau__menu"><span class="visuellement-cache">{{ 'administration.villes.colonne.actions'|trans }}</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for abonnement in abonnements %}
+                        {% set association = abonnement.association %}
+                        <tr>
+                            <td>
+                                <span class="entite">
+                                    <span class="entite__initiales" aria-hidden="true">{{ association.nom|split(' ')|last|slice(0, 2)|upper }}</span>
+                                    <span class="entite__texte">
+                                        <a class="entite__nom" href="{{ path('administration_association_fiche', {id: association.id}) }}#abonnement">{{ association.nom }}</a>
+                                        <span class="entite__detail">{{ macros.statut_association(association) }}</span>
+                                    </span>
+                                </span>
+                            </td>
+                            <td>{{ macros.statut_abonnement(abonnement, aujourdhui) }}</td>
+                            <td class="tableau__tertiaire">{{ abonnement.formule }}</td>
+                            <td class="numerique tableau__tertiaire">{% if abonnement.montant > 0 %}{{ (abonnement.montant / 100)|format_currency('EUR') }}<span class="tableau__precision tableau__precision--neutre">{{ ('periodicite.par.' ~ abonnement.periodicite.value)|trans }}</span>{% else %}{{ 'administration.abonnement.gratuit'|trans }}{% endif %}</td>
+                            <td class="tableau__tertiaire">
+                                {% if abonnement.prochaineEcheanceLe %}
+                                    <time datetime="{{ abonnement.prochaineEcheanceLe|date('Y-m-d') }}">{{ abonnement.prochaineEcheanceLe|format_date('medium') }}</time>
+                                    {% if abonnement.estEnRetard(aujourdhui) %}<span class="tableau__precision">{{ 'administration.abonnements.depassee'|trans }}</span>{% elseif abonnement.echeanceProche(aujourdhui) %}<span class="tableau__precision">{{ 'administration.abonnement.bientot'|trans }}</span>{% endif %}
+                                {% else %}
+                                    <span class="tableau__precision tableau__precision--neutre">{{ 'administration.abonnement.sans_echeance'|trans }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="tableau__tres-large">{{ abonnement.dernierPaiementLe ? abonnement.dernierPaiementLe|format_date('medium') : 'administration.abonnement.aucun_paiement'|trans }}</td>
+                            <td class="tableau__menu">
+                                <details class="menu" data-controller="menu" data-action="toggle->menu#ouvrir">
+                                    <summary class="bouton bouton--icone" aria-label="{{ 'administration.associations.actions_pour'|trans({nom: association.nom}) }}" title="{{ 'administration.associations.actions_pour'|trans({nom: association.nom}) }}">{{ icones.icone('menu') }}</summary>
+                                    <div class="menu__liste">
+                                        <a class="menu__item" href="{{ path('administration_association_fiche', {id: association.id}) }}#abonnement">{{ icones.icone('externe', 15) }}{{ 'administration.associations.action.fiche'|trans }}</a>
+                                        <a class="menu__item" href="{{ path('administration_association_abonnement', {id: association.id, retour: path('administration_abonnements')}) }}">{{ icones.icone('modifier', 15) }}{{ 'administration.abonnement.modifier'|trans }}</a>
+                                        {% if abonnement.estFacturable() %}
+                                            <form method="post" action="{{ path('administration_association_abonnement_paye', {id: association.id}) }}" class="menu__form" data-turbo-confirm="{{ 'administration.abonnement.paye_confirmation'|trans({nom: association.nom}) }}">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('abonnement-paye-' ~ association.id) }}">
+                                                <input type="hidden" name="retour" value="{{ path('administration_abonnements') }}">
+                                                <button type="submit" class="menu__item">{{ icones.icone('coche', 15) }}{{ 'administration.abonnement.marquer_paye'|trans }}</button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </details>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="7" class="tableau__vide">{{ 'administration.abonnements.aucun'|trans }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <p class="note">{{ 'administration.abonnements.pied'|trans }}</p>
+{% endblock %}

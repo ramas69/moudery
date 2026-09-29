@@ -1,0 +1,603 @@
+/*
+ * Espace membre (F-26, F-27, F-04) : mobile d'abord, colonne unique centrée, onglets en bas de l'écran sur téléphone et
+ * sous l'en-tête sur un grand écran. Direction Console : tokens de app.css uniquement.
+ */
+.espace-membre {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: var(--fond);
+}
+
+.espace-membre__entete {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--bordure);
+    background: var(--surface);
+}
+
+.espace-membre__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--sur-accent);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+}
+
+.espace-membre__avatar::-webkit-details-marker {
+    display: none;
+}
+
+.espace-membre__compte .menu__liste {
+    min-width: 14rem;
+}
+
+.menu__item--info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    font-weight: 700;
+    cursor: default;
+}
+
+.menu__item--info:hover {
+    background: none;
+}
+
+.menu__item--info .menu__note {
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.espace-membre__compte .deconnexion {
+    margin: 0;
+}
+
+.espace-membre__compte .deconnexion .bouton {
+    width: 100%;
+    justify-content: flex-start;
+}
+
+.espace-membre__onglets {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding-bottom: env(safe-area-inset-bottom);
+    border-top: 1px solid var(--bordure);
+    background: var(--surface);
+}
+
+.espace-membre__onglet {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.5rem;
+    border-top: 2px solid transparent;
+    color: var(--texte-2);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+}
+
+.espace-membre__onglet[aria-current="page"] {
+    border-top-color: var(--accent);
+    color: var(--texte);
+}
+
+.espace-membre__contenu {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 6rem;
+    box-sizing: border-box;
+}
+
+@media (min-width: 48rem) {
+    .espace-membre__onglets {
+        position: static;
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        border-top: 0;
+        border-bottom: 1px solid var(--bordure);
+    }
+
+    .espace-membre__onglet {
+        min-height: 3rem;
+        padding: 0 1rem;
+        border-top: 0;
+        border-bottom: 2px solid transparent;
+    }
+
+    .espace-membre__onglet[aria-current="page"] {
+        border-bottom-color: var(--accent);
+    }
+
+    .espace-membre__contenu {
+        padding-bottom: 3rem;
+    }
+}
+
+.espace-membre__surtitre {
+    margin: 0 0 -1rem;
+    font-size: var(--taille-petit);
+    font-weight: 600;
+    color: var(--texte-3);
+}
+
+.espace-membre__titre {
+    margin: 0;
+    font-size: 1.625rem;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+}
+
+.espace-membre__intro,
+.espace-membre__vide,
+.espace-membre__note-compte {
+    margin: 0;
+    color: var(--texte-2);
+    text-wrap: pretty;
+}
+
+.espace-membre__chiffres {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+    box-shadow: var(--ombre);
+}
+
+.espace-membre__chiffres > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    padding: 0.875rem 1rem;
+}
+
+.espace-membre__chiffres > div + div {
+    border-left: 1px solid var(--bordure);
+}
+
+.espace-membre__chiffres dt {
+    font-size: var(--taille-petit);
+    font-weight: 600;
+    color: var(--texte-2);
+}
+
+.espace-membre__chiffres dd {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.espace-membre__retard {
+    color: var(--erreur-texte);
+}
+
+.espace-membre__liste {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0 1rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+    list-style: none;
+}
+
+.espace-membre__ligne {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 4.25rem;
+    padding: 0.625rem 0;
+    border-bottom: 1px solid var(--bordure);
+}
+
+.espace-membre__ligne:last-child {
+    border-bottom: 0;
+}
+
+.espace-membre__ligne--annulee .espace-membre__montant {
+    color: var(--texte-3);
+    text-decoration: line-through;
+}
+
+.espace-membre__ligne-texte {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1875rem;
+    min-width: 0;
+}
+
+.espace-membre__ligne-titre {
+    font-weight: 600;
+    text-wrap: pretty;
+}
+
+.espace-membre__ligne-detail {
+    font-size: var(--taille-petit);
+    color: var(--texte-3);
+}
+
+.espace-membre__ligne-droite {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.125rem;
+}
+
+.espace-membre__montant {
+    flex: none;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.espace-membre__lien {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    font-size: var(--taille-petit);
+    font-weight: 600;
+    color: var(--lien);
+}
+
+.espace-membre__note {
+    margin: 0;
+}
+
+.espace-membre__bilan {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0 1rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+    box-shadow: var(--ombre);
+}
+
+.espace-membre__bilan > div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--bordure);
+}
+
+.espace-membre__bilan dt {
+    color: var(--texte-2);
+}
+
+.espace-membre__bilan dd {
+    margin: 0;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.espace-membre__bilan-total {
+    border-bottom: 0 !important;
+}
+
+.espace-membre__bilan-total dt {
+    color: var(--texte);
+    font-weight: 700;
+}
+
+.espace-membre__bilan-total dd {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.espace-membre__bloc {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.espace-membre__bloc h2 {
+    margin: 0;
+    font-size: 1.0625rem;
+}
+
+.espace-membre__barres {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    margin: 0;
+    padding: 1rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+    list-style: none;
+}
+
+.espace-membre__barres li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.25rem 0.75rem;
+    align-items: center;
+}
+
+.espace-membre__barre-libelle {
+    font-size: var(--taille-petit);
+    font-weight: 600;
+}
+
+.espace-membre__barre-montant {
+    font-size: var(--taille-petit);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.espace-membre__piste {
+    grid-column: 1 / -1;
+    display: block;
+    height: 0.5rem;
+    border-radius: 0.25rem;
+    background: var(--surface-2);
+    overflow: hidden;
+}
+
+.espace-membre__piste > span {
+    display: block;
+    height: 100%;
+    border-radius: 0.25rem;
+    background: var(--accent);
+}
+
+.espace-membre__identite {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0 1rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+}
+
+.espace-membre__identite > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--bordure);
+}
+
+.espace-membre__identite > div:last-child {
+    border-bottom: 0;
+}
+
+.espace-membre__identite dt {
+    color: var(--texte-3);
+}
+
+.espace-membre__identite dd {
+    margin: 0;
+    font-weight: 600;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.espace-membre__formulaire {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+}
+
+.espace-membre__formulaire .champ {
+    width: 100%;
+}
+
+.espace-membre__case {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    cursor: pointer;
+}
+
+.espace-membre__case input {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0.125rem;
+    accent-color: var(--accent);
+}
+
+.espace-membre__case > span {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    font-weight: 600;
+}
+
+/* Pages ajoutées le 29 septembre 2026 : bandeau d'attente, total et attestation de l'historique, retour. */
+.espace-membre__attente {
+    margin: 0;
+}
+
+.espace-membre__total {
+    margin: 0;
+    font-weight: 700;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.espace-membre__attestation {
+    align-self: flex-start;
+}
+
+.espace-membre__retour {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    align-self: flex-start;
+    margin-bottom: -0.75rem;
+    font-size: var(--taille-petit);
+    font-weight: 600;
+    color: var(--texte-3);
+    text-decoration: none;
+}
+
+.espace-membre__retour:hover {
+    color: var(--texte);
+}
+
+/* Paiement en ligne simulé (29 septembre 2026) : payer mes échéances, puis la confirmation. */
+.espace-membre__cta {
+    align-self: stretch;
+}
+
+.payer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.payer__choix {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.payer__legende {
+    margin-bottom: 0.5rem;
+    font-size: var(--taille-petit);
+    font-weight: 600;
+    color: var(--texte-2);
+}
+
+.payer__ligne {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+}
+
+.payer__case {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 2.75rem;
+    cursor: pointer;
+}
+
+.payer__case input {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0;
+    accent-color: var(--accent);
+}
+
+.payer__case .espace-membre__ligne-texte {
+    flex: 1;
+}
+
+.payer__libre {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding-left: 2rem;
+    font-size: var(--taille-petit);
+    font-weight: 600;
+    color: var(--texte-2);
+}
+
+.payer__euro {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 12rem;
+}
+
+.payer__pied {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.payer__total {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 0;
+    font-weight: 600;
+}
+
+.payer__total strong {
+    font-size: 1.5rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.payer__bouton {
+    width: 100%;
+}
+
+.payer__simulation {
+    margin: 0;
+}
+
+.merci {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.merci__coche {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--succes);
+    color: #fff;
+}
+
+.merci__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+@media (max-width: 47.99rem) {
+    .merci__actions .bouton {
+        flex: 1 1 100%;
+    }
+}

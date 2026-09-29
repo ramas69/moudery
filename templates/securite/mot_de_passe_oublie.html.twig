@@ -1,0 +1,29 @@
+{# Demande d'un lien de réinitialisation (F-03). #}
+{% extends 'securite/_layout.html.twig' %}
+{% import 'composants/formulaire.html.twig' as formulaire %}
+
+{% block title %}{{ 'mot_de_passe_oublie.titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block contenu %}
+    <div class="securite__entete">
+        <span class="surtitre">{{ 'mot_de_passe_oublie.surtitre'|trans }}</span>
+        <h1 class="securite__titre">{{ 'mot_de_passe_oublie.titre'|trans }}</h1>
+        <p class="securite__intro">{{ 'mot_de_passe_oublie.intro'|trans }}</p>
+    </div>
+
+    {{ form_start(form, {attr: {class: 'securite__formulaire', novalidate: 'novalidate'}}) }}
+        {% if form.vars.submitted and not form.vars.valid %}
+            <div class="alerte alerte--erreur" role="alert">
+                {% if form.vars.errors|length > 0 %}
+                    {%- for erreur in form.vars.errors %}{{ erreur.message }}{% if not loop.last %} {% endif %}{% endfor -%}
+                {% else %}
+                    {{ 'formulaire.erreurs'|trans }}
+                {% endif %}
+            </div>
+        {% endif %}
+        {{ formulaire.champ(form.email, null) }}
+        <button type="submit" class="bouton bouton--primaire bouton--large">{{ 'mot_de_passe_oublie.bouton'|trans }}</button>
+    {{ form_end(form) }}
+
+    <p class="securite__lien"><a href="{{ path('connexion') }}">{{ 'mot_de_passe_oublie.retour'|trans }}</a></p>
+{% endblock %}

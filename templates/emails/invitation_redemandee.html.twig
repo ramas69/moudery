@@ -1,0 +1,4 @@
+<p>Bonjour {{ destinataire.prenom }},</p>
+<p>Le lien d'invitation envoyé à {{ invitation.email }} ({{ ('role.' ~ invitation.role.value)|trans|lower }}{% if invitation.ville %} de {{ invitation.ville.nom }}{% endif %}) a expiré le {{ invitation.expireLe|format_date('long') }}. La personne demande un nouveau lien.</p>
+<p>Renvoyez l'invitation depuis Paramètres › Responsables et rôles : le nouveau lien sera valable 7 jours.</p>
+<p><a href="{{ lien }}">Ouvrir Responsables et rôles</a></p>

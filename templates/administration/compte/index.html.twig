@@ -1,0 +1,94 @@
+{# Tous les comptes de la plateforme, filtrables par association et par statut.
+   Variables : comptes, associations, filtreAssociation, filtreStatut, statuts. #}
+{% extends 'administration/_layout.html.twig' %}
+{% set page = 'comptes' %}
+{% import 'composants/icones.html.twig' as icones %}
+{% import 'administration/_macros.html.twig' as macros %}
+
+{% block title %}{{ 'administration.comptes.titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+
+{% block titre_page %}{{ 'administration.comptes.titre'|trans }} <span class="compteur">{{ comptes|length }}</span>{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'administration.comptes.sous_titre'|trans({nombre: comptes|length}) }}</p>{% endblock %}
+
+{% block actions %}
+    <a class="bouton bouton--primaire" href="{{ path('administration_compte_inviter', {association: filtreAssociation ? filtreAssociation.slug : null}) }}">{{ icones.icone('envoyer', 15) }}{{ 'administration.comptes.inviter'|trans }}</a>
+{% endblock %}
+
+{% block contenu %}
+    {% set statutCourant = filtreStatut ? filtreStatut.value : null %}
+    {% set associationCourante = filtreAssociation ? filtreAssociation.slug : null %}
+    {% set rechercheCourante = recherche != '' ? recherche : null %}
+    <form method="get" action="{{ path('administration_comptes') }}" class="barre-outils" role="search">
+        <label class="recherche">
+            <span class="visuellement-cache">{{ 'administration.comptes.rechercher'|trans }}</span>
+            {{ icones.icone('recherche', 15) }}
+            <input class="recherche__saisie" type="search" name="q" value="{{ recherche }}" placeholder="{{ 'administration.comptes.recherche_placeholder'|trans }}" autocomplete="off">
+        </label>
+        {% if associationCourante %}<input type="hidden" name="association" value="{{ associationCourante }}">{% endif %}
+        {% if statutCourant %}<input type="hidden" name="statut" value="{{ statutCourant }}">{% endif %}
+        <button type="submit" class="bouton bouton--secondaire">{{ 'administration.comptes.rechercher'|trans }}</button>
+        {% if rechercheCourante %}
+            <a class="bouton bouton--discret" href="{{ path('administration_comptes', {association: associationCourante, statut: statutCourant}) }}">{{ 'administration.comptes.effacer_recherche'|trans }}</a>
+        {% endif %}
+    </form>
+    <nav class="filtres" aria-label="{{ 'administration.comptes.filtre_association'|trans }}">
+        <span class="filtres__libelle">{{ 'administration.comptes.filtre_association'|trans }}</span>
+        <a class="filtre" href="{{ path('administration_comptes', {statut: statutCourant, q: rechercheCourante}) }}"{% if not filtreAssociation %} aria-current="true"{% endif %}>{{ 'administration.comptes.filtre_toutes'|trans }}</a>
+        {% for association in associations %}
+            <a class="filtre" href="{{ path('administration_comptes', {association: association.slug, statut: statutCourant, q: rechercheCourante}) }}"{% if filtreAssociation and filtreAssociation.id == association.id %} aria-current="true"{% endif %}>{{ association.nom }}</a>
+        {% endfor %}
+    </nav>
+    <nav class="filtres" aria-label="{{ 'administration.comptes.filtre_statut'|trans }}">
+        <span class="filtres__libelle">{{ 'administration.comptes.filtre_statut'|trans }}</span>
+        <a class="filtre" href="{{ path('administration_comptes', {association: associationCourante, q: rechercheCourante}) }}"{% if not filtreStatut %} aria-current="true"{% endif %}>{{ 'administration.comptes.filtre_tous'|trans }}</a>
+        {% for statut in statuts %}
+            <a class="filtre" href="{{ path('administration_comptes', {association: associationCourante, statut: statut.value, q: rechercheCourante}) }}"{% if filtreStatut == statut %} aria-current="true"{% endif %}>{{ ('statut_compte.' ~ statut.value)|trans }}</a>
+        {% endfor %}
+    </nav>
+
+    <section class="section" aria-label="{{ 'administration.comptes.titre'|trans }}">
+        <div class="tableau">
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">{{ 'administration.comptes.colonne.personne'|trans }}</th>
+                        <th scope="col" class="tableau__tertiaire">{{ 'administration.comptes.colonne.association'|trans }}</th>
+                        <th scope="col" class="tableau__tertiaire">{{ 'administration.comptes.colonne.roles'|trans }}</th>
+                        <th scope="col">{{ 'administration.comptes.colonne.statut'|trans }}</th>
+                        <th scope="col" class="tableau__large">{{ 'administration.comptes.colonne.derniere_connexion'|trans }}</th>
+                        <th scope="col" class="tableau__tertiaire"><span class="visuellement-cache">{{ 'administration.villes.colonne.actions'|trans }}</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for compte in comptes %}
+                        <tr>
+                            <td>
+                                <span class="entite">
+                                    <span class="entite__initiales entite__initiales--rond" aria-hidden="true">{{ macros.initiales(compte.prenom, compte.nom) }}</span>
+                                    <span class="entite__texte">
+                                        <a class="entite__nom" href="{{ path('administration_compte_fiche', {id: compte.id}) }}">{{ compte.nomComplet }}</a>
+                                        <span class="entite__detail">{{ compte.email }}</span>
+                                    </span>
+                                </span>
+                            </td>
+                            <td class="tableau__tertiaire">
+                                {% if compte.association %}
+                                    <a href="{{ path('administration_association_fiche', {id: compte.association.id}) }}">{{ compte.association.nom }}</a>
+                                {% else %}
+                                    <span class="tableau__precision tableau__precision--neutre">{{ 'administration.comptes.plateforme'|trans }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="tableau__tertiaire">{{ macros.roles(compte) }}</td>
+                            <td>{{ macros.statut_compte(compte) }}</td>
+                            <td class="tableau__large">{{ compte.derniereConnexionLe ? compte.derniereConnexionLe|format_datetime('medium', 'short') : 'administration.comptes.jamais_connecte'|trans }}</td>
+                            {# Sur téléphone, le nom suffit : il mène déjà à la fiche. #}
+                            <td class="tableau__tertiaire"><div class="tableau__actions"><a class="bouton bouton--secondaire bouton--petit" href="{{ path('administration_compte_fiche', {id: compte.id}) }}">{{ 'administration.comptes.ouvrir'|trans }}</a></div></td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="6" class="tableau__vide">{{ 'administration.comptes.aucun'|trans }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+{% endblock %}
