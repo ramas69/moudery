@@ -1,0 +1,25 @@
+{# Coquille publique du guide d'utilisation, pour qui n'est pas connecté : l'en-tête de l'accueil avec « Se connecter »,
+   puis le contenu en sections de la coquille Console. Mêmes blocs que parametres/_simple. #}
+{% extends 'base.html.twig' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/accueil.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/console.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="accueil">
+        <header class="accueil__entete">
+            {{ include('composants/logo.html.twig', {taille: 36, permanent: true, lien: path('accueil')}) }}
+            <div class="accueil__compte">
+                <a class="bouton bouton--secondaire" href="{{ path('connexion') }}">{{ icones.icone('comptes', 15) }}{{ 'connexion.titre'|trans }}</a>
+            </div>
+        </header>
+        <main class="accueil__contenu aide__page" id="contenu">
+            <h1 class="accueil__titre">{% block titre_page %}{% endblock %}</h1>
+            {% block sous_titre %}{% endblock %}
+            {% block contenu %}{% endblock %}
+        </main>
+    </div>
+{% endblock %}

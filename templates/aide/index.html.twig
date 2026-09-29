@@ -1,7 +1,8 @@
 {# Guide d'utilisation (page « Aide ») : une page qui décrit tout. Vue d'ensemble, puis un tutoriel par rôle, pas à pas
    et écran par écran, avec des captures prises sur la ville fictive « Montreuil » (outils/captures-aide.sh), puis un
    glossaire. Le contenu est un document, écrit ici en français ; seuls les libellés de la page passent par les
-   traductions. Variables : coquille, association (facultatif), guideLecteur (central, ville ou membre). #}
+   traductions. Page publique. Variables : coquille, association (facultatif), guideLecteur (central, ville, membre, ou
+   null sans compte). #}
 {% extends coquille %}
 {% set page = 'aide' %}
 {% import 'composants/icones.html.twig' as icones %}
@@ -10,7 +11,7 @@
 {% block title %}{{ 'aide.titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
 {% block titre_page %}{{ 'aide.titre'|trans }}{% endblock %}
 {% block sous_titre %}<p class="console__sous-titre">{{ 'aide.sous_titre'|trans }}</p>{% endblock %}
-{% block actions %}<a class="bouton bouton--primaire" href="#guide-{{ guideLecteur }}">{{ icones.icone('chevron', 15) }}{{ 'aide.votre_guide'|trans({role: ('aide.guides.' ~ guideLecteur)|trans}) }}</a>{% endblock %}
+{% block actions %}{% if guideLecteur %}<a class="bouton bouton--primaire" href="#guide-{{ guideLecteur }}">{{ icones.icone('chevron', 15) }}{{ 'aide.votre_guide'|trans({role: ('aide.guides.' ~ guideLecteur)|trans}) }}</a>{% endif %}{% endblock %}
 
 {% macro capture(nom, legende) %}
     <figure class="aide__figure">

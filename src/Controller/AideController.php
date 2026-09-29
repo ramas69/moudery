@@ -10,21 +10,21 @@ use App\Security\Role;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Guide d'utilisation (« Aide ») : une page qui décrit tout, vue d'ensemble, tutoriel de chaque rôle avec des captures
- * d'écran prises sur une ville fictive, glossaire ; dans la coquille de la personne (administration, espace de
- * l'association, coquille simple). Tout le monde voit les trois guides, le sien est proposé en premier.
+ * Guide d'utilisation (« Aide ») : une page publique qui décrit tout, vue d'ensemble, tutoriel de chaque rôle avec des
+ * captures d'écran prises sur une ville fictive, glossaire. Connecté, on la lit dans sa coquille (administration, espace
+ * de l'association, coquille simple) avec son guide proposé en premier ; sans compte, dans une coquille publique.
  */
 final class AideController extends AbstractController
 {
     #[Route('/aide', name: 'aide', methods: ['GET'])]
-    #[IsGranted('IS_AUTHENTICATED')]
     public function index(): Response
     {
         $compte = $this->getUser();
-        \assert($compte instanceof Utilisateur);
+        if (!$compte instanceof Utilisateur) {
+            return $this->render('aide/index.html.twig', ['coquille' => 'aide/_public.html.twig', 'association' => null, 'guideLecteur' => null]);
+        }
         $association = $compte->getAssociation();
         $superAdmin = $this->isGranted(Permission::PLATEFORME_ADMINISTRER);
         $pilote = null !== $association && $this->isGranted(Permission::ASSOCIATION_PILOTER, $association);

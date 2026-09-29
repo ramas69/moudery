@@ -61,9 +61,18 @@ final class AideTest extends CasDeTestWeb
         self::assertSelectorNotExists('.console__nav');
     }
 
-    public function testLaPageDemandeUneConnexion(): void
+    public function testLaPageEstPubliqueSansCompte(): void
     {
         $this->client->request('GET', '/aide');
-        self::assertResponseRedirects('/connexion');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h1', 'Guide d’utilisation');
+        self::assertSelectorExists('#vue-ensemble');
+        self::assertSelectorExists('#guide-central');
+        self::assertSelectorExists('#guide-ville');
+        self::assertSelectorExists('#guide-membre');
+        self::assertSelectorExists('#glossaire');
+        self::assertSelectorExists('.accueil__entete a[href="/connexion"]', 'Sans compte, la coquille publique propose de se connecter.');
+        self::assertSelectorNotExists('.console__nav');
+        self::assertSelectorNotExists('.aide__sommaire-vous', 'Aucun rôle à signaler sans compte.');
     }
 }

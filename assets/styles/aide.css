@@ -180,6 +180,16 @@
     }
 }
 
+/* Coquille publique : le contenu de l'accueil est une carte étroite ; le guide, déjà fait de cartes, prend la largeur
+   de l'espace Console sur le fond de page, sans carte autour. */
+.aide__page {
+    max-width: 84rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
 .aide__sommaire-vous {
     margin-left: 0.25rem;
     padding: 0 0.375rem;
