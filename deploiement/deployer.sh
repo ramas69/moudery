@@ -9,7 +9,9 @@ UTILISATEUR="${O2_UTILISATEUR:?Indiquez le compte cPanel : O2_UTILISATEUR=moncom
 DOSSIER="${O2_DOSSIER:-caisses}"          # relatif au dossier personnel du compte
 PHP="${O2_PHP:-php}"                        # binaire PHP 8.3 ou 8.4 sur le serveur
 RACINE="$(cd "$(dirname "$0")/.." && pwd)"
-SSH="ssh -p ${O2_PORT:-22} ${UTILISATEUR}@${HOTE}"
+CLE="${O2_CLE:-$HOME/.ssh/id_ed25519_o2switch}"   # clé créée le 29 septembre 2026, à importer dans cPanel › Accès SSH
+SSH_OPTIONS="-p ${O2_PORT:-22} -i ${CLE} -o IdentitiesOnly=yes"
+SSH="ssh ${SSH_OPTIONS} ${UTILISATEUR}@${HOTE}"
 
 echo "▶ Vérifications locales"
 cd "$RACINE"
@@ -23,7 +25,7 @@ rsync -az --delete \
     --exclude '/var/' --exclude '/vendor/' --exclude '/public/assets/' \
     --exclude '/tests/' --exclude '/.phpunit.cache/' --exclude '*.db' \
     --exclude '/docs/' --exclude '/deploiement/' --exclude '.DS_Store' --exclude '/.claude/' \
-    -e "ssh -p ${O2_PORT:-22}" \
+    -e "ssh ${SSH_OPTIONS}" \
     ./ "${UTILISATEUR}@${HOTE}:${DOSSIER}/"
 
 echo "▶ Installation sur le serveur"

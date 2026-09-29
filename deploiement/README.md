@@ -14,7 +14,9 @@ Hébergement mutualisé cPanel, serveur `tabebuia.o2switch.net`. À faire une fo
    (cPanel ajoute le préfixe du compte), lui donner tous les droits. Noter la version affichée (MySQL ou MariaDB) pour
    `serverVersion` dans `.env.local`.
 5. **E-mail** : la boîte `moudery@sansraccourcis.com` existe ; vérifier SPF et DKIM dans cPanel › Délivrabilité des e-mails.
-6. **SSH** : cPanel › Autorisation SSH › ajouter l'adresse IP de l'ordinateur qui déploie.
+6. **SSH** : cPanel › Autorisation SSH › ajouter l'adresse IP de l'ordinateur qui déploie ; cPanel › Accès SSH › Gérer
+   les clés SSH › Importer la clé publique `~/.ssh/id_ed25519_o2switch.pub` du Mac, puis l'autoriser. Le script de
+   déploiement utilise cette clé (variable `O2_CLE` pour en choisir une autre).
 
 ## 2. Sur le serveur (une fois)
 
