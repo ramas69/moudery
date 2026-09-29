@@ -7,12 +7,12 @@ Hébergement mutualisé cPanel, serveur `tabebuia.o2switch.net`. À faire une fo
 1. **Sous-domaine** : cPanel › Domaines › créer `caisses.sansraccourcis.com` avec pour racine `caisses.sansraccourcis.com/public`
    (le dossier `public/` du projet, jamais la racine du projet).
 2. **HTTPS** : cPanel › SSL/TLS Status › lancer AutoSSL sur le sous-domaine (Let's Encrypt). `public/.htaccess` force HTTPS.
-3. **PHP** : cPanel › Sélectionner une version de PHP › 8.4 (ou 8.3). Extensions à cocher : intl, mbstring, xml, xmlreader,
-   simplexml, zip, pdo_mysql, ctype, iconv, sodium, opcache. Options : `memory_limit` 256M, `upload_max_filesize` 12M,
-   `post_max_size` 16M, `max_execution_time` 120.
+3. **PHP** : le compte `sora3439` tourne en PHP 8.5 (sélecteur CloudLinux, commun à tous les sites du compte) avec
+   toutes les extensions utiles (intl, mbstring, xmlreader, zip, pdo_mysql, sodium, opcache) et des limites de 512M :
+   rien à changer. Ne pas repasser le compte en 8.4 : les extensions n'y sont pas cochées (vérifié le 29 septembre 2026).
 4. **Base de données** : cPanel › Bases de données MySQL › créer la base `caisses` et l'utilisateur `caisses`
-   (cPanel ajoute le préfixe du compte), lui donner tous les droits. Noter la version affichée (MySQL ou MariaDB) pour
-   `serverVersion` dans `.env.local`.
+   (cPanel ajoute le préfixe : `sora3439_caisses`), lui donner tous les droits. Le serveur est en **MariaDB 11.4**
+   (`serverVersion=mariadb-11.4.13` dans `.env.local`).
 5. **E-mail** : la boîte `moudery@sansraccourcis.com` existe ; vérifier SPF et DKIM dans cPanel › Délivrabilité des e-mails.
 6. **SSH** : cPanel › Autorisation SSH › ajouter l'adresse IP de l'ordinateur qui déploie ; cPanel › Accès SSH › Gérer
    les clés SSH › Importer la clé publique `~/.ssh/id_ed25519_o2switch.pub` du Mac, puis l'autoriser. Le script de

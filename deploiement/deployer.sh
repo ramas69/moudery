@@ -25,6 +25,7 @@ rsync -az --delete \
     --exclude '/var/' --exclude '/vendor/' --exclude '/public/assets/' \
     --exclude '/tests/' --exclude '/.phpunit.cache/' --exclude '*.db' \
     --exclude '/docs/' --exclude '/deploiement/' --exclude '.DS_Store' --exclude '/.claude/' \
+    --exclude '/.git/' --exclude '/public/.well-known/' --exclude '/cgi-bin/' --exclude '/composer.phar' \
     -e "ssh ${SSH_OPTIONS}" \
     ./ "${UTILISATEUR}@${HOTE}:${DOSSIER}/"
 
