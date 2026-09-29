@@ -1,0 +1,127 @@
+/* La carte de la diaspora (composants/carte_diaspora.html.twig), partagée par la page d'accueil et les pages de
+   connexion. Ses couleurs sont locales : vert nuit, menthe et sable, sur fond sombre. */
+.carte-diaspora {
+    --nuit: #0e3a2f;
+    --menthe: #7fd1b0;
+    --sable: #f3c77b;
+}
+
+.carte-diaspora {
+    margin: 0;
+}
+
+.carte-diaspora svg {
+    display: block;
+    width: 100%;
+    max-width: 34rem;
+    height: auto;
+    margin: 0 auto;
+    overflow: visible;
+}
+
+.carte__terre {
+    fill: rgba(255, 255, 255, 0.06);
+    stroke: rgba(127, 209, 176, 0.55);
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+    stroke-dasharray: 1400;
+    stroke-dashoffset: 1400;
+    animation: carte-tracer 1.6s ease-out 0.1s forwards;
+}
+
+.carte__fleuve {
+    fill: none;
+    stroke: #6fb7ff;
+    stroke-opacity: 0.8;
+    stroke-width: 2;
+    stroke-linecap: round;
+}
+
+.carte__pays {
+    font-family: var(--police);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    fill: rgba(255, 255, 255, 0.45);
+}
+
+.carte__arc {
+    fill: none;
+    stroke: url(#arc);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-dasharray: 700;
+    stroke-dashoffset: 700;
+    animation: carte-tracer 1.4s cubic-bezier(0.3, 0.7, 0.2, 1) forwards;
+    animation-delay: calc(0.6s + var(--retard) * 0.35);
+}
+
+.carte__piece {
+    fill: var(--sable);
+    filter: drop-shadow(0 0 4px rgba(243, 199, 123, 0.9));
+}
+
+.carte__ville {
+    fill: var(--menthe);
+    stroke: var(--nuit);
+    stroke-width: 2;
+}
+
+.carte__nom {
+    font-family: var(--police);
+    font-size: 12px;
+    font-weight: 600;
+    fill: rgba(255, 255, 255, 0.7);
+}
+
+.carte__halo {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: carte-pouls 2.8s ease-in-out infinite;
+}
+
+.carte__village {
+    fill: var(--sable);
+    stroke: #fff;
+    stroke-width: 2.5;
+}
+
+.carte__village-nom {
+    font-family: var(--police);
+    font-size: 20px;
+    font-weight: 800;
+    fill: #fff;
+}
+
+.carte__village-note {
+    font-family: var(--police);
+    font-size: 12px;
+    font-weight: 500;
+    fill: rgba(255, 255, 255, 0.65);
+}
+
+@keyframes carte-tracer {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes carte-pouls {
+    0%, 100% { transform: scale(0.85); opacity: 0.75; }
+    50% { transform: scale(1.25); opacity: 1; }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+    .carte__terre,
+    .carte__arc {
+        animation: none;
+        stroke-dashoffset: 0;
+    }
+
+    .carte__halo {
+        animation: none;
+    }
+
+    .carte__piece {
+        display: none;
+    }
+}

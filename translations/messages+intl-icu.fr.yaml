@@ -2831,6 +2831,14 @@ vitrine:
         ecole: 'Rénovation de l’école'
         payer: 'Payer 60 €'
         anonyme: 'Vous voyez vos comptes, jamais ceux des autres.'
+        paye: 'Paiement reçu'
+        fil_nouveau: 'Un membre a payé 60 €'
+        fil_1: 'Un membre a payé sa cotisation'
+        fil_2: 'Dépense validée par le président'
+        a_l_instant: 'à l’instant'
+        il_y_a: 'il y a 2 h'
+        hier: hier
+        legende: 'Le membre paie, la caisse de sa ville le voit aussitôt, et personne d’autre ne sait qui a payé.'
     roles:
         titre: 'Chacun y trouve sa part, et seulement la sienne.'
         central:
@@ -2884,8 +2892,11 @@ vitrine:
 
 aide:
     titre: 'Guide d’utilisation'
-    sous_titre: 'Pas à pas, écran par écran, pour chaque rôle. Imprimez-le ou gardez-le sous la main.'
-    imprimer: 'Imprimer ou PDF'
+    sous_titre: 'Tout Caisses, décrit pas à pas et écran par écran : le fonctionnement, chaque rôle, les mots à connaître.'
+    votre_guide: 'Votre guide : {role}'
+    vous: vous
+    vue_ensemble: 'Vue d’ensemble'
+    glossaire: Glossaire
     sommaire: Sommaire
     guides:
         central: 'Bureau central'

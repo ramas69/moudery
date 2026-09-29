@@ -29,7 +29,7 @@
     padding: 1.25rem 0;
 }
 
-.vitrine__marque {
+.marque-claire {
     display: inline-flex;
     align-items: center;
     gap: 0.625rem;
@@ -156,289 +156,43 @@
     }
 }
 
-/* ---------- La carte ---------- */
-.vitrine__carte {
-    margin: 0;
-}
-
-.vitrine__carte svg {
-    display: block;
-    width: 100%;
-    max-width: 34rem;
-    height: auto;
-    margin: 0 auto;
-    overflow: visible;
-}
-
-.carte__terre {
-    fill: rgba(255, 255, 255, 0.06);
-    stroke: rgba(127, 209, 176, 0.55);
-    stroke-width: 1.4;
-    stroke-linejoin: round;
-    stroke-dasharray: 1400;
-    stroke-dashoffset: 1400;
-    animation: carte-tracer 1.6s ease-out 0.1s forwards;
-}
-
-.carte__fleuve {
-    fill: none;
-    stroke: #6fb7ff;
-    stroke-opacity: 0.8;
-    stroke-width: 2;
-    stroke-linecap: round;
-}
-
-.carte__pays {
-    font-family: var(--police);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    fill: rgba(255, 255, 255, 0.45);
-}
-
-.carte__arc {
-    fill: none;
-    stroke: url(#arc);
-    stroke-width: 1.6;
-    stroke-linecap: round;
-    stroke-dasharray: 700;
-    stroke-dashoffset: 700;
-    animation: carte-tracer 1.4s cubic-bezier(0.3, 0.7, 0.2, 1) forwards;
-    animation-delay: calc(0.6s + var(--retard) * 0.35);
-}
-
-.carte__piece {
-    fill: var(--sable);
-    filter: drop-shadow(0 0 4px rgba(243, 199, 123, 0.9));
-}
-
-.carte__ville {
-    fill: var(--menthe);
-    stroke: var(--nuit);
-    stroke-width: 2;
-}
-
-.carte__nom {
-    font-family: var(--police);
-    font-size: 12px;
-    font-weight: 600;
-    fill: rgba(255, 255, 255, 0.7);
-}
-
-.carte__halo {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: carte-pouls 2.8s ease-in-out infinite;
-}
-
-.carte__village {
-    fill: var(--sable);
-    stroke: #fff;
-    stroke-width: 2.5;
-}
-
-.carte__village-nom {
-    font-family: var(--police);
-    font-size: 20px;
-    font-weight: 800;
-    fill: #fff;
-}
-
-.carte__village-note {
-    font-family: var(--police);
-    font-size: 12px;
-    font-weight: 500;
-    fill: rgba(255, 255, 255, 0.65);
-}
-
-@keyframes carte-tracer {
-    to { stroke-dashoffset: 0; }
-}
-
-@keyframes carte-pouls {
-    0%, 100% { transform: scale(0.85); opacity: 0.75; }
-    50% { transform: scale(1.25); opacity: 1; }
-}
-
-/* ---------- Les écrans ---------- */
-.vitrine__ecrans {
+/* ---------- L'application en action ----------
+   Un cycle de 9 s, joué seulement quand la scène est à l'écran (classe demo--visible posée par le contrôleur
+   `vitrine`) : 10–18 % le doigt touche « Payer », 18–22 % le paiement est reçu, 22–46 % la pièce file vers le
+   tableau de bord, 47–50 % le collecté change, 50–58 % la barre du mois grandit, 55–60 % le fil annonce « un
+   membre », 92–96 % tout revient doucement. Sans JavaScript ou en mouvement réduit : la scène reste immobile. */
+.vitrine__demo {
     position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    max-width: 68rem;
-    margin: clamp(-9rem, -14vw, -6rem) auto 0;
+    max-width: 76rem;
+    margin: clamp(-9rem, -12vw, -6rem) auto 0;
     padding: 0 clamp(1rem, 4vw, 2rem);
 }
 
-.ecran {
-    width: min(100%, 50rem);
-    border: 1px solid rgba(16, 24, 40, 0.08);
-    border-radius: 14px;
-    background: #fff;
-    box-shadow: 0 30px 80px rgba(14, 58, 47, 0.25), 0 2px 6px rgba(16, 24, 40, 0.06);
-    overflow: hidden;
-    transform: perspective(1600px) rotateX(4deg);
-    transform-origin: 50% 100%;
-    animation: ecran-monter 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s both;
-}
-
-.ecran__barre {
-    display: flex;
-    gap: 6px;
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--bordure);
-    background: var(--surface-3);
-}
-
-.ecran__barre span {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--bordure-forte);
-}
-
-.ecran__corps {
-    display: flex;
-    min-height: 19rem;
-}
-
-.ecran__menu {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 9rem;
-    padding: 18px 14px;
-    border-right: 1px solid var(--bordure);
-    background: var(--fond);
-}
-
-.ecran__menu i {
-    display: block;
-    height: 10px;
-    border-radius: 5px;
-    background: var(--surface-2);
-}
-
-.ecran__menu i:nth-child(2n) { width: 70%; }
-
-.ecran__menu .ecran__menu-actif {
-    height: 22px;
-    border: 1px solid var(--bordure);
-    border-radius: 6px;
-    background: #fff;
-}
-
-.ecran__contenu {
-    flex: 1;
-    min-width: 0;
-    padding: 18px 20px 20px;
-}
-
-.ecran__titre {
-    font-size: 1rem;
-}
-
-.ecran__kpis {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
-    margin-top: 12px;
-}
-
-.ecran__kpis div {
-    display: flex;
-    flex-direction: column;
-    padding: 10px 12px;
-    border: 1px solid var(--bordure);
-    border-radius: 8px;
-}
-
-.ecran__kpis small {
-    font-size: 11px;
-    color: var(--texte-3);
-}
-
-.ecran__kpis b {
-    font-size: clamp(0.9375rem, 2vw, 1.25rem);
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -0.02em;
-}
-
-.ecran__hausse {
-    font-size: 11px;
-    font-style: normal;
-    font-weight: 700;
-    color: var(--succes-texte);
-}
-
-.ecran__graphique {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: 6px;
-    align-items: end;
-    height: 6.5rem;
-    margin-top: 16px;
-}
-
-.ecran__graphique span {
-    height: var(--h);
-    border-radius: 4px 4px 0 0;
-    background: var(--accent);
-    transform-origin: 50% 100%;
-    animation: barre-monter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-    animation-delay: calc(0.9s + var(--i) * 0.05s);
-}
-
-.ecran__lignes {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 14px;
-}
-
-.ecran__lignes div {
-    display: grid;
-    grid-template-columns: 5.5rem minmax(0, 1fr) 2.75rem;
-    gap: 10px;
-    align-items: center;
-    font-size: 12px;
-}
-
-.ecran__lignes i {
-    height: 6px;
-    border-radius: 3px;
-    background: var(--surface-2);
-}
-
-.ecran__lignes i b {
-    display: block;
-    height: 100%;
-    border-radius: 3px;
-    background: var(--accent);
-}
-
-.ecran__lignes em {
-    font-style: normal;
-    font-weight: 600;
-    text-align: right;
-}
-
-.telephone {
+.demo {
+    --cycle: 9s;
     position: relative;
-    flex: none;
-    width: 14.5rem;
-    margin-left: -6rem;
-    margin-bottom: -2.5rem;
-    padding: 30px 16px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.demo__telephone {
+    position: relative;
+    order: 2;
+    display: flex;
+    flex-direction: column;
+    width: 15rem;
+    height: 31rem;
+    padding: 2rem 1rem 1rem;
     border: 8px solid #101828;
-    border-radius: 34px;
+    border-radius: 36px;
     background: var(--fond);
     box-shadow: 0 30px 70px rgba(14, 58, 47, 0.35);
-    animation: ecran-monter 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.55s both;
+    box-sizing: border-box;
 }
 
-.telephone__encoche {
+.demo__encoche {
     position: absolute;
     top: 8px;
     left: 50%;
@@ -449,111 +203,378 @@
     transform: translateX(-50%);
 }
 
-.telephone__surtitre {
+.demo__surtitre {
     margin: 0;
     font-size: 11px;
     font-weight: 600;
     color: var(--accent-texte);
 }
 
-.telephone__titre {
-    display: block;
+.demo__titre-tel {
     font-size: 1.125rem;
     letter-spacing: -0.02em;
 }
 
-.telephone__chiffre {
+.demo__du {
     display: flex;
     flex-direction: column;
-    margin-top: 10px;
-    padding: 10px 12px;
+    margin-top: 0.75rem;
+    padding: 0.625rem 0.75rem;
     border: 1px solid var(--bordure);
-    border-radius: 10px;
+    border-radius: 12px;
     background: #fff;
 }
 
-.telephone__chiffre small {
+.demo__du small,
+.demo__kpi small {
     font-size: 11px;
     color: var(--texte-3);
 }
 
-.telephone__chiffre b {
+.demo__du b,
+.demo__kpi b {
+    display: grid;
     font-size: 1.5rem;
     letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
 }
 
-.telephone__liste {
-    margin: 10px 0 0;
-    padding: 0 12px;
+/* Deux valeurs superposées qui se relaient. */
+.demo__du b > span,
+.demo__kpi b > span,
+.demo__bouton > span {
+    grid-area: 1 / 1;
+}
+
+.demo__du-apres,
+.demo__kpi-apres,
+.demo__bouton-apres {
+    opacity: 0;
+}
+
+.demo__liste {
+    margin: 0.625rem 0 0;
+    padding: 0 0.75rem;
     border: 1px solid var(--bordure);
-    border-radius: 10px;
+    border-radius: 12px;
     background: #fff;
     list-style: none;
 }
 
-.telephone__liste li b {
-    white-space: nowrap;
-}
-
-.telephone__liste li {
+.demo__liste li {
     display: flex;
     justify-content: space-between;
-    gap: 8px;
-    padding: 9px 0;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
     font-size: 12px;
 }
 
-.telephone__liste li + li {
+.demo__liste li + li {
     border-top: 1px solid var(--bordure);
 }
 
-.telephone__bouton {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 2.5rem;
-    margin-top: 12px;
-    border-radius: 10px;
+.demo__liste b {
+    white-space: nowrap;
+}
+
+.demo__bouton {
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: 2.75rem;
+    margin-top: auto;
+    border-radius: 12px;
     background: var(--accent);
     color: #fff;
     font-size: 13px;
     font-weight: 700;
 }
 
-.telephone__note {
-    margin: 10px 0 0;
+.demo__bouton-apres {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.demo__doigt {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin: -1.125rem 0 0 -1.125rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.55);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.demo__note {
+    margin: 0.625rem 0 0;
     font-size: 10.5px;
     line-height: 1.4;
     color: var(--texte-3);
     text-align: center;
 }
 
-@keyframes ecran-monter {
-    from { opacity: 0; transform: translateY(40px); }
+.demo__trajet {
+    display: none;
 }
 
-@keyframes barre-monter {
-    from { transform: scaleY(0); }
+.demo__tableau {
+    order: 1;
+    width: min(100%, 38rem);
+    border: 1px solid rgba(16, 24, 40, 0.08);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 30px 80px rgba(14, 58, 47, 0.22), 0 2px 6px rgba(16, 24, 40, 0.05);
+    overflow: hidden;
 }
 
-@media (max-width: 47.99rem) {
-    .vitrine__ecrans {
-        flex-direction: column;
+.demo__barre {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 2.25rem;
+    padding: 0 0.875rem;
+    border-bottom: 1px solid var(--bordure);
+    background: var(--surface-3);
+}
+
+.demo__barre span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--bordure-forte);
+}
+
+.demo__barre em {
+    margin-left: 0.5rem;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    color: var(--texte-2);
+}
+
+.demo__contenu {
+    padding: 1.25rem;
+}
+
+.demo__kpis {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.625rem;
+}
+
+.demo__kpi {
+    display: flex;
+    flex-direction: column;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid var(--bordure);
+    border-radius: 10px;
+}
+
+.demo__kpi b {
+    font-size: clamp(1rem, 2.4vw, 1.375rem);
+}
+
+.demo__graphique {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 6px;
+    align-items: end;
+    height: 6rem;
+    margin-top: 1rem;
+}
+
+.demo__graphique span {
+    height: var(--h);
+    border-radius: 4px 4px 0 0;
+    background: var(--accent);
+    opacity: 0.85;
+}
+
+.demo__graphique .demo__barre-vivante {
+    height: 22%;
+    background: var(--accent);
+    opacity: 1;
+}
+
+.demo__fil {
+    display: flex;
+    flex-direction: column;
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.demo__fil li {
+    display: grid;
+    grid-template-columns: 0.625rem minmax(0, 1fr) auto;
+    gap: 0.625rem;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-top: 1px solid var(--bordure);
+    font-size: 12px;
+}
+
+.demo__fil i {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--bordure-forte);
+}
+
+.demo__fil em {
+    font-style: normal;
+    color: var(--texte-3);
+}
+
+.demo__fil .demo__fil-nouveau {
+    max-height: 0;
+    padding-block: 0;
+    overflow: hidden;
+    opacity: 0;
+    border-top-color: transparent;
+}
+
+.demo__fil-nouveau i {
+    background: var(--sable);
+}
+
+.vitrine__legende {
+    max-width: 34rem;
+    margin: 2.5rem auto 0;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--texte-2);
+    text-align: center;
+    text-wrap: balance;
+}
+
+/* Écran large : téléphone à gauche, tableau à droite, la pièce vole de l'un à l'autre. */
+@media (min-width: 62rem) {
+    .demo {
+        flex-direction: row;
         align-items: center;
+        justify-content: space-between;
+        width: 60rem;
+        max-width: 100%;
+        margin: 0 auto;
+        gap: 0;
     }
 
-    .ecran__menu {
-        display: none;
+    .demo__telephone {
+        order: 0;
     }
 
-    .ecran__corps {
-        min-height: 0;
+    .demo__tableau {
+        order: 0;
+        width: 38rem;
+        height: 24rem;
     }
 
-    .telephone {
-        margin: -3rem 0 0 auto;
-        margin-right: 0.5rem;
-        width: 13rem;
+    /* Point de départ : le bouton « Payer » du téléphone (7,5 rem ; 26,1 rem). */
+    .demo__trajet {
+        position: absolute;
+        top: 26.1rem;
+        left: 7.5rem;
+        display: block;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+    }
+
+    .demo__piece {
+        position: absolute;
+        top: -0.625rem;
+        left: -0.625rem;
+        width: 1.25rem;
+        height: 1.25rem;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, #fff3d6, var(--sable) 55%, #d9a24a);
+        box-shadow: 0 0 18px rgba(243, 199, 123, 0.9);
+        opacity: 0;
+    }
+}
+
+.demo--visible .demo__doigt { animation: demo-doigt var(--cycle) ease-out infinite; }
+.demo--visible .demo__bouton-avant,
+.demo--visible .demo__du-avant { animation: demo-sortir var(--cycle) ease-in-out infinite; }
+.demo--visible .demo__bouton-apres,
+.demo--visible .demo__du-apres { animation: demo-entrer var(--cycle) ease-in-out infinite; }
+.demo--visible .demo__trajet { animation: demo-aller-x var(--cycle) linear infinite; }
+.demo--visible .demo__piece { animation: demo-aller-y var(--cycle) cubic-bezier(0.15, 0.85, 0.35, 1) infinite; }
+.demo--visible .demo__kpi-avant { animation: demo-kpi-sortir var(--cycle) ease-in-out infinite; }
+.demo--visible .demo__kpi-apres { animation: demo-kpi-entrer var(--cycle) ease-in-out infinite; }
+.demo--visible .demo__kpi--vivant { animation: demo-lueur var(--cycle) ease-out infinite; }
+.demo--visible .demo__barre-vivante { animation: demo-barre var(--cycle) cubic-bezier(0.2, 0.8, 0.2, 1) infinite; }
+.demo--visible .demo__fil-nouveau { animation: demo-fil var(--cycle) cubic-bezier(0.2, 0.8, 0.2, 1) infinite; }
+
+@keyframes demo-doigt {
+    0%, 9% { opacity: 0; transform: scale(0.3); }
+    12% { opacity: 1; transform: scale(0.9); }
+    18% { opacity: 0; transform: scale(1.8); }
+    100% { opacity: 0; transform: scale(1.8); }
+}
+
+@keyframes demo-sortir {
+    0%, 17% { opacity: 1; transform: translateY(0); }
+    21%, 91% { opacity: 0; transform: translateY(-6px); }
+    96%, 100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes demo-entrer {
+    0%, 17% { opacity: 0; transform: translateY(6px); }
+    21%, 91% { opacity: 1; transform: translateY(0); }
+    96%, 100% { opacity: 0; transform: translateY(6px); }
+}
+
+@keyframes demo-aller-x {
+    0%, 22% { transform: translateX(0); }
+    46%, 100% { transform: translateX(21.5rem); }
+}
+
+@keyframes demo-aller-y {
+    0%, 21% { opacity: 0; transform: translateY(0) scale(0.6); }
+    23% { opacity: 1; transform: translateY(-0.5rem) scale(1); }
+    44% { opacity: 1; transform: translateY(-17rem) scale(1); }
+    48%, 100% { opacity: 0; transform: translateY(-17rem) scale(0.4); }
+}
+
+@keyframes demo-kpi-sortir {
+    0%, 46% { opacity: 1; transform: translateY(0); }
+    50%, 91% { opacity: 0; transform: translateY(-8px); }
+    96%, 100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes demo-kpi-entrer {
+    0%, 46% { opacity: 0; transform: translateY(8px); }
+    50%, 91% { opacity: 1; transform: translateY(0); }
+    96%, 100% { opacity: 0; transform: translateY(8px); }
+}
+
+@keyframes demo-lueur {
+    0%, 46% { box-shadow: 0 0 0 0 rgba(243, 199, 123, 0); border-color: var(--bordure); }
+    50% { box-shadow: 0 0 0 6px rgba(243, 199, 123, 0.45); border-color: #e2b25f; }
+    70%, 100% { box-shadow: 0 0 0 0 rgba(243, 199, 123, 0); border-color: var(--bordure); }
+}
+
+@keyframes demo-barre {
+    0%, 50% { height: 22%; }
+    58%, 91% { height: 48%; }
+    96%, 100% { height: 22%; }
+}
+
+@keyframes demo-fil {
+    0%, 54% { max-height: 0; opacity: 0; padding-block: 0; }
+    60%, 91% { max-height: 2.5rem; opacity: 1; padding-block: 0.5rem; }
+    96%, 100% { max-height: 0; opacity: 0; padding-block: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .demo--visible * {
+        animation: none !important;
     }
 }
 
@@ -817,24 +838,4 @@
 
 .vitrine__pied p {
     margin: 0;
-}
-
-/* Mouvement réduit : tout est posé d'emblée, l'argent ne circule plus. */
-@media (prefers-reduced-motion: reduce) {
-    .carte__terre,
-    .carte__arc {
-        animation: none;
-        stroke-dashoffset: 0;
-    }
-
-    .carte__halo,
-    .ecran,
-    .telephone,
-    .ecran__graphique span {
-        animation: none;
-    }
-
-    .carte__piece {
-        display: none;
-    }
 }
