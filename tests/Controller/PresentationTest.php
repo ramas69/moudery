@@ -16,7 +16,7 @@ final class PresentationTest extends CasDeTestWeb
         self::assertSelectorTextContains('h1', 'De la ville au village');
         self::assertSelectorExists('.vitrine__entete a[href="/connexion"]');
         self::assertSelectorTextContains('.vitrine__membre', 'pas d’inscription');
-        self::assertSelectorTextContains('.vitrine__carte', 'Moudéry');
+        self::assertSelectorExists('.demo .demo__piece');
         self::assertSelectorNotExists('a[href*="inscription"]');
         self::assertSelectorExists('.pied-legal a[href="/confidentialite"]');
 

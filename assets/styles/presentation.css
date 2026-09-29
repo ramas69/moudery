@@ -68,11 +68,26 @@
     padding-top: clamp(1.5rem, 5vw, 3rem);
 }
 
-@media (min-width: 62rem) {
-    .vitrine__une-grille {
-        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-        gap: 2rem;
-    }
+/* Sans visuel à côté : le titre se centre, la scène de l'application vient chevaucher le bas du haut de page. */
+.vitrine__une-grille {
+    justify-items: center;
+    text-align: center;
+}
+
+.vitrine__une-texte {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 58rem;
+    padding-bottom: clamp(1rem, 3vw, 2rem);
+}
+
+.vitrine__une-texte .vitrine__chapo {
+    margin-inline: auto;
+}
+
+.vitrine__une-texte .vitrine__actions {
+    justify-content: center;
 }
 
 .vitrine__accroche {
@@ -88,7 +103,7 @@
 
 .vitrine__titre {
     margin: 0;
-    font-size: clamp(2.5rem, 6.4vw, 4.75rem);
+    font-size: clamp(2.5rem, 7.2vw, 5.5rem);
     font-weight: 800;
     line-height: 1.02;
     letter-spacing: -0.045em;

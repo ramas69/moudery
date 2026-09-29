@@ -395,25 +395,7 @@
     color: #fff;
 }
 
-.securite__carte {
-    display: none;
-}
-
-@media (min-width: 64rem) {
-    .securite__carte {
-        display: block;
-        flex-shrink: 1;
-        min-height: 0;
-    }
-
-    .securite__carte svg {
-        max-height: 40vh;
-        width: auto;
-        max-width: 100%;
-    }
-}
-
-/* Sur téléphone, le panneau est une bande : la marque et la promesse, sans la carte. */
+/* La marque en blanc sur le panneau vert nuit (bande sur téléphone). */
 .marque-claire {
     display: inline-flex;
     align-items: center;
@@ -429,29 +411,8 @@
 }
 
 @media (min-width: 64rem) {
-    /* La carte prend la place des trois points (déjà racontés par la page d'accueil) : Moudéry reste visible. */
-    .securite__points {
-        display: none;
-    }
-
-    .securite__carte {
-        display: flex;
-        flex: 1 1 auto;
-        align-items: flex-end;
+    /* Sans la carte, la promesse se centre dans le panneau. */
+    .securite__panneau {
         justify-content: center;
-    }
-
-    .securite__carte svg {
-        width: auto;
-        height: 100%;
-        max-height: 58vh;
-        max-width: 100%;
-    }
-}
-
-@media (min-width: 64rem) {
-    /* Sur un écran bas, la carte se limite à la place laissée sous le texte du panneau. */
-    .securite__carte svg {
-        max-height: min(58vh, calc(100vh - 23rem));
     }
 }

@@ -1,6 +1,6 @@
-{# Page d'accueil publique, refaite le 29 septembre 2026 (demande de Rama : « moderne, effet waouh »). Le moment fort :
-   l'argent versé dans les villes de France qui remonte, en arcs lumineux, jusqu'au village au bord du fleuve Sénégal.
-   Puis l'application elle-même (écrans en HTML, aucun visuel importé), les rôles, les règles, les étapes, l'appel final.
+{# Page d'accueil publique, refaite le 29 septembre 2026 (demande de Rama : « moderne, effet waouh » ; la carte animée
+   vers Moudéry a été retirée le soir même à sa demande). Un haut de page typographique sur le vert nuit, puis
+   l'application elle-même (écrans en HTML, aucun visuel importé), les rôles, les règles, les étapes, l'appel final.
    Aucune inscription libre : on se connecte, ou l'association nous écrit. #}
 {% extends 'base.html.twig' %}
 {% import 'composants/icones.html.twig' as icones %}
@@ -8,7 +8,6 @@
 {% block title %}{{ 'vitrine.titre_page'|trans }}{% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('styles/carte_diaspora.css') }}">
     <link rel="stylesheet" href="{{ asset('styles/presentation.css') }}">
     <link rel="stylesheet" href="{{ asset('styles/legal.css') }}">
 {% endblock %}
@@ -36,7 +35,6 @@
                 </div>
 
                 {# La carte : les villes de France, des arcs qui portent l'argent jusqu'au village. Décorative. #}
-                {{ include('composants/carte_diaspora.html.twig', {classe: 'vitrine__carte'}) }}
             </div>
         </section>
 
