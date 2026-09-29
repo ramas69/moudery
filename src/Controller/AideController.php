@@ -13,10 +13,9 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Guide d'utilisation (« Aide ») : le tutoriel de chaque rôle, avec des captures d'écran prises sur une ville fictive,
- * dans la coquille de la personne (administration, espace de l'association, coquille simple), imprimable en PDF depuis
- * le navigateur. Qui pilote l'association voit les trois guides ; un responsable de ville voit le sien et celui des
- * membres ; un membre voit le sien.
+ * Guide d'utilisation (« Aide ») : une page qui décrit tout, vue d'ensemble, tutoriel de chaque rôle avec des captures
+ * d'écran prises sur une ville fictive, glossaire ; dans la coquille de la personne (administration, espace de
+ * l'association, coquille simple). Tout le monde voit les trois guides, le sien est proposé en premier.
  */
 final class AideController extends AbstractController
 {
@@ -38,11 +37,11 @@ final class AideController extends AbstractController
                 default => 'parametres/_simple.html.twig',
             },
             'association' => $association,
-            'guides' => [
-                'central' => $superAdmin || $pilote,
-                'ville' => $superAdmin || $pilote || $responsable,
-                'membre' => true,
-            ],
+            'guideLecteur' => match (true) {
+                $superAdmin || $pilote => 'central',
+                $responsable => 'ville',
+                default => 'membre',
+            },
         ]);
     }
 }

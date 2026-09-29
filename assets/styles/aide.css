@@ -1,6 +1,6 @@
-/* Guide d'utilisation (page Aide) : sommaire collant à gauche dès 64 rem, un guide par rôle en sections, captures
-   encadrées, étapes numérotées en accent, encarts « Bon à savoir ». À l'impression, la coquille disparaît, chaque guide
-   commence sur une nouvelle page et les captures restent entières. Tokens de app.css uniquement. */
+/* Guide d'utilisation (page Aide) : sommaire collant à gauche dès 64 rem, vue d'ensemble, un guide par rôle en
+   sections, captures encadrées, étapes numérotées en accent, encarts « Bon à savoir », glossaire. Tokens de app.css
+   uniquement. */
 .aide {
     display: grid;
     gap: 1.5rem;
@@ -180,56 +180,44 @@
     }
 }
 
-@page {
-    size: A4;
-    margin: 14mm;
+.aide__sommaire-vous {
+    margin-left: 0.25rem;
+    padding: 0 0.375rem;
+    border-radius: var(--rayon-chip);
+    background: var(--accent-doux);
+    color: var(--accent-texte);
+    font-size: 0.6875rem;
+    font-weight: 700;
 }
 
-@media print {
-    .console__barre,
-    .console__actions,
-    .console__onglets,
-    .aide__sommaire,
-    .accueil__entete,
-    .sf-toolbar {
-        display: none !important;
+.aide__glossaire {
+    display: grid;
+    gap: 0.25rem 1rem;
+    margin: 0;
+}
+
+.aide__glossaire dt {
+    margin-top: 0.5rem;
+    font-weight: 600;
+    color: var(--texte);
+}
+
+.aide__glossaire dd {
+    max-width: 70ch;
+    margin: 0;
+    color: var(--texte-2);
+    text-wrap: pretty;
+}
+
+@media (min-width: 48rem) {
+    .aide__glossaire {
+        grid-template-columns: 11rem minmax(0, 1fr);
     }
 
-    body {
-        background: #fff;
-    }
-
-    .console__contenu {
-        padding: 0;
-        animation: none;
-    }
-
-    .aide {
-        display: block;
-    }
-
-    .aide__guide {
-        break-before: page;
-    }
-
-    .aide__guide:first-child {
-        break-before: auto;
-    }
-
-    .aide__section,
-    .aide__figure {
-        break-inside: avoid;
-        box-shadow: none;
-    }
-
-    .aide__figure img {
-        max-height: 115mm;
-        object-fit: contain;
-        object-position: top;
-    }
-
-    .aide__etapes li::before {
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
+    .aide__glossaire dt,
+    .aide__glossaire dd {
+        margin-top: 0;
+        padding: 0.5rem 0;
+        border-top: 1px solid var(--bordure);
     }
 }

@@ -1,7 +1,7 @@
-{# Guide d'utilisation (page « Aide ») : un tutoriel par rôle, pas à pas et écran par écran, avec des captures prises sur
-   la ville fictive « Montreuil » (outils/captures-aide.sh). Le contenu est un document, écrit ici en français, seuls les
-   libellés de la page passent par les traductions. Imprimable en PDF depuis le navigateur (aide.css, @media print).
-   Variables : coquille, association (facultatif), guides (central, ville, membre : booléens). #}
+{# Guide d'utilisation (page « Aide ») : une page qui décrit tout. Vue d'ensemble, puis un tutoriel par rôle, pas à pas
+   et écran par écran, avec des captures prises sur la ville fictive « Montreuil » (outils/captures-aide.sh), puis un
+   glossaire. Le contenu est un document, écrit ici en français ; seuls les libellés de la page passent par les
+   traductions. Variables : coquille, association (facultatif), guideLecteur (central, ville ou membre). #}
 {% extends coquille %}
 {% set page = 'aide' %}
 {% import 'composants/icones.html.twig' as icones %}
@@ -10,7 +10,7 @@
 {% block title %}{{ 'aide.titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
 {% block titre_page %}{{ 'aide.titre'|trans }}{% endblock %}
 {% block sous_titre %}<p class="console__sous-titre">{{ 'aide.sous_titre'|trans }}</p>{% endblock %}
-{% block actions %}<button type="button" class="bouton bouton--primaire" onclick="window.print()">{{ icones.icone('recu', 15) }}{{ 'aide.imprimer'|trans }}</button>{% endblock %}
+{% block actions %}<a class="bouton bouton--primaire" href="#guide-{{ guideLecteur }}">{{ icones.icone('chevron', 15) }}{{ 'aide.votre_guide'|trans({role: ('aide.guides.' ~ guideLecteur)|trans}) }}</a>{% endblock %}
 
 {% macro capture(nom, legende) %}
     <figure class="aide__figure">
@@ -55,17 +55,54 @@
     <nav class="aide__sommaire" aria-label="{{ 'aide.sommaire'|trans }}">
         <h2>{{ 'aide.sommaire'|trans }}</h2>
         <ul>
+            <li class="aide__sommaire-guide"><a href="#vue-ensemble">{{ 'aide.vue_ensemble'|trans }}</a></li>
             {% for cle, sections in sommaire %}
-                {% if guides[cle] %}
-                    <li class="aide__sommaire-guide"><a href="#guide-{{ cle }}">{{ ('aide.guides.' ~ cle)|trans }}</a></li>
-                    {% for s in sections %}<li><a href="#{{ s[0] }}">{{ s[1] }}</a></li>{% endfor %}
-                {% endif %}
+                <li class="aide__sommaire-guide"><a href="#guide-{{ cle }}">{{ ('aide.guides.' ~ cle)|trans }}{% if cle == guideLecteur %} <span class="aide__sommaire-vous">{{ 'aide.vous'|trans }}</span>{% endif %}</a></li>
+                {% for s in sections %}<li><a href="#{{ s[0] }}">{{ s[1] }}</a></li>{% endfor %}
             {% endfor %}
+            <li class="aide__sommaire-guide"><a href="#glossaire">{{ 'aide.glossaire'|trans }}</a></li>
         </ul>
     </nav>
 
     <div class="aide__guides">
-    {% if guides.central %}
+        <section class="aide__guide" id="vue-ensemble" aria-labelledby="vue-ensemble-titre">
+            <header class="aide__guide-entete">
+                <span class="chip">{{ 'aide.vue_ensemble'|trans }}</span>
+                <h2 id="vue-ensemble-titre">Comment Caisses fonctionne</h2>
+                <p>Caisses tient les caisses d’une association de la diaspora d’un village : une caisse par ville, un bureau central qui coordonne, des membres qui cotisent. Cette page décrit tout, du premier réglage à l’assemblée générale.</p>
+            </header>
+            <article class="section aide__section" id="vue-acteurs">
+                <h3>Qui fait quoi</h3>
+                <ol class="aide__etapes">
+                    <li><strong>Le bureau central</strong> crée les villes, invite leurs responsables, lance les appels à contribution pour toute l’association, reçoit les reversements des villes, valide ses propres dépenses et produit le rapport d’assemblée générale.</li>
+                    <li><strong>La trésorière ou le trésorier d’une ville</strong> tient la liste des membres, encaisse les paiements, relance les retards, saisit les dépenses de la ville et déclare les virements faits au bureau central.</li>
+                    <li><strong>Le président ou la présidente d’une ville</strong> valide ou refuse les dépenses de sa ville et peut lancer un appel pour sa ville. Le secrétaire gère les membres.</li>
+                    <li><strong>Le membre</strong> voit ce qu’il doit, paie, garde ses reçus et consulte les comptes de sa ville, sans jamais voir les noms des autres.</li>
+                </ol>
+                <p class="aide__astuce"><strong>{{ 'aide.astuce'|trans }}</strong> Chaque droit est attaché à un rôle et à un périmètre : un trésorier de Montreuil ne voit que Montreuil ; une personne peut cumuler plusieurs rôles.</p>
+            </article>
+            <article class="section aide__section" id="vue-argent">
+                <h3>Le circuit de l’argent</h3>
+                <ol class="aide__etapes">
+                    <li>Chaque année, la ville ouvre sa <strong>cotisation</strong> : un tarif mensuel, un jour d’échéance, une mensualité par membre et par mois.</li>
+                    <li>Un <strong>appel à contribution</strong> (décès, projet, fête) ajoute une échéance ponctuelle aux membres concernés, par personne ou par foyer.</li>
+                    <li>Les <strong>paiements</strong> encaissés par la trésorière soldent ces échéances ; chaque membre reçoit un reçu. Ce qui n’est pas payé à la date limite devient un <strong>impayé</strong>, relancé par e-mail selon le calendrier de l’association.</li>
+                    <li>Les <strong>dépenses</strong> sortent de la caisse après validation par une autre personne que celle qui les a saisies, justificatif à l’appui.</li>
+                    <li>La ville <strong>reverse</strong> au bureau central un pourcentage de sa collecte et la part fixée sur chaque appel ; le bureau central confirme chaque virement reçu.</li>
+                    <li>À la fin de l’exercice, le <strong>rapport d’assemblée générale</strong> présente tout cela, ville par ville, sans aucun nom.</li>
+                </ol>
+            </article>
+            <article class="section aide__section" id="vue-navigation">
+                <h3>Se repérer dans l’application</h3>
+                <ol class="aide__etapes">
+                    <li>La barre de gauche liste les modules : tableau de bord, membres, cotisations, paiements, impayés et relances, projets et appels, dépenses, reversements, rapports d’AG, paramètres.</li>
+                    <li>Le <strong>sélecteur de périmètre</strong>, sous le logo, choisit toute l’association ou une ville ; toutes les pages le suivent.</li>
+                    <li>Le menu de votre compte, en bas, ouvre vos paramètres (adresse, mot de passe) et cette aide.</li>
+                    <li>Sur téléphone, la barre d’onglets en bas remplace la barre de gauche pour les responsables de ville.</li>
+                </ol>
+            </article>
+        </section>
+
         <section class="aide__guide" id="guide-central" aria-labelledby="guide-central-titre">
             <header class="aide__guide-entete">
                 <span class="chip">{{ 'aide.guides.central'|trans }}</span>
@@ -197,9 +234,7 @@
                 {{ _self.capture('central-parametres', 'les paramètres de l’association.') }}
             </article>
         </section>
-    {% endif %}
 
-    {% if guides.ville %}
         <section class="aide__guide" id="guide-ville" aria-labelledby="guide-ville-titre">
             <header class="aide__guide-entete">
                 <span class="chip">{{ 'aide.guides.ville'|trans }}</span>
@@ -285,9 +320,7 @@
                 <p class="aide__astuce"><strong>{{ 'aide.astuce'|trans }}</strong> Toutes les actions sensibles (paiement, annulation, relance, décision sur une dépense, reversement) sont tracées dans le journal de l’association.</p>
             </article>
         </section>
-    {% endif %}
 
-    {% if guides.membre %}
         <section class="aide__guide" id="guide-membre" aria-labelledby="guide-membre-titre">
             <header class="aide__guide-entete">
                 <span class="chip">{{ 'aide.guides.membre'|trans }}</span>
@@ -328,7 +361,30 @@
                 <p class="aide__astuce"><strong>{{ 'aide.astuce'|trans }}</strong> Sans accord e-mail, vous ne recevez ni rappel ni reçu par courriel : votre trésorière vous les remettra en main propre.</p>
             </article>
         </section>
-    {% endif %}
+
+        <section class="aide__guide" id="glossaire" aria-labelledby="glossaire-titre">
+            <header class="aide__guide-entete">
+                <span class="chip">{{ 'aide.glossaire'|trans }}</span>
+                <h2 id="glossaire-titre">Les mots de Caisses</h2>
+            </header>
+            <article class="section aide__section">
+                <dl class="aide__glossaire">
+                    <dt>Exercice</dt><dd>L’année comptable de l’association. Elle commence au mois réglé dans les paramètres (janvier par défaut) ; l’association choisit aussi le premier exercice qu’elle suit dans l’application.</dd>
+                    <dt>Adhésion</dt><dd>Le fait d’être membre pour une année donnée. Une adhésion porte la ligne du classeur : les douze mois, le rapatriement, le projet.</dd>
+                    <dt>Cotisation</dt><dd>La cotisation d’une année pour une ville : un type, un tarif mensuel, un jour d’échéance. Elle crée les mensualités de chaque membre.</dd>
+                    <dt>Échéance, mensualité</dt><dd>Une somme due par un membre à une date limite : un mois de cotisation, ou la contribution à un appel. Elle est due, payée ou annulée.</dd>
+                    <dt>Appel à contribution</dt><dd>Une demande ponctuelle envoyée aux membres : décès, projet du village, fête. Montant fixe ou libre, par personne ou par foyer, avec ou sans relances automatiques.</dd>
+                    <dt>Foyer, payeur</dt><dd>Un groupe de membres d’une même ville qui paient ensemble ; le payeur est celui qui reçoit les échéances par foyer.</dd>
+                    <dt>Paiement, reçu</dt><dd>Un règlement encaissé (espèces, virement, chèque, carte) qui solde une ou plusieurs échéances. Chaque paiement a son reçu ; un paiement annulé remet ses échéances dues.</dd>
+                    <dt>Impayé, relance</dt><dd>Une échéance due dont la date limite est passée. Une relance est un rappel par e-mail (automatique selon le calendrier, ou manuel) ou un appel téléphonique noté par la trésorière.</dd>
+                    <dt>Dépense, justificatif</dt><dd>Une sortie d’argent de la caisse du bureau central ou d’une ville, avec sa facture ou son ticket. Elle est saisie, soumise, validée ou refusée, puis payée.</dd>
+                    <dt>Reversement</dt><dd>La part de sa collecte qu’une ville doit au bureau central pour un exercice : un pourcentage par défaut, plus la part fixée sur chaque appel. Déclaré par la ville, confirmé par le bureau central.</dd>
+                    <dt>Périmètre</dt><dd>Ce que l’application montre : toute l’association ou une ville, choisi sous le logo.</dd>
+                    <dt>Invitation</dt><dd>Le lien envoyé par e-mail pour créer son compte : valable sept jours, à usage unique. Responsables et membres entrent tous par une invitation.</dd>
+                    <dt>Journal</dt><dd>La trace de chaque action sensible : qui a fait quoi, quand. Consultable par le bureau central dans Responsables et rôles.</dd>
+                </dl>
+            </article>
+        </section>
     </div>
 </div>
 {% endblock %}

@@ -28,9 +28,11 @@ connecter() { # compte -> pot de cookies
 capturer() { # pot chemin nom [hauteur]
     local pot="$1" chemin="$2" nom="$3" hauteur="${4:-$HAUTEUR}" page="$TRAVAIL/$3.html"
     curl -s -b "$pot" "$SERVEUR$chemin" -o "$page"
-    # Feuilles de style et images depuis le serveur ; la barre de débogage n'apparaît pas hors navigateur.
-    perl -0pi -e "s#<head>#<head><base href=\"$SERVEUR/\">#" "$page"
-    perl -e 'alarm 60; exec @ARGV' -- "$CHROME" --headless=new --disable-gpu --hide-scrollbars --no-first-run \
+    # Feuilles de style et images depuis le serveur ; la barre de débogage de Symfony est masquée (sans JavaScript, elle
+    # resterait affichée « Loading… » au bas de la capture).
+    perl -0pi -e "s#<head>#<head><base href=\"$SERVEUR/\"><style>.sf-toolbar,.sf-toolbarreset,.sf-minitoolbar{display:none!important}</style>#" "$page"
+    # Chrome écrit la capture en quelques secondes puis ne rend pas la main : l'alarme le coupe.
+    perl -e 'alarm 30; exec @ARGV' -- "$CHROME" --headless=new --disable-gpu --hide-scrollbars --no-first-run \
         --user-data-dir="$TRAVAIL/profil" --window-size="$LARGEUR,$hauteur" --virtual-time-budget=4000 --timeout=15000 \
         --screenshot="$SORTIE/$nom.png" "file://$page" >/dev/null 2>&1 || true
     [ -s "$SORTIE/$nom.png" ] && echo "✓ $nom" || echo "✗ $nom (échec)"
