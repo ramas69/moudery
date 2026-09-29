@@ -40,6 +40,8 @@ if command -v composer >/dev/null; then COMPOSER="composer"; else
 fi
 APP_ENV=prod \$COMPOSER install --no-dev --optimize-autoloader --classmap-authoritative --no-interaction --no-progress
 mkdir -p var/justificatifs var/import var/log
+# Le worker lancé par cron chaque minute s'arrête avant la reconstruction du cache (sinon il perd son conteneur).
+${PHP} bin/console messenger:stop-workers --env=prod || true
 ${PHP} bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --env=prod
 ${PHP} bin/console asset-map:compile --env=prod
 ${PHP} bin/console cache:clear --env=prod
