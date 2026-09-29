@@ -6,7 +6,7 @@ set -euo pipefail
 
 HOTE="${O2_HOTE:-tabebuia.o2switch.net}"
 UTILISATEUR="${O2_UTILISATEUR:?Indiquez le compte cPanel : O2_UTILISATEUR=moncompte}"
-DOSSIER="${O2_DOSSIER:-caisses}"          # relatif au dossier personnel du compte
+DOSSIER="${O2_DOSSIER:-caisses.sansraccourcis.com}"   # relatif au dossier personnel du compte ; le site pointe sur DOSSIER/public
 PHP="${O2_PHP:-php}"                        # binaire PHP 8.3 ou 8.4 sur le serveur
 RACINE="$(cd "$(dirname "$0")/.." && pwd)"
 CLE="${O2_CLE:-$HOME/.ssh/id_ed25519_o2switch}"   # clé créée le 29 septembre 2026, à importer dans cPanel › Accès SSH
