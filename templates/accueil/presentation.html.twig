@@ -1,91 +1,179 @@
-{# Page d'accueil publique (29 septembre 2026) : ce qu'est Caisses, pour qui, les règles, comment démarrer. Le village
-   du logo porte une maison par ville sur un même socle : la structure du produit. Aucune inscription libre : on se
-   connecte, ou l'association nous écrit. #}
+{# Page d'accueil publique, refaite le 29 septembre 2026 (demande de Rama : « moderne, effet waouh »). Le moment fort :
+   l'argent versé dans les villes de France qui remonte, en arcs lumineux, jusqu'au village au bord du fleuve Sénégal.
+   Puis l'application elle-même (écrans en HTML, aucun visuel importé), les rôles, les règles, les étapes, l'appel final.
+   Aucune inscription libre : on se connecte, ou l'association nous écrit. #}
 {% extends 'base.html.twig' %}
 {% import 'composants/icones.html.twig' as icones %}
 
-{% block title %}{{ 'presentation.titre_page'|trans }}{% endblock %}
+{% block title %}{{ 'vitrine.titre_page'|trans }}{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/presentation.css') }}">
     <link rel="stylesheet" href="{{ asset('styles/legal.css') }}">
 {% endblock %}
 
-{% block body %}
-    <div class="presentation">
-        <header class="presentation__entete">
-            {{ include('composants/logo.html.twig', {taille: 36}) }}
-            <a class="bouton bouton--secondaire" href="{{ path('connexion') }}">{{ 'presentation.se_connecter'|trans }}</a>
-        </header>
+{% set contact = 'mailto:' ~ legal.contact ~ '?subject=' ~ ('vitrine.contact_sujet'|trans|url_encode) %}
+{% set villes = [
+    {nom: 'Lille', x: 378.9, y: 39.9, c: '150 250', d: 0.0},
+    {nom: 'Rouen', x: 347.1, y: 57.1, c: '96 262', d: 0.9},
+    {nom: 'Paris', x: 367.4, y: 65.6, c: '120 300', d: 0.3},
+    {nom: 'Le Mans', x: 332.4, y: 77.9, c: '70 290', d: 1.5},
+    {nom: 'Lyon', x: 407.8, y: 110.4, c: '190 330', d: 0.6},
+    {nom: 'Bordeaux', x: 319.7, y: 123.8, c: '60 330', d: 1.2},
+    {nom: 'Marseille', x: 416.5, y: 146.2, c: '240 360', d: 1.8},
+] %}
 
-        <main id="contenu">
-            <section class="presentation__une" aria-labelledby="presentation-titre">
-                <div class="presentation__texte">
-                    <h1 id="presentation-titre" class="presentation__titre">{{ 'presentation.une.titre'|trans }}</h1>
-                    <p class="presentation__chapo">{{ 'presentation.une.chapo'|trans }}</p>
-                    <div class="presentation__actions">
-                        <a class="bouton bouton--primaire presentation__bouton" href="{{ path('connexion') }}">{{ 'presentation.se_connecter'|trans }}</a>
-                        <a class="bouton bouton--secondaire presentation__bouton" href="mailto:{{ legal.contact }}?subject={{ 'presentation.contact_sujet'|trans|url_encode }}">{{ icones.icone('envoyer', 16) }}{{ 'presentation.une.association'|trans }}</a>
+{% block body %}
+    <div class="vitrine">
+        <section class="vitrine__une" aria-labelledby="vitrine-titre">
+            <header class="vitrine__entete">
+                <a class="vitrine__marque" href="{{ path('accueil') }}">
+                    <svg viewBox="0 0 100 100" width="34" height="34" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#fff"/><path fill="#21705b" fill-opacity="0.55" d="M14 78 V54 L23 46 L32 54 V78 Z"/><path fill="#21705b" fill-opacity="0.8" d="M35 78 V40 L44 32 L53 40 V78 Z"/><path fill="#21705b" d="M56 78 V28 L65 20 L74 28 V78 Z"/><path fill="#21705b" fill-opacity="0.65" d="M77 78 V50 L86 42 L95 50 V78 Z"/><line x1="12" y1="84" x2="88" y2="84" stroke="#21705b" stroke-width="5" stroke-linecap="round"/></svg>
+                    <span>{{ 'app.nom'|trans }}</span>
+                </a>
+                <a class="vitrine__connexion" href="{{ path('connexion') }}">{{ 'vitrine.se_connecter'|trans }}</a>
+            </header>
+
+            <div class="vitrine__une-grille">
+                <div class="vitrine__une-texte">
+                    <p class="vitrine__accroche">{{ 'vitrine.une.accroche'|trans }}</p>
+                    <h1 id="vitrine-titre" class="vitrine__titre">{{ 'vitrine.une.titre'|trans }}</h1>
+                    <p class="vitrine__chapo">{{ 'vitrine.une.chapo'|trans }}</p>
+                    <div class="vitrine__actions">
+                        <a class="vitrine__bouton vitrine__bouton--plein" href="{{ path('connexion') }}">{{ 'vitrine.se_connecter'|trans }}</a>
+                        <a class="vitrine__bouton vitrine__bouton--contour" href="{{ contact }}">{{ 'vitrine.une.association'|trans }}</a>
                     </div>
                 </div>
 
-                {# Le village : une maison par caisse de ville, toutes sur le socle du bureau central. Décoratif. #}
-                <figure class="presentation__village" aria-hidden="true">
-                    <svg viewBox="0 0 560 260" focusable="false">
-                        <circle class="village__soleil" cx="486" cy="48" r="20"/>
-                        <g class="village__maisons">
-                            <g class="village__maison" style="--rang: 0"><path d="M24 200 V132 L56 104 L88 132 V200 Z"/><text x="56" y="222">Rouen</text></g>
-                            <g class="village__maison village__maison--claire" style="--rang: 1"><path d="M104 200 V150 L128 128 L152 150 V200 Z"/><text x="128" y="222">Évry</text></g>
-                            <g class="village__maison village__maison--forte" style="--rang: 2"><path d="M168 200 V96 L208 60 L248 96 V200 Z"/><rect class="village__porte" x="196" y="166" width="24" height="34" rx="2"/><text x="208" y="222">Paris</text></g>
-                            <g class="village__maison" style="--rang: 3"><path d="M264 200 V124 L296 96 L328 124 V200 Z"/><rect class="village__fenetre" x="284" y="140" width="24" height="16" rx="2"/><text x="296" y="222">Lyon</text></g>
-                            <g class="village__maison village__maison--claire" style="--rang: 4"><path d="M344 200 V156 L366 136 L388 156 V200 Z"/><text x="366" y="222">Le Mans</text></g>
-                            <g class="village__maison village__maison--forte" style="--rang: 5"><path d="M404 200 V112 L440 80 L476 112 V200 Z"/><rect class="village__porte" x="428" y="170" width="24" height="30" rx="2"/><text x="440" y="222">Marseille</text></g>
-                            <g class="village__maison" style="--rang: 6"><path d="M492 200 V146 L516 124 L540 146 V200 Z"/><text x="516" y="222">Creil</text></g>
-                        </g>
-                        <line class="village__socle" x1="12" y1="206" x2="548" y2="206"/>
-                        <text class="village__central" x="280" y="252">{{ 'presentation.une.socle'|trans }}</text>
+                {# La carte : les villes de France, des arcs qui portent l'argent jusqu'au village. Décorative. #}
+                <figure class="vitrine__carte" aria-hidden="true">
+                    <svg viewBox="0 0 520 620" focusable="false">
+                        <defs>
+                            <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+                                <stop offset="0" stop-color="#f3c77b" stop-opacity="0.9"/>
+                                <stop offset="0.45" stop-color="#f3c77b" stop-opacity="0.25"/>
+                                <stop offset="1" stop-color="#f3c77b" stop-opacity="0"/>
+                            </radialGradient>
+                            <linearGradient id="arc" x1="1" y1="0" x2="0" y2="1">
+                                <stop offset="0" stop-color="#7fd1b0" stop-opacity="0.15"/>
+                                <stop offset="1" stop-color="#f3c77b" stop-opacity="0.9"/>
+                            </linearGradient>
+                            <pattern id="points" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.1" fill="#ffffff" fill-opacity="0.07"/></pattern>
+                        </defs>
+                        <rect width="520" height="620" fill="url(#points)"/>
+                        <path class="carte__terre" d="M367.7 33.8L359.3 35.2L355.2 38.4L351.4 48.1L330.8 56.4L322.6 58.4L308.7 53.8L297.6 53.1L303.1 65.8L296.6 68.6L273.2 66.1L256.1 72.3L252.2 77.4L274.3 81.6L293.4 88.6L300.2 99.8L310.4 104.7L312.4 112.5L310.1 126.4L303.8 143.5L300.4 145.3L309.0 148.2L331.4 152.7L351.9 156.3L375.7 158.3L380.7 158.6L378.5 154.8L381.2 147.9L389.4 144.7L393.1 142.8L404.0 145.4L416.5 146.2L425.6 149.0L437.2 146.6L443.1 142.5L447.4 140.3L451.2 139.2L441.4 130.2L439.0 120.0L440.8 109.5L429.2 104.1L428.4 99.8L443.1 85.2L452.7 83.9L456.1 69.7L463.1 63.9L441.4 60.6L430.0 56.2L423.0 56.0L407.6 47.0L397.5 49.0L394.2 44.9L387.7 43.2L381.2 38.8L370.6 33.2Z"/>
+                        <path class="carte__terre" d="M60.7 541.3L75.3 537.7L86.7 533.3L98.1 537.7L112.7 546.4L120.9 553.6L129.8 559.4L132.3 565.2L137.2 579.7L130.6 592.0L106.2 594.2L83.5 595.6L57.4 593.5L55.8 584.0L67.2 578.2L81.8 581.1L80.2 576.8L59.1 573.9L45.4 561.4L50.9 558.0L55.8 547.8Z"/>
+                        <path class="carte__fleuve" d="M60.7 541.6 Q60.7 541.6 68.8 538.0 Q76.9 534.5 81.3 533.5 Q85.7 532.6 92.7 535.9 Q99.7 539.1 106.7 543.0 Q113.6 546.9 120.0 552.5 Q126.4 558.0 134.7 561.2 L143.0 564.5"/>
+                        <text class="carte__pays" x="352" y="188">France</text>
+                        <text class="carte__pays" x="54" y="622">Sénégal</text>
+
+                        {% for v in villes %}
+                            <path id="arc-{{ loop.index }}" class="carte__arc" style="--retard: {{ v.d }}s" d="M{{ v.x }} {{ v.y }} Q{{ v.c }} 128.2 557.2"/>
+                        {% endfor %}
+                        {% for v in villes %}
+                            <circle class="carte__piece" r="3.2"><animateMotion dur="{{ 3.2 + loop.index0 * 0.35 }}s" begin="{{ 1.2 + v.d }}s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear"><mpath href="#arc-{{ loop.index }}"/></animateMotion></circle>
+                        {% endfor %}
+                        {% for v in villes %}
+                            <circle class="carte__ville" cx="{{ v.x }}" cy="{{ v.y }}" r="4"/>
+                        {% endfor %}
+                        <text class="carte__nom" x="244" y="46" text-anchor="end">Lille · Rouen · Paris</text>
+                        <text class="carte__nom" x="244" y="64" text-anchor="end">Le Mans · Lyon</text>
+                        <text class="carte__nom" x="244" y="82" text-anchor="end">Bordeaux · Marseille</text>
+
+                        <circle class="carte__halo" cx="128.2" cy="557.2" r="46" fill="url(#halo)"/>
+                        <circle class="carte__village" cx="128.2" cy="557.2" r="7"/>
+                        <text class="carte__village-nom" x="150" y="534">Moudéry</text>
+                        <text class="carte__village-note" x="150" y="551">{{ 'vitrine.une.fleuve'|trans }}</text>
                     </svg>
                 </figure>
-            </section>
+            </div>
+        </section>
 
-            <section class="presentation__bloc" aria-labelledby="roles-titre">
-                <h2 id="roles-titre" class="presentation__sous-titre">{{ 'presentation.roles.titre'|trans }}</h2>
-                <dl class="presentation__roles">
-                    {% for role in ['central', 'ville', 'membre'] %}
-                        <div class="presentation__role">
-                            <dt>{{ ('presentation.roles.' ~ role ~ '.nom')|trans }}</dt>
-                            <dd>{{ ('presentation.roles.' ~ role ~ '.texte')|trans }}</dd>
+        {# L'application elle-même : un tableau de bord et un téléphone, dessinés en HTML. Illustration, chiffres d'exemple. #}
+        <section class="vitrine__ecrans" aria-label="{{ 'vitrine.ecrans.aria'|trans }}">
+            <div class="ecran" aria-hidden="true">
+                <div class="ecran__barre"><span></span><span></span><span></span></div>
+                <div class="ecran__corps">
+                    <aside class="ecran__menu"><i class="ecran__menu-actif"></i><i></i><i></i><i></i><i></i><i></i></aside>
+                    <div class="ecran__contenu">
+                        <strong class="ecran__titre">{{ 'vitrine.ecrans.tableau'|trans }}</strong>
+                        <div class="ecran__kpis">
+                            <div><small>{{ 'vitrine.ecrans.collecte'|trans }}</small><b>29 410 €</b><em class="ecran__hausse">+12 %</em></div>
+                            <div><small>{{ 'vitrine.ecrans.depense'|trans }}</small><b>11 730 €</b></div>
+                            <div><small>{{ 'vitrine.ecrans.a_jour'|trans }}</small><b>77 %</b></div>
                         </div>
-                    {% endfor %}
-                </dl>
-            </section>
-
-            <section class="presentation__bloc presentation__bloc--regles" aria-labelledby="regles-titre">
-                <h2 id="regles-titre" class="presentation__sous-titre">{{ 'presentation.regles.titre'|trans }}</h2>
-                <ul class="presentation__regles">
-                    {% for regle, icone in {deux: 'coche', noms: 'oeil', etanche: 'cle', trace: 'activite'} %}
-                        <li><span class="presentation__icone" aria-hidden="true">{{ icones.icone(icone, 18) }}</span><span><strong>{{ ('presentation.regles.' ~ regle ~ '.titre')|trans }}</strong> {{ ('presentation.regles.' ~ regle ~ '.texte')|trans }}</span></li>
-                    {% endfor %}
+                        <div class="ecran__graphique">
+                            {% for h in [38, 72, 64, 30, 26, 44, 28, 34, 52, 30, 22, 66] %}<span style="--h: {{ h }}%; --i: {{ loop.index0 }}"></span>{% endfor %}
+                        </div>
+                        <div class="ecran__lignes">
+                            {% for v in [['Lyon', 88], ['Marseille', 74], ['Paris', 81]] %}
+                                <div><span>{{ v[0] }}</span><i><b style="width: {{ v[1] }}%"></b></i><em>{{ v[1] }} %</em></div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="telephone" aria-hidden="true">
+                <div class="telephone__encoche"></div>
+                <p class="telephone__surtitre">Bonjour Hawa · Lyon</p>
+                <strong class="telephone__titre">{{ 'vitrine.ecrans.echeances'|trans }}</strong>
+                <div class="telephone__chiffre"><small>{{ 'vitrine.ecrans.a_payer'|trans }}</small><b>60 €</b></div>
+                <ul class="telephone__liste">
+                    <li><span>{{ 'vitrine.ecrans.cotisation'|trans }}</span><b>10 €</b></li>
+                    <li><span>{{ 'vitrine.ecrans.ecole'|trans }}</span><b>50 €</b></li>
                 </ul>
+                <span class="telephone__bouton">{{ 'vitrine.ecrans.payer'|trans }}</span>
+                <p class="telephone__note">{{ 'vitrine.ecrans.anonyme'|trans }}</p>
+            </div>
+        </section>
+
+        <main id="contenu">
+            <section class="vitrine__section" aria-labelledby="roles-titre">
+                <h2 id="roles-titre" class="vitrine__h2">{{ 'vitrine.roles.titre'|trans }}</h2>
+                <div class="vitrine__roles">
+                    {% for role, icone in {central: 'associations', ville: 'villes', membre: 'comptes'} %}
+                        <article class="role">
+                            <span class="role__icone" aria-hidden="true">{{ icones.icone(icone, 22) }}</span>
+                            <h3>{{ ('vitrine.roles.' ~ role ~ '.nom')|trans }}</h3>
+                            <p>{{ ('vitrine.roles.' ~ role ~ '.texte')|trans }}</p>
+                        </article>
+                    {% endfor %}
+                </div>
             </section>
 
-            <section class="presentation__bloc" aria-labelledby="etapes-titre">
-                <h2 id="etapes-titre" class="presentation__sous-titre">{{ 'presentation.etapes.titre'|trans }}</h2>
-                <ol class="presentation__etapes">
+            <section class="vitrine__regles" aria-labelledby="regles-titre">
+                <div class="vitrine__section">
+                    <h2 id="regles-titre" class="vitrine__h2">{{ 'vitrine.regles.titre'|trans }}</h2>
+                    <ul class="regles">
+                        {% for regle in ['deux', 'noms', 'etanche', 'trace'] %}
+                            <li><strong>{{ ('vitrine.regles.' ~ regle ~ '.titre')|trans }}</strong><span>{{ ('vitrine.regles.' ~ regle ~ '.texte')|trans }}</span></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </section>
+
+            <section class="vitrine__section" aria-labelledby="etapes-titre">
+                <h2 id="etapes-titre" class="vitrine__h2">{{ 'vitrine.etapes.titre'|trans }}</h2>
+                <ol class="etapes">
                     {% for etape in ['villes', 'classeurs', 'invitations', 'suivi', 'ag'] %}
-                        <li><strong>{{ ('presentation.etapes.' ~ etape ~ '.titre')|trans }}</strong><span>{{ ('presentation.etapes.' ~ etape ~ '.texte')|trans }}</span></li>
+                        <li><strong>{{ ('vitrine.etapes.' ~ etape ~ '.titre')|trans }}</strong><span>{{ ('vitrine.etapes.' ~ etape ~ '.texte')|trans }}</span></li>
                     {% endfor %}
                 </ol>
             </section>
 
-            <section class="presentation__membre" aria-labelledby="membre-titre">
-                <h2 id="membre-titre">{{ 'presentation.membre.titre'|trans }}</h2>
-                <p>{{ 'presentation.membre.texte'|trans }}</p>
+            <section class="vitrine__final" aria-labelledby="final-titre">
+                <h2 id="final-titre">{{ 'vitrine.final.titre'|trans }}</h2>
+                <p>{{ 'vitrine.final.texte'|trans }}</p>
+                <div class="vitrine__actions">
+                    <a class="vitrine__bouton vitrine__bouton--plein" href="{{ contact }}">{{ icones.icone('envoyer', 16) }}{{ 'vitrine.final.ecrire'|trans }}</a>
+                    <a class="vitrine__bouton vitrine__bouton--contour" href="{{ path('connexion') }}">{{ 'vitrine.se_connecter'|trans }}</a>
+                </div>
+                <p class="vitrine__membre"><strong>{{ 'vitrine.membre.titre'|trans }}</strong> {{ 'vitrine.membre.texte'|trans }}</p>
             </section>
         </main>
 
-        <footer class="presentation__pied">
-            <p>{{ 'presentation.pied'|trans }}</p>
+        <footer class="vitrine__pied">
+            <p>{{ 'vitrine.pied'|trans }}</p>
             {{ include('composants/pied_legal.html.twig') }}
         </footer>
     </div>

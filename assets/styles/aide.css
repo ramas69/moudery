@@ -1,0 +1,235 @@
+/* Guide d'utilisation (page Aide) : sommaire collant à gauche dès 64 rem, un guide par rôle en sections, captures
+   encadrées, étapes numérotées en accent, encarts « Bon à savoir ». À l'impression, la coquille disparaît, chaque guide
+   commence sur une nouvelle page et les captures restent entières. Tokens de app.css uniquement. */
+.aide {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.aide__sommaire {
+    padding: 1rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+    font-size: var(--taille-petit);
+}
+
+.aide__sommaire h2 {
+    margin: 0 0 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--texte-3);
+}
+
+.aide__sommaire ul {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.aide__sommaire-guide {
+    margin-top: 0.75rem;
+    font-weight: 700;
+}
+
+.aide__sommaire-guide:first-child {
+    margin-top: 0;
+}
+
+.aide__sommaire a {
+    display: block;
+    padding: 0.125rem 0;
+    color: var(--texte-2);
+    text-decoration: none;
+}
+
+.aide__sommaire-guide a {
+    color: var(--texte);
+}
+
+.aide__sommaire a:hover,
+.aide__sommaire a:focus-visible {
+    color: var(--accent-texte);
+    text-decoration: underline;
+}
+
+.aide__guides {
+    display: grid;
+    gap: 2rem;
+    min-width: 0;
+}
+
+.aide__guide {
+    display: grid;
+    gap: 1rem;
+}
+
+.aide__guide-entete {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: start;
+}
+
+.aide__guide-entete h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    text-wrap: balance;
+}
+
+.aide__guide-entete p,
+.aide__section p {
+    max-width: 70ch;
+    margin: 0;
+    color: var(--texte-2);
+    text-wrap: pretty;
+}
+
+.aide__section {
+    display: grid;
+    gap: 0.875rem;
+}
+
+.aide__section h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.aide__etapes {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: etape;
+}
+
+.aide__etapes li {
+    position: relative;
+    max-width: 70ch;
+    padding-left: 2.25rem;
+    counter-increment: etape;
+    text-wrap: pretty;
+}
+
+.aide__etapes li::before {
+    content: counter(etape);
+    position: absolute;
+    top: -0.0625rem;
+    left: 0;
+    display: grid;
+    place-items: center;
+    width: 1.625rem;
+    height: 1.625rem;
+    border-radius: 50%;
+    background: var(--accent-doux);
+    color: var(--accent-texte);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.aide__figure {
+    margin: 0;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    overflow: hidden;
+    background: var(--surface-2);
+    box-shadow: var(--ombre);
+}
+
+.aide__figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.aide__figure figcaption {
+    padding: 0.5rem 0.75rem;
+    border-top: 1px solid var(--bordure);
+    background: var(--surface);
+    font-size: var(--taille-petit);
+    color: var(--texte-3);
+}
+
+.aide__astuce {
+    max-width: none;
+    padding: 0.75rem 1rem;
+    border-left: 3px solid var(--info);
+    border-radius: 0 var(--rayon-petit) var(--rayon-petit) 0;
+    background: var(--info-doux);
+    color: var(--texte);
+}
+
+.aide__astuce strong {
+    color: var(--info-texte);
+}
+
+@media (min-width: 64rem) {
+    .aide {
+        grid-template-columns: 15rem minmax(0, 1fr);
+        align-items: start;
+    }
+
+    .aide__sommaire {
+        position: sticky;
+        top: 1rem;
+        max-height: calc(100vh - 2rem);
+        overflow-y: auto;
+    }
+}
+
+@page {
+    size: A4;
+    margin: 14mm;
+}
+
+@media print {
+    .console__barre,
+    .console__actions,
+    .console__onglets,
+    .aide__sommaire,
+    .accueil__entete,
+    .sf-toolbar {
+        display: none !important;
+    }
+
+    body {
+        background: #fff;
+    }
+
+    .console__contenu {
+        padding: 0;
+        animation: none;
+    }
+
+    .aide {
+        display: block;
+    }
+
+    .aide__guide {
+        break-before: page;
+    }
+
+    .aide__guide:first-child {
+        break-before: auto;
+    }
+
+    .aide__section,
+    .aide__figure {
+        break-inside: avoid;
+        box-shadow: none;
+    }
+
+    .aide__figure img {
+        max-height: 115mm;
+        object-fit: contain;
+        object-position: top;
+    }
+
+    .aide__etapes li::before {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+}

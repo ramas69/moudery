@@ -1,360 +1,840 @@
-/* Page d'accueil publique (29 septembre 2026). Direction Console : fond vert-gris, surfaces blanches, une seule couleur
-   d'action. L'élément fort est le village (une maison par ville sur le socle du bureau central) ; le reste reste sobre. */
-.presentation {
-    min-height: 100vh;
+/* Page d'accueil publique (refaite le 29 septembre 2026). Le vert de la marque en version nuit pour le haut de page,
+   un sable ocre en seul appoint chaud (décor, jamais d'action), Manrope seule. Une seule entrée orchestrée : la carte
+   se dessine, puis l'argent circule des villes vers le village. */
+.vitrine {
+    --nuit: #0e3a2f;
+    --nuit-2: #134a3c;
+    --menthe: #7fd1b0;
+    --sable: #f3c77b;
+    --sable-doux: #fbf1df;
     background: var(--fond);
     color: var(--texte);
+    overflow-x: clip;
 }
 
-.presentation__entete {
+/* ---------- Haut de page ---------- */
+.vitrine__une {
+    position: relative;
+    padding: 0 clamp(1rem, 4vw, 2.5rem) clamp(8rem, 16vw, 12rem);
+    background: var(--nuit);
+    color: #fff;
+}
+
+.vitrine__entete {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    max-width: 72rem;
+    max-width: 76rem;
     margin: 0 auto;
-    padding: 1rem clamp(1rem, 4vw, 2rem);
+    padding: 1.25rem 0;
 }
 
-.presentation__une {
+.vitrine__marque {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    color: #fff;
+    font-size: 1.125rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.vitrine__connexion {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 1.125rem;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 999px;
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.15s ease-out, border-color 0.15s ease-out;
+}
+
+.vitrine__connexion:hover {
+    border-color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.vitrine__une-grille {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1rem;
     align-items: center;
-    max-width: 72rem;
+    max-width: 76rem;
     margin: 0 auto;
-    padding: clamp(1.5rem, 5vw, 4rem) clamp(1rem, 4vw, 2rem) clamp(2rem, 5vw, 3.5rem);
+    padding-top: clamp(1.5rem, 5vw, 3rem);
 }
 
-@media (min-width: 60rem) {
-    .presentation__une {
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-        gap: 3rem;
+@media (min-width: 62rem) {
+    .vitrine__une-grille {
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+        gap: 2rem;
     }
 }
 
-.presentation__titre {
+.vitrine__accroche {
+    display: inline-flex;
+    margin: 0 0 1.25rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 999px;
+    background: rgba(243, 199, 123, 0.14);
+    color: var(--sable);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.vitrine__titre {
     margin: 0;
-    font-size: clamp(2rem, 5.2vw, 3.25rem);
-    font-weight: 700;
-    line-height: 1.08;
-    letter-spacing: -0.03em;
+    font-size: clamp(2.5rem, 6.4vw, 4.75rem);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.045em;
     text-wrap: balance;
 }
 
-.presentation__chapo {
-    max-width: 34rem;
-    margin: 1.25rem 0 0;
-    font-size: 1.125rem;
+.vitrine__chapo {
+    max-width: 36rem;
+    margin: 1.5rem 0 0;
+    font-size: clamp(1.0625rem, 1.6vw, 1.25rem);
     line-height: 1.6;
-    color: var(--texte-2);
+    color: rgba(255, 255, 255, 0.78);
     text-wrap: pretty;
 }
 
-.presentation__actions {
+.vitrine__actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
-    margin-top: 2rem;
+    margin-top: 2.25rem;
 }
 
-.presentation__bouton {
-    min-height: 3rem;
-    padding-inline: 1.25rem;
+.vitrine__bouton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 3.25rem;
+    padding: 0 1.5rem;
+    border-radius: 999px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.15s ease-out, background-color 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+
+.vitrine__bouton:active {
+    transform: scale(0.97);
+}
+
+.vitrine__bouton--plein {
+    background: #fff;
+    color: var(--nuit);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.vitrine__bouton--plein:hover {
+    background: var(--sable-doux);
+    color: var(--nuit);
+}
+
+.vitrine__bouton--contour {
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    color: #fff;
+}
+
+.vitrine__bouton--contour:hover {
+    border-color: #fff;
+    color: #fff;
 }
 
 @media (max-width: 29.99rem) {
-    .presentation__bouton {
+    .vitrine__bouton {
         flex: 1 1 100%;
-        justify-content: center;
     }
 }
 
-.presentation__village {
+/* ---------- La carte ---------- */
+.vitrine__carte {
     margin: 0;
 }
 
-.presentation__village svg {
+.vitrine__carte svg {
     display: block;
     width: 100%;
+    max-width: 34rem;
     height: auto;
+    margin: 0 auto;
     overflow: visible;
 }
 
-.village__maison path {
-    fill: var(--accent);
-    fill-opacity: 0.78;
+.carte__terre {
+    fill: rgba(255, 255, 255, 0.06);
+    stroke: rgba(127, 209, 176, 0.55);
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+    stroke-dasharray: 1400;
+    stroke-dashoffset: 1400;
+    animation: carte-tracer 1.6s ease-out 0.1s forwards;
 }
 
-.village__maison--claire path {
-    fill-opacity: 0.5;
-}
-
-.village__maison--forte path {
-    fill-opacity: 1;
-}
-
-.village__maison text,
-.village__central {
-    font-family: var(--police);
-    font-size: 13px;
-    font-weight: 600;
-    text-anchor: middle;
-    fill: var(--texte-2);
-}
-
-.village__central {
-    font-size: 13px;
-    font-weight: 700;
-    fill: var(--accent-texte);
-}
-
-.village__porte,
-.village__fenetre {
-    fill: var(--fond);
-}
-
-.village__socle {
-    stroke: var(--accent-texte);
-    stroke-width: 6;
+.carte__fleuve {
+    fill: none;
+    stroke: #6fb7ff;
+    stroke-opacity: 0.8;
+    stroke-width: 2;
     stroke-linecap: round;
 }
 
-.village__soleil {
-    fill: var(--attention);
-    fill-opacity: 0.35;
+.carte__pays {
+    font-family: var(--police);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    fill: rgba(255, 255, 255, 0.45);
 }
 
-/* Une seule entrée orchestrée : les maisons se lèvent l'une après l'autre sur le socle tracé. */
-.village__socle {
-    stroke-dasharray: 540;
-    stroke-dashoffset: 540;
-    animation: village-tracer 0.7s ease-out 0.1s forwards;
+.carte__arc {
+    fill: none;
+    stroke: url(#arc);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-dasharray: 700;
+    stroke-dashoffset: 700;
+    animation: carte-tracer 1.4s cubic-bezier(0.3, 0.7, 0.2, 1) forwards;
+    animation-delay: calc(0.6s + var(--retard) * 0.35);
 }
 
-.village__maison {
+.carte__piece {
+    fill: var(--sable);
+    filter: drop-shadow(0 0 4px rgba(243, 199, 123, 0.9));
+}
+
+.carte__ville {
+    fill: var(--menthe);
+    stroke: var(--nuit);
+    stroke-width: 2;
+}
+
+.carte__nom {
+    font-family: var(--police);
+    font-size: 12px;
+    font-weight: 600;
+    fill: rgba(255, 255, 255, 0.7);
+}
+
+.carte__halo {
     transform-box: fill-box;
-    transform-origin: 50% 100%;
-    opacity: 0;
-    animation: village-lever 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-    animation-delay: calc(0.45s + var(--rang) * 0.08s);
+    transform-origin: center;
+    animation: carte-pouls 2.8s ease-in-out infinite;
 }
 
-@keyframes village-tracer {
+.carte__village {
+    fill: var(--sable);
+    stroke: #fff;
+    stroke-width: 2.5;
+}
+
+.carte__village-nom {
+    font-family: var(--police);
+    font-size: 20px;
+    font-weight: 800;
+    fill: #fff;
+}
+
+.carte__village-note {
+    font-family: var(--police);
+    font-size: 12px;
+    font-weight: 500;
+    fill: rgba(255, 255, 255, 0.65);
+}
+
+@keyframes carte-tracer {
     to { stroke-dashoffset: 0; }
 }
 
-@keyframes village-lever {
-    from { opacity: 0; transform: scaleY(0.2); }
-    to { opacity: 1; transform: scaleY(1); }
+@keyframes carte-pouls {
+    0%, 100% { transform: scale(0.85); opacity: 0.75; }
+    50% { transform: scale(1.25); opacity: 1; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .village__socle,
-    .village__maison {
-        animation: none;
-        opacity: 1;
-        stroke-dashoffset: 0;
-    }
-}
-
-.presentation__bloc {
-    max-width: 72rem;
-    margin: 0 auto;
-    padding: clamp(2rem, 5vw, 3rem) clamp(1rem, 4vw, 2rem);
-    border-top: 1px solid var(--bordure);
-}
-
-.presentation__sous-titre {
-    margin: 0 0 1.5rem;
-    font-size: clamp(1.375rem, 3vw, 1.75rem);
-    letter-spacing: -0.02em;
-    text-wrap: balance;
-}
-
-.presentation__roles {
-    display: grid;
-    grid-template-columns: 1fr;
-    margin: 0;
-}
-
-@media (min-width: 48rem) {
-    .presentation__roles {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .presentation__role + .presentation__role {
-        border-left: 1px solid var(--bordure);
-    }
-}
-
-.presentation__role {
-    padding: 0.25rem 0 1.25rem;
-}
-
-@media (min-width: 48rem) {
-    .presentation__role {
-        padding: 0.25rem 1.5rem;
-    }
-
-    .presentation__role:first-child {
-        padding-left: 0;
-    }
-}
-
-.presentation__role dt {
-    font-size: 1.0625rem;
-    font-weight: 700;
-}
-
-.presentation__role dd {
-    margin: 0.5rem 0 0;
-    line-height: 1.6;
-    color: var(--texte-2);
-    text-wrap: pretty;
-}
-
-.presentation__bloc--regles {
-    max-width: none;
-    background: var(--surface);
-}
-
-.presentation__bloc--regles > * {
+/* ---------- Les écrans ---------- */
+.vitrine__ecrans {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
     max-width: 68rem;
-    margin-inline: auto;
+    margin: clamp(-9rem, -14vw, -6rem) auto 0;
+    padding: 0 clamp(1rem, 4vw, 2rem);
 }
 
-.presentation__regles {
+.ecran {
+    width: min(100%, 50rem);
+    border: 1px solid rgba(16, 24, 40, 0.08);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 30px 80px rgba(14, 58, 47, 0.25), 0 2px 6px rgba(16, 24, 40, 0.06);
+    overflow: hidden;
+    transform: perspective(1600px) rotateX(4deg);
+    transform-origin: 50% 100%;
+    animation: ecran-monter 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s both;
+}
+
+.ecran__barre {
+    display: flex;
+    gap: 6px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--bordure);
+    background: var(--surface-3);
+}
+
+.ecran__barre span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--bordure-forte);
+}
+
+.ecran__corps {
+    display: flex;
+    min-height: 19rem;
+}
+
+.ecran__menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 9rem;
+    padding: 18px 14px;
+    border-right: 1px solid var(--bordure);
+    background: var(--fond);
+}
+
+.ecran__menu i {
+    display: block;
+    height: 10px;
+    border-radius: 5px;
+    background: var(--surface-2);
+}
+
+.ecran__menu i:nth-child(2n) { width: 70%; }
+
+.ecran__menu .ecran__menu-actif {
+    height: 22px;
+    border: 1px solid var(--bordure);
+    border-radius: 6px;
+    background: #fff;
+}
+
+.ecran__contenu {
+    flex: 1;
+    min-width: 0;
+    padding: 18px 20px 20px;
+}
+
+.ecran__titre {
+    font-size: 1rem;
+}
+
+.ecran__kpis {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.25rem 2.5rem;
-    margin: 0 auto;
-    padding: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.ecran__kpis div {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 12px;
+    border: 1px solid var(--bordure);
+    border-radius: 8px;
+}
+
+.ecran__kpis small {
+    font-size: 11px;
+    color: var(--texte-3);
+}
+
+.ecran__kpis b {
+    font-size: clamp(0.9375rem, 2vw, 1.25rem);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+}
+
+.ecran__hausse {
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 700;
+    color: var(--succes-texte);
+}
+
+.ecran__graphique {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 6px;
+    align-items: end;
+    height: 6.5rem;
+    margin-top: 16px;
+}
+
+.ecran__graphique span {
+    height: var(--h);
+    border-radius: 4px 4px 0 0;
+    background: var(--accent);
+    transform-origin: 50% 100%;
+    animation: barre-monter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: calc(0.9s + var(--i) * 0.05s);
+}
+
+.ecran__lignes {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.ecran__lignes div {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr) 2.75rem;
+    gap: 10px;
+    align-items: center;
+    font-size: 12px;
+}
+
+.ecran__lignes i {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--surface-2);
+}
+
+.ecran__lignes i b {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    background: var(--accent);
+}
+
+.ecran__lignes em {
+    font-style: normal;
+    font-weight: 600;
+    text-align: right;
+}
+
+.telephone {
+    position: relative;
+    flex: none;
+    width: 14.5rem;
+    margin-left: -6rem;
+    margin-bottom: -2.5rem;
+    padding: 30px 16px 18px;
+    border: 8px solid #101828;
+    border-radius: 34px;
+    background: var(--fond);
+    box-shadow: 0 30px 70px rgba(14, 58, 47, 0.35);
+    animation: ecran-monter 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.55s both;
+}
+
+.telephone__encoche {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    width: 70px;
+    height: 16px;
+    border-radius: 10px;
+    background: #101828;
+    transform: translateX(-50%);
+}
+
+.telephone__surtitre {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent-texte);
+}
+
+.telephone__titre {
+    display: block;
+    font-size: 1.125rem;
+    letter-spacing: -0.02em;
+}
+
+.telephone__chiffre {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--bordure);
+    border-radius: 10px;
+    background: #fff;
+}
+
+.telephone__chiffre small {
+    font-size: 11px;
+    color: var(--texte-3);
+}
+
+.telephone__chiffre b {
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+}
+
+.telephone__liste {
+    margin: 10px 0 0;
+    padding: 0 12px;
+    border: 1px solid var(--bordure);
+    border-radius: 10px;
+    background: #fff;
     list-style: none;
 }
 
-@media (min-width: 48rem) {
-    .presentation__regles {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+.telephone__liste li b {
+    white-space: nowrap;
+}
+
+.telephone__liste li {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 9px 0;
+    font-size: 12px;
+}
+
+.telephone__liste li + li {
+    border-top: 1px solid var(--bordure);
+}
+
+.telephone__bouton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.5rem;
+    margin-top: 12px;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.telephone__note {
+    margin: 10px 0 0;
+    font-size: 10.5px;
+    line-height: 1.4;
+    color: var(--texte-3);
+    text-align: center;
+}
+
+@keyframes ecran-monter {
+    from { opacity: 0; transform: translateY(40px); }
+}
+
+@keyframes barre-monter {
+    from { transform: scaleY(0); }
+}
+
+@media (max-width: 47.99rem) {
+    .vitrine__ecrans {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .ecran__menu {
+        display: none;
+    }
+
+    .ecran__corps {
+        min-height: 0;
+    }
+
+    .telephone {
+        margin: -3rem 0 0 auto;
+        margin-right: 0.5rem;
+        width: 13rem;
     }
 }
 
-.presentation__regles li {
-    display: flex;
-    gap: 0.875rem;
-    line-height: 1.6;
-    color: var(--texte-2);
-    text-wrap: pretty;
+/* ---------- Sections ---------- */
+.vitrine__section {
+    max-width: 76rem;
+    margin: 0 auto;
+    padding: clamp(4rem, 9vw, 7rem) clamp(1rem, 4vw, 2.5rem) clamp(3rem, 6vw, 4rem);
 }
 
-.presentation__regles strong {
-    display: block;
-    color: var(--texte);
+.vitrine__h2 {
+    max-width: 40rem;
+    margin: 0 0 2.5rem;
+    font-size: clamp(1.875rem, 4vw, 3rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
 }
 
-.presentation__icone {
+.vitrine__roles {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+@media (min-width: 52rem) {
+    .vitrine__roles {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1.5rem;
+    }
+}
+
+.role {
+    padding: 1.75rem;
+    border: 1px solid var(--bordure);
+    border-radius: 18px;
+    background: #fff;
+}
+
+.role:nth-child(2) {
+    background: var(--nuit);
+    border-color: var(--nuit);
+    color: #fff;
+}
+
+.role__icone {
     display: flex;
-    flex: none;
     align-items: center;
     justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: var(--rayon-petit);
+    width: 3rem;
+    height: 3rem;
+    border-radius: 14px;
     background: var(--surface-2);
     color: var(--accent-texte);
 }
 
-.presentation__etapes {
+.role:nth-child(2) .role__icone {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--sable);
+}
+
+.role h3 {
+    margin: 1.25rem 0 0.5rem;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+}
+
+.role p {
+    margin: 0;
+    line-height: 1.65;
+    color: var(--texte-2);
+    text-wrap: pretty;
+}
+
+.role:nth-child(2) p {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.vitrine__regles {
+    background: var(--sable-doux);
+}
+
+.regles {
     display: grid;
-    gap: 1rem;
+    grid-template-columns: 1fr;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--texte);
+}
+
+@media (min-width: 52rem) {
+    .regles {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 3rem;
+    }
+}
+
+.regles li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgba(16, 24, 40, 0.14);
+}
+
+.regles strong {
+    font-size: clamp(1.25rem, 2.2vw, 1.625rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+}
+
+.regles span {
+    max-width: 30rem;
+    line-height: 1.6;
+    color: var(--texte-2);
+    text-wrap: pretty;
+}
+
+.etapes {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
     margin: 0;
     padding: 0;
     list-style: none;
     counter-reset: etape;
 }
 
-.presentation__etapes li {
-    display: grid;
-    grid-template-columns: 2.5rem minmax(0, 1fr);
-    column-gap: 1rem;
+.etapes li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding: 0 0 2rem 3.5rem;
     counter-increment: etape;
 }
 
-.presentation__etapes li::before {
-    grid-row: span 2;
+.etapes li::before {
     content: counter(etape);
+    position: absolute;
+    top: -0.25rem;
+    left: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    border: 2px solid var(--accent);
+    width: 2.5rem;
+    height: 2.5rem;
     border-radius: 50%;
-    font-weight: 700;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 800;
     font-variant-numeric: tabular-nums;
-    color: var(--accent-texte);
 }
 
-.presentation__etapes strong {
-    align-self: end;
+.etapes li:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 2.5rem;
+    bottom: 0;
+    left: 1.25rem;
+    width: 2px;
+    background: var(--bordure-forte);
 }
 
-.presentation__etapes span {
+.etapes strong {
+    font-size: 1.0625rem;
+}
+
+.etapes span {
     line-height: 1.6;
     color: var(--texte-2);
     text-wrap: pretty;
 }
 
-.presentation__membre {
-    max-width: 44rem;
-    margin: 0 auto clamp(2rem, 5vw, 3rem);
-    padding: 1.25rem 1.5rem;
-    border: 1px solid var(--bordure);
-    border-radius: var(--rayon);
-    background: var(--surface);
-    box-shadow: var(--ombre);
-}
+@media (min-width: 62rem) {
+    .etapes {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 1.5rem;
+    }
 
-@media (max-width: 47.99rem) {
-    .presentation__membre {
-        margin-inline: 1rem;
+    .etapes li {
+        padding: 3.5rem 0 0;
+    }
+
+    .etapes li::before {
+        top: 0;
+    }
+
+    .etapes li:not(:last-child)::after {
+        top: 1.25rem;
+        right: -1.5rem;
+        bottom: auto;
+        left: 3rem;
+        width: auto;
+        height: 2px;
     }
 }
 
-.presentation__membre h2 {
+.vitrine__final {
+    max-width: 76rem;
+    margin: 0 auto clamp(3rem, 6vw, 5rem);
+    padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.5rem, 5vw, 4rem);
+    border-radius: 28px;
+    background: var(--nuit);
+    color: #fff;
+}
+
+@media (max-width: 76rem) {
+    .vitrine__final {
+        margin-inline: clamp(1rem, 4vw, 2.5rem);
+    }
+}
+
+.vitrine__final h2 {
+    max-width: 36rem;
     margin: 0;
-    font-size: 1.0625rem;
+    font-size: clamp(1.875rem, 4vw, 3rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
 }
 
-.presentation__membre p {
-    margin: 0.5rem 0 0;
+.vitrine__final > p {
+    max-width: 38rem;
+    margin: 1rem 0 0;
+    font-size: 1.125rem;
     line-height: 1.6;
-    color: var(--texte-2);
+    color: rgba(255, 255, 255, 0.78);
 }
 
-.presentation__pied {
+.vitrine__final .vitrine__actions {
+    margin-top: 2rem;
+}
+
+.vitrine__membre {
+    max-width: 44rem;
+    margin: 2.5rem 0 0 !important;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    font-size: 0.9375rem !important;
+}
+
+.vitrine__membre strong {
+    color: var(--sable);
+}
+
+.vitrine__pied {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    padding: 1.5rem 1rem 2rem;
-    border-top: 1px solid var(--bordure);
+    padding: 0 1rem 2.5rem;
     font-size: var(--taille-petit);
     color: var(--texte-3);
     text-align: center;
 }
 
-.presentation__pied p {
+.vitrine__pied p {
     margin: 0;
 }
 
-/* Sur téléphone, le village se réduit : ses libellés grossissent pour rester lisibles (environ 12 px à l'écran). */
-@media (max-width: 37.5rem) {
-    .village__maison text {
-        font-size: 19px;
+/* Mouvement réduit : tout est posé d'emblée, l'argent ne circule plus. */
+@media (prefers-reduced-motion: reduce) {
+    .carte__terre,
+    .carte__arc {
+        animation: none;
+        stroke-dashoffset: 0;
     }
 
-    .village__central {
-        font-size: 19px;
+    .carte__halo,
+    .ecran,
+    .telephone,
+    .ecran__graphique span {
+        animation: none;
+    }
+
+    .carte__piece {
+        display: none;
     }
 }

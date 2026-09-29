@@ -1676,6 +1676,7 @@ emprunt:
 menu_compte:
     ouvrir: 'Menu du compte'
     parametres: Paramètres
+    aide: 'Aide et tutoriel'
 
 parametres:
     titre: Paramètres
@@ -2808,33 +2809,46 @@ legal:
     mentions: 'Mentions légales'
     confidentialite: 'Politique de confidentialité'
     mise_a_jour: 'Mise à jour le {date}.'
-presentation:
-    titre_page: 'Caisses · la caisse du village, tenue ensemble'
+vitrine:
+    titre_page: 'Caisses · de la ville au village, chaque euro compte'
     se_connecter: 'Se connecter'
     contact_sujet: 'Notre association voudrait utiliser Caisses'
     une:
-        titre: 'La caisse du village, tenue ensemble, ville par ville.'
-        chapo: 'Caisses aide les associations de la diaspora à suivre leurs membres, leurs cotisations, leurs appels à contribution et leurs dépenses, dans chaque ville où vit le village, avec des comptes que tout le monde peut comprendre.'
+        accroche: 'Pour les associations de la diaspora'
+        titre: 'De la ville au village, chaque euro se voit.'
+        chapo: 'Caisses tient les comptes de chaque ville où vit la diaspora et les réunit pour le village : cotisations, appels à contribution, dépenses, reversements. Chacun sait ce qu’il doit, et tout le monde voit où va l’argent.'
         association: 'Votre association veut l’utiliser'
-        socle: 'Le bureau central relie toutes les caisses'
+        fleuve: 'au bord du fleuve Sénégal'
+    ecrans:
+        aria: 'Aperçu de l’application'
+        tableau: 'Tableau de bord'
+        collecte: Collecté
+        depense: Dépensé
+        a_jour: 'À jour'
+        echeances: 'Mes échéances'
+        a_payer: 'À payer'
+        cotisation: 'Cotisation de septembre'
+        ecole: 'Rénovation de l’école'
+        payer: 'Payer 60 €'
+        anonyme: 'Vous voyez vos comptes, jamais ceux des autres.'
     roles:
-        titre: 'Ce que chacun y trouve'
+        titre: 'Chacun y trouve sa part, et seulement la sienne.'
         central:
             nom: 'Le bureau central'
-            texte: 'Toutes les villes d’un coup d’œil : collecté, dépensé, reversements attendus, appels à contribution et rapport d’assemblée générale prêt à imprimer.'
+            texte: 'Toutes les villes d’un coup d’œil : collecté, dépensé, reversements attendus, appels à contribution, et le rapport d’assemblée générale prêt à imprimer.'
         ville:
-            nom: 'La trésorière et le président de ville'
-            texte: 'Les membres de la ville, les paiements reçus en réunion, les relances aux retardataires et les dépenses à valider, depuis le téléphone.'
+            nom: 'La trésorière et le président'
+            texte: 'Les paiements reçus en réunion en un geste, les relances qui partent toutes seules, les dépenses à valider depuis le téléphone.'
         membre:
             nom: 'Chaque membre'
-            texte: 'Ses échéances, ses reçus et ce que devient l’argent de sa ville, sans jamais voir ce que versent les autres.'
+            texte: 'Ses échéances, ses reçus, et ce que devient l’argent de sa ville, sans jamais voir ce que versent les autres.'
     regles:
-        titre: 'Des règles qui ne se contournent pas'
+        titre: 'Des règles qui ne se contournent pas.'
         deux:
             titre: 'Une dépense se valide à deux.'
             texte: 'Personne ne valide une dépense qu’il a saisie lui-même ; dans une ville, c’est son président qui décide.'
         noms:
-            titre: 'Transparence sans indiscrétion.'
+            titre: 'Transparence, sans indiscrétion.'
             texte: 'Les membres voient les totaux de leur ville, jamais les noms ni les montants des autres.'
         etanche:
             titre: 'Chaque association chez elle.'
@@ -2843,23 +2857,40 @@ presentation:
             titre: 'Tout est tracé.'
             texte: 'Paiements, dépenses, relances et changements de rôle restent dans un journal consultable.'
     etapes:
-        titre: 'Comment on démarre'
+        titre: 'En route en une soirée.'
         villes:
-            titre: 'Le bureau central crée ses villes.'
-            texte: 'Une caisse par ville, avec sa trésorière et son président.'
+            titre: 'Les villes'
+            texte: 'Le bureau central ouvre une caisse par ville, avec sa trésorière et son président.'
         classeurs:
-            titre: 'Les classeurs Excel entrent tels quels.'
-            texte: 'Un onglet par ville, les années passées et les mois déjà payés sont repris.'
+            titre: 'Les classeurs'
+            texte: 'Les fichiers Excel entrent tels quels : un onglet par ville, les années passées reprises.'
         invitations:
-            titre: 'Chacun reçoit son invitation.'
-            texte: 'Un lien par e-mail, valable sept jours, ouvre le compte de chaque responsable et de chaque membre.'
+            titre: 'Les invitations'
+            texte: 'Chacun reçoit un lien par e-mail, valable sept jours, qui ouvre son compte.'
         suivi:
-            titre: 'Cotisations, appels et dépenses se suivent au jour le jour.'
-            texte: 'Les paiements s’enregistrent en réunion, les relances partent toutes seules.'
+            titre: 'Le quotidien'
+            texte: 'Paiements en réunion, appels à contribution, dépenses, relances automatiques.'
         ag:
-            titre: 'Le rapport d’assemblée générale est prêt.'
-            texte: 'Les chiffres de l’exercice, par ville, à imprimer ou à exporter pour Excel.'
+            titre: 'L’assemblée générale'
+            texte: 'Le rapport de l’exercice, par ville, à imprimer ou à exporter pour Excel.'
+    final:
+        titre: 'Votre association a aussi son village ?'
+        texte: 'Écrivez-nous : nous ouvrons votre espace, vous créez vos villes, et vos classeurs prennent vie.'
+        ecrire: 'Nous écrire'
     membre:
         titre: 'Vous êtes membre ?'
         texte: 'Il n’y a pas d’inscription : c’est votre ville qui vous envoie un lien d’invitation par e-mail. Vous l’avez déjà utilisé ? Connectez-vous.'
     pied: 'Caisses, né pour l’association de la diaspora de Moudéry.'
+
+aide:
+    titre: 'Guide d’utilisation'
+    sous_titre: 'Pas à pas, écran par écran, pour chaque rôle. Imprimez-le ou gardez-le sous la main.'
+    imprimer: 'Imprimer ou PDF'
+    sommaire: Sommaire
+    guides:
+        central: 'Bureau central'
+        ville: 'Responsables d’une ville'
+        membre: Membres
+    etapes: 'Pas à pas'
+    astuce: 'Bon à savoir'
+    capture: 'Capture d’écran :'

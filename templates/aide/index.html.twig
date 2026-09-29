@@ -1,0 +1,334 @@
+{# Guide d'utilisation (page « Aide ») : un tutoriel par rôle, pas à pas et écran par écran, avec des captures prises sur
+   la ville fictive « Montreuil » (outils/captures-aide.sh). Le contenu est un document, écrit ici en français, seuls les
+   libellés de la page passent par les traductions. Imprimable en PDF depuis le navigateur (aide.css, @media print).
+   Variables : coquille, association (facultatif), guides (central, ville, membre : booléens). #}
+{% extends coquille %}
+{% set page = 'aide' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block stylesheets %}{{ parent() }}<link rel="stylesheet" href="{{ asset('styles/aide.css') }}">{% endblock %}
+{% block title %}{{ 'aide.titre'|trans }} · {{ 'app.nom'|trans }}{% endblock %}
+{% block titre_page %}{{ 'aide.titre'|trans }}{% endblock %}
+{% block sous_titre %}<p class="console__sous-titre">{{ 'aide.sous_titre'|trans }}</p>{% endblock %}
+{% block actions %}<button type="button" class="bouton bouton--primaire" onclick="window.print()">{{ icones.icone('recu', 15) }}{{ 'aide.imprimer'|trans }}</button>{% endblock %}
+
+{% macro capture(nom, legende) %}
+    <figure class="aide__figure">
+        <img src="{{ asset('images/aide/' ~ nom ~ '.png') }}" alt="{{ legende }}" loading="lazy" width="1280">
+        <figcaption>{{ 'aide.capture'|trans }} {{ legende }}</figcaption>
+    </figure>
+{% endmacro %}
+
+{% set sommaire = {
+    central: [
+        ['central-tableau-de-bord', 'Le tableau de bord'],
+        ['central-ville', 'Créer une ville'],
+        ['central-villes', 'Suivre les villes'],
+        ['central-membres', 'Les membres'],
+        ['central-cotisations', 'Les cotisations'],
+        ['central-appels', 'Lancer un appel à contribution'],
+        ['central-depenses', 'Les dépenses du bureau central'],
+        ['central-reversements', 'Les reversements des villes'],
+        ['central-rapport', 'Le rapport d’assemblée générale'],
+        ['central-responsables', 'Responsables et rôles'],
+        ['central-parametres', 'Les paramètres de l’association'],
+    ],
+    ville: [
+        ['ville-accueil', 'Votre espace'],
+        ['ville-membres', 'Les membres de votre ville'],
+        ['ville-paiements', 'Enregistrer les paiements'],
+        ['ville-impayes', 'Impayés et relances'],
+        ['ville-depenses', 'Les dépenses : saisir, décider, payer'],
+        ['ville-reversements', 'Reverser au bureau central'],
+        ['ville-parametres', 'Appels, rapport et paramètres de la ville'],
+    ],
+    membre: [
+        ['membre-compte', 'Créer son compte'],
+        ['membre-espace', 'Mon espace : échéances, paiements, reçus'],
+        ['membre-ville', 'Ma ville, en toute transparence'],
+        ['membre-profil', 'Mon profil'],
+    ],
+} %}
+
+{% block contenu %}
+<div class="aide">
+    <nav class="aide__sommaire" aria-label="{{ 'aide.sommaire'|trans }}">
+        <h2>{{ 'aide.sommaire'|trans }}</h2>
+        <ul>
+            {% for cle, sections in sommaire %}
+                {% if guides[cle] %}
+                    <li class="aide__sommaire-guide"><a href="#guide-{{ cle }}">{{ ('aide.guides.' ~ cle)|trans }}</a></li>
+                    {% for s in sections %}<li><a href="#{{ s[0] }}">{{ s[1] }}</a></li>{% endfor %}
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </nav>
+
+    <div class="aide__guides">
+    {% if guides.central %}
+        <section class="aide__guide" id="guide-central" aria-labelledby="guide-central-titre">
+            <header class="aide__guide-entete">
+                <span class="chip">{{ 'aide.guides.central'|trans }}</span>
+                <h2 id="guide-central-titre">Piloter l’association</h2>
+                <p>Le bureau central voit toute l’association : ses villes, ses membres, l’argent collecté, les dépenses et ce que chaque ville lui reverse. Tout se fait depuis l’espace de l’association, dans la barre de gauche.</p>
+            </header>
+
+            <article class="section aide__section" id="central-tableau-de-bord">
+                <h3>1. Le tableau de bord</h3>
+                <p>À l’ouverture, vous voyez l’exercice en cours en cinq chiffres : collecté, dépensé, solde des caisses, membres à jour, reversements dus. En dessous, les encaissements mois par mois et le tableau des villes.</p>
+                <ol class="aide__etapes">
+                    <li>Choisissez l’exercice dans l’en-tête si l’association en suit plusieurs.</li>
+                    <li>Passez de « Mois » à « Cumul » pour lire la progression de l’année.</li>
+                    <li>Le sélecteur de périmètre, sous le logo, recentre toute l’application sur une ville : le tableau de bord, les membres, les cotisations, les impayés.</li>
+                    <li>« À traiter » liste ce qui vous attend : brouillon de ville sans trésorier, invitation expirée, dépense à valider.</li>
+                </ol>
+                {{ _self.capture('central-tableau-de-bord', 'le tableau de bord de l’association, exercice en cours.') }}
+                <p class="aide__astuce"><strong>{{ 'aide.astuce'|trans }}</strong> Les montants sont toujours en euros entiers sur les cartes ; les centimes se retrouvent dans les tableaux.</p>
+            </article>
+
+            <article class="section aide__section" id="central-ville">
+                <h3>2. Créer une ville</h3>
+                <p>Seul le bureau central crée une ville. L’assistant se fait en trois étapes : identité, membres, activation.</p>
+                <ol class="aide__etapes">
+                    <li>Villes › « Créer une ville ». Donnez le nom de la ville et l’adresse e-mail de la trésorière ou du trésorier ; président et secrétaire sont facultatifs.</li>
+                    <li>Ajoutez les membres tout de suite ou plus tard : à la main, un par un, ou en important le classeur de la ville (CSV ou Excel). L’import reconnaît les colonnes du classeur et vous laisse les corriger avant de confirmer.</li>
+                    <li>Activez la ville. Elle devient visible de ses responsables, qui reçoivent chacun un e-mail avec un lien valable sept jours pour créer leur compte. Tant qu’elle est en brouillon, rien ne part.</li>
+                </ol>
+                {{ _self.capture('central-ville-nouvelle', 'l’étape « Identité » de l’assistant de création d’une ville.') }}
+                <p class="aide__astuce"><strong>{{ 'aide.astuce'|trans }}</strong> Une ville ne se supprime jamais : elle passe de brouillon à active, puis archivée. Son historique reste consultable.</p>
+            </article>
+
+            <article class="section aide__section" id="central-villes">
+                <h3>3. Suivre les villes</h3>
+                <p>La page Villes montre, pour chaque ville, ses responsables et l’état de leurs invitations, ses membres, sa collecte et ce qu’elle doit reverser.</p>
+                <ol class="aide__etapes">
+                    <li>Filtrez par statut (actives, brouillons, archivées) ou cherchez une ville ou un responsable.</li>
+                    <li>Le menu de chaque ligne ouvre son tableau de bord, ses membres, ses cotisations ou son identité.</li>
+                    <li>« Exporter » donne le tableau en CSV pour un tableur.</li>
+                </ol>
+                {{ _self.capture('central-villes', 'la liste des villes de l’association.') }}
+            </article>
+
+            <article class="section aide__section" id="central-membres">
+                <h3>4. Les membres</h3>
+                <p>Tous les membres de l’association, ville par ville et année par année, comme dans le classeur. Un membre « de 2026 » est un membre qui a une adhésion en 2026.</p>
+                <ol class="aide__etapes">
+                    <li>Choisissez une ville dans le périmètre et une année dans le sélecteur ; la recherche porte sur le nom, l’e-mail, le téléphone, la localité et le foyer.</li>
+                    <li>Le nom ouvre la fiche : identité, contact, foyer, années d’adhésion avec les douze mois, échéances dues et derniers paiements.</li>
+                    <li>Depuis la fiche : modifier, marquer comme sorti, valider une inscription, transférer vers une autre ville (l’historique reste dans la ville d’origine) ou inviter le membre à son espace.</li>
+                </ol>
+                {{ _self.capture('central-membres', 'les membres d’une ville pour l’année en cours.') }}
+            </article>
+
+            <article class="section aide__section" id="central-cotisations">
+                <h3>5. Les cotisations</h3>
+                <p>La cotisation d’une année s’ouvre ville par ville : un type, un tarif mensuel, un jour d’échéance. L’application crée alors une mensualité par membre et par mois de l’exercice, et la grille du classeur se remplit au fil des paiements.</p>
+                <ol class="aide__etapes">
+                    <li>Cotisations, ville choisie dans le périmètre › « Ouvrir les cotisations de l’année ».</li>
+                    <li>Choisissez le type (créé dans Paramètres › Types de contribution), le tarif mensuel et le jour du mois.</li>
+                    <li>Un membre arrivé en cours d’année ? « Mettre à jour les échéances » crée les siennes sans toucher aux autres. Un tarif qui change ne s’applique qu’aux mensualités encore dues.</li>
+                </ol>
+                {{ _self.capture('central-cotisations', 'la grille des cotisations d’une ville : un membre par ligne, un mois par colonne.') }}
+            </article>
+
+            <article class="section aide__section" id="central-appels">
+                <h3>6. Lancer un appel à contribution</h3>
+                <p>Un décès, un projet du village, une fête : l’appel crée une échéance pour chaque membre concerné et lui envoie un e-mail. La part qui revient au bureau central se fixe sur l’appel.</p>
+                <ol class="aide__etapes">
+                    <li>Projets et appels › « Nouvel appel » : type, objet, message, montant fixe ou libre, date limite, villes concernées, relances automatiques ou non.</li>
+                    <li>« Ce qui va se passer » se recalcule pendant la saisie : membres concernés, joignables par e-mail, montant attendu.</li>
+                    <li>Enregistrez en brouillon pour relire, puis « Lancer l’appel ». Le suivi montre ensuite les contributions jour par jour et par ville.</li>
+                </ol>
+                {{ _self.capture('central-appel-nouveau', 'la préparation d’un appel à contribution.') }}
+                <p class="aide__astuce"><strong>{{ 'aide.astuce'|trans }}</strong> Par foyer, seul le payeur du foyer reçoit l’échéance ; par personne, chaque membre actif.</p>
+            </article>
+
+            <article class="section aide__section" id="central-depenses">
+                <h3>7. Les dépenses du bureau central</h3>
+                <p>Une dépense se saisit avec son justificatif, puis passe par un autre membre du bureau pour être validée. La personne qui saisit ne valide jamais sa propre dépense.</p>
+                <ol class="aide__etapes">
+                    <li>Dépenses › « Nouvelle dépense » : libellé, montant, date, catégorie, appel lié, bénéficiaire, moyen de paiement, justificatif.</li>
+                    <li>« Soumettre pour validation » prévient les valideurs par e-mail ; « Enregistrer en brouillon » garde la main.</li>
+                    <li>Le valideur ouvre la fiche, lit le justificatif et valide ou refuse en donnant un motif. Une dépense validée se marque ensuite payée.</li>
+                </ol>
+                {{ _self.capture('central-depenses', 'la liste des dépenses avec leur statut.') }}
+            </article>
+
+            <article class="section aide__section" id="central-reversements">
+                <h3>8. Les reversements des villes</h3>
+                <p>Chaque ville doit au bureau central un pourcentage de sa collecte (le taux par défaut des paramètres) plus la part fixée sur chaque appel. La page montre le dû, le reçu et le restant par ville, pour l’exercice choisi.</p>
+                <ol class="aide__etapes">
+                    <li>Une trésorière déclare un virement depuis son espace : il apparaît dans « À confirmer ».</li>
+                    <li>Confirmez-le en corrigeant, s’il le faut, le montant réellement reçu ; l’écart reste visible.</li>
+                    <li>Un virement reçu sans déclaration ? « Enregistrer un virement reçu » le saisit directement.</li>
+                </ol>
+                {{ _self.capture('central-reversements', 'le dû par ville et les déclarations à confirmer.') }}
+            </article>
+
+            <article class="section aide__section" id="central-rapport">
+                <h3>9. Le rapport d’assemblée générale</h3>
+                <p>Trois pages A4 prêtes à présenter : la synthèse de l’exercice, les graphiques, les comptes de chaque ville et les appels. Aucun nom de membre n’y figure.</p>
+                <ol class="aide__etapes">
+                    <li>Rapports d’AG › choisissez l’exercice.</li>
+                    <li>« Imprimer ou PDF » ouvre l’impression du navigateur : choisissez « Enregistrer au format PDF ».</li>
+                    <li>« Exporter en Excel » donne les chiffres à retravailler.</li>
+                </ol>
+                {{ _self.capture('central-rapport', 'la première page du rapport d’AG.') }}
+            </article>
+
+            <article class="section aide__section" id="central-responsables">
+                <h3>10. Responsables et rôles</h3>
+                <p>Un rôle regroupe des droits : trésorier, président, secrétaire pour une ville ; bureau central pour l’association. Une personne peut cumuler plusieurs rôles.</p>
+                <ol class="aide__etapes">
+                    <li>Paramètres › Responsables et rôles : une ligne par rôle attribué, par invitation en cours et par responsable à inviter à l’activation d’une ville.</li>
+                    <li>« Inviter un responsable » envoie un lien valable sept jours ; une invitation expirée se renvoie d’un clic.</li>
+                    <li>L’onglet « Rôles et droits » détaille ce que chaque rôle peut faire, le journal retrace chaque changement.</li>
+                </ol>
+                {{ _self.capture('central-responsables', 'la page des responsables et de leurs rôles.') }}
+            </article>
+
+            <article class="section aide__section" id="central-parametres">
+                <h3>11. Les paramètres de l’association</h3>
+                <p>Le début de l’exercice, le premier exercice suivi, le taux de reversement par défaut, le calendrier des relances automatiques et les types de contribution se règlent ici, ainsi que l’abonnement à la plateforme.</p>
+                <ol class="aide__etapes">
+                    <li>Paramètres › Association : contact, exercice, taux et calendrier (par exemple J-7, J, J+15 autour de chaque échéance).</li>
+                    <li>Paramètres › Types de contribution : les motifs d’appel et de cotisation, par personne ou par foyer, montant fixe ou libre. Un type qui ne sert plus s’archive.</li>
+                </ol>
+                {{ _self.capture('central-parametres', 'les paramètres de l’association.') }}
+            </article>
+        </section>
+    {% endif %}
+
+    {% if guides.ville %}
+        <section class="aide__guide" id="guide-ville" aria-labelledby="guide-ville-titre">
+            <header class="aide__guide-entete">
+                <span class="chip">{{ 'aide.guides.ville'|trans }}</span>
+                <h2 id="guide-ville-titre">Tenir la caisse de sa ville</h2>
+                <p>La trésorière gère les membres, encaisse et relance, saisit les dépenses et reverse au bureau central. Le président valide les dépenses et lance les appels de sa ville. Le secrétaire gère les membres. Chacun ne voit que sa ville.</p>
+            </header>
+
+            <article class="section aide__section" id="ville-accueil">
+                <h3>1. Votre espace</h3>
+                <p>L’accueil dit bonjour et va à l’essentiel : collecté, membres à jour, impayés, solde de la caisse, puis « À faire » avec un bouton pour chaque action qui vous attend, et les derniers paiements.</p>
+                <ol class="aide__etapes">
+                    <li>Sur téléphone, la barre d’onglets en bas donne Accueil, Membres, Impayés, Dépenses et « Plus » pour le reste.</li>
+                    <li>Le sélecteur sous le logo affiche votre ville ; avec plusieurs villes, il permet d’en changer.</li>
+                    <li>« Paramètres de la ville » rappelle l’identité de la ville et ses responsables.</li>
+                </ol>
+                {{ _self.capture('ville-accueil', 'l’accueil de la trésorière de Montreuil.') }}
+            </article>
+
+            <article class="section aide__section" id="ville-membres">
+                <h3>2. Les membres de votre ville</h3>
+                <p>Une ligne par membre avec sa situation : à jour, en retard, en attente d’inscription. Les inscriptions en attente s’affichent en bandeau, à valider en une fois.</p>
+                <ol class="aide__etapes">
+                    <li>La recherche filtre pendant la frappe ; les chips « À jour », « En retard », « En attente » comptent chaque situation.</li>
+                    <li>« Ajouter un membre » et « Importer » ouvrent la gestion de la ville : saisie à la main ou import du classeur.</li>
+                    <li>Cochez des membres : la barre en bas propose « Relancer par e-mail », « Enregistrer un paiement », « Inviter à leur espace » (pour ceux qui ont une adresse et pas encore de compte) et « Exporter ».</li>
+                    <li>Le menu de chaque ligne ouvre la fiche, un paiement ou la modification.</li>
+                </ol>
+                {{ _self.capture('ville-membres', 'les membres de Montreuil et leur situation de paiement.') }}
+                <p class="aide__astuce"><strong>{{ 'aide.astuce'|trans }}</strong> Un membre n’entre dans l’application que sur invitation de sa ville : il n’y a pas d’inscription libre.</p>
+            </article>
+
+            <article class="section aide__section" id="ville-paiements">
+                <h3>3. Enregistrer les paiements</h3>
+                <p>Le cas courant, une permanence où vingt personnes règlent la même chose, se fait en une fois : cochez les membres, cochez les mois ou l’appel, indiquez le moyen et la date.</p>
+                <ol class="aide__etapes">
+                    <li>Paiements › « Enregistrer un paiement » : la liste montre ce que chacun doit ; le filtre réduit la liste pendant la frappe.</li>
+                    <li>Cochez les membres puis les cibles : les mois de la cotisation (le mois en cours est précoché) ou un appel ouvert.</li>
+                    <li>Moyen (espèces, virement, chèque, carte), date de réception, référence facultative, puis « Enregistrer N paiements ».</li>
+                    <li>Chaque membre qui a une adresse reçoit son reçu par e-mail ; le reçu s’imprime aussi depuis la liste des paiements. « Détail » sur une ligne permet un paiement partiel ou un montant libre.</li>
+                </ol>
+                {{ _self.capture('ville-paiement-groupe', 'la saisie groupée d’un paiement.') }}
+                <p class="aide__astuce"><strong>{{ 'aide.astuce'|trans }}</strong> Un paiement enregistré par erreur s’annule depuis la liste des paiements : les échéances redeviennent dues et la grille se vide.</p>
+            </article>
+
+            <article class="section aide__section" id="ville-impayes">
+                <h3>4. Impayés et relances</h3>
+                <p>Les membres dont une échéance est en retard, ce qu’ils doivent, depuis quand, et la dernière relance. Les relances automatiques suivent le calendrier de l’association ; vous pouvez relancer à la main à tout moment.</p>
+                <ol class="aide__etapes">
+                    <li>Les quatre chiffres : montant dû, plus de 60 jours (à appeler), sans adresse e-mail, prochaine relance automatique.</li>
+                    <li>« Relancer les N membres » envoie un rappel à tous ceux qui sont joignables ; jamais deux fois le même jour.</li>
+                    <li>Cochez des membres pour relancer, enregistrer un paiement ou « Marquer comme appelé » après un coup de téléphone : l’appel est noté comme une relance.</li>
+                    <li>« Calendrier des relances » montre les règles et les prochains envois automatiques.</li>
+                </ol>
+                {{ _self.capture('ville-impayes', 'les impayés de Montreuil.') }}
+            </article>
+
+            <article class="section aide__section" id="ville-depenses">
+                <h3>5. Les dépenses : saisir, décider, payer</h3>
+                <p>La trésorière saisit la dépense avec son justificatif et la soumet ; seul le président de la ville la valide ou la refuse ; la trésorière la marque ensuite payée.</p>
+                <ol class="aide__etapes">
+                    <li>Dépenses › « Nouvelle dépense » : libellé, montant, date, catégorie, appel lié le cas échéant, bénéficiaire, moyen, justificatif (photo ou PDF), commentaire pour le président.</li>
+                    <li>Le président reçoit un e-mail, ouvre la fiche, lit le justificatif et décide. Un refus est toujours motivé et la dépense redevient modifiable.</li>
+                    <li>Sans président ayant un compte, « Prévenir le bureau central » signale la situation.</li>
+                </ol>
+                {{ _self.capture('ville-depense-nouvelle', 'la saisie d’une dépense de la ville.') }}
+                {{ _self.capture('president-depenses', 'les dépenses vues par le président, avec celles en attente de sa décision.') }}
+            </article>
+
+            <article class="section aide__section" id="ville-reversements">
+                <h3>6. Reverser au bureau central</h3>
+                <p>La page Reversements montre ce que la ville doit pour l’exercice, ce qui a déjà été reçu et le restant, avec la date limite.</p>
+                <ol class="aide__etapes">
+                    <li>Faites le virement depuis la banque de la ville.</li>
+                    <li>Reversements › « Déclarer un virement » : montant (le restant dû est proposé), date, référence du virement.</li>
+                    <li>Le bureau central confirme la réception ; le statut passe à « Soldé » ou « Partiel ».</li>
+                </ol>
+                {{ _self.capture('ville-reversements', 'les reversements de Montreuil.') }}
+            </article>
+
+            <article class="section aide__section" id="ville-parametres">
+                <h3>7. Appels, rapport et paramètres de la ville</h3>
+                <p>Le président lance un appel pour sa ville depuis Projets et appels, exactement comme le bureau central pour toute l’association. Le rapport d’AG de la ville s’imprime depuis Rapports d’AG. L’identité et les responsables se consultent dans « Paramètres de la ville ».</p>
+                <p class="aide__astuce"><strong>{{ 'aide.astuce'|trans }}</strong> Toutes les actions sensibles (paiement, annulation, relance, décision sur une dépense, reversement) sont tracées dans le journal de l’association.</p>
+            </article>
+        </section>
+    {% endif %}
+
+    {% if guides.membre %}
+        <section class="aide__guide" id="guide-membre" aria-labelledby="guide-membre-titre">
+            <header class="aide__guide-entete">
+                <span class="chip">{{ 'aide.guides.membre'|trans }}</span>
+                <h2 id="guide-membre-titre">Mon espace de membre</h2>
+                <p>Chaque membre voit ce qu’il doit, ce qu’il a payé, ses reçus et les comptes de sa ville, sans jamais voir les noms des autres membres.</p>
+            </header>
+
+            <article class="section aide__section" id="membre-compte">
+                <h3>1. Créer son compte</h3>
+                <p>Le compte se crée à partir d’une invitation envoyée par la ville. Le lien reçu par e-mail est valable sept jours et ne sert qu’une fois.</p>
+                <ol class="aide__etapes">
+                    <li>Ouvrez le lien de l’e-mail d’invitation.</li>
+                    <li>Choisissez un mot de passe (douze caractères au moins), indiquez votre téléphone et dites si vous acceptez les e-mails de rappel.</li>
+                    <li>Vous arrivez sur votre espace. Lien expiré ? La page propose d’en demander un nouveau à votre ville.</li>
+                </ol>
+            </article>
+
+            <article class="section aide__section" id="membre-espace">
+                <h3>2. Mon espace : échéances, paiements, reçus</h3>
+                <p>L’onglet Échéances liste ce qui reste à payer ; Historique garde chaque paiement avec son reçu et l’attestation annuelle.</p>
+                <ol class="aide__etapes">
+                    <li>Échéances : les mensualités et appels dus, avec leur date limite ; « Payer en ligne » quand le paiement en ligne est ouvert, sinon réglez auprès de votre trésorière.</li>
+                    <li>Historique : chaque paiement, son reçu imprimable, et l’attestation de l’année pour vos démarches.</li>
+                    <li>Un paiement annulé reste visible, barré.</li>
+                </ol>
+                {{ _self.capture('membre-espace', 'l’espace d’un membre : ses échéances.') }}
+            </article>
+
+            <article class="section aide__section" id="membre-ville">
+                <h3>3. Ma ville, en toute transparence</h3>
+                <p>L’onglet Ma ville montre les entrées de l’exercice, ce qui a été reversé au bureau central, les dépenses payées et le solde : la caisse de la ville, sans aucun nom.</p>
+                {{ _self.capture('membre-ville', 'les comptes de la ville vus par un membre.') }}
+            </article>
+
+            <article class="section aide__section" id="membre-profil">
+                <h3>4. Mon profil</h3>
+                <p>Téléphone et accord pour recevoir les e-mails se modifient dans Profil ; le mot de passe et l’adresse de connexion dans Paramètres, depuis le menu de votre compte.</p>
+                <p class="aide__astuce"><strong>{{ 'aide.astuce'|trans }}</strong> Sans accord e-mail, vous ne recevez ni rappel ni reçu par courriel : votre trésorière vous les remettra en main propre.</p>
+            </article>
+        </section>
+    {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -16,6 +16,7 @@
             {% if not is_granted('IS_IMPERSONATOR') %}
                 <a class="menu__item" href="{{ path('parametres') }}">{{ icones.icone('reglages', 15) }}{{ 'menu_compte.parametres'|trans }}</a>
             {% endif %}
+            <a class="menu__item" href="{{ path('aide') }}">{{ icones.icone('aide', 15) }}{{ 'menu_compte.aide'|trans }}</a>
             <form method="post" action="{{ path('deconnexion') }}" class="menu__form deconnexion">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" data-controller="csrf-protection">
                 <button type="submit" class="menu__item menu__item--danger">{{ icones.icone('deconnexion', 15) }}{{ 'connexion.deconnexion'|trans }}</button>
