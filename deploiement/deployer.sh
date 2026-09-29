@@ -44,5 +44,7 @@ ${PHP} bin/console doctrine:migrations:migrate --no-interaction --allow-no-migra
 ${PHP} bin/console asset-map:compile --env=prod
 ${PHP} bin/console cache:clear --env=prod
 ${PHP} bin/console cache:warmup --env=prod
+# Le worker lancé par cron chaque minute s'arrête proprement et repart avec le nouveau code à la minute suivante.
+${PHP} bin/console messenger:stop-workers --env=prod
 echo "Déploiement terminé."
 DISTANT
