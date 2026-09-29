@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Page d'entrée après connexion : le super-admin va à l'administration de la plateforme, le bureau central au tableau
+ * Page d'entrée : une personne non connectée voit la présentation publique ; après connexion, le super-admin va à l'administration de la plateforme, le bureau central au tableau
  * de bord de son association, un responsable de ville à l'espace cadré sur sa ville, un membre à son espace (F-26) ;
  * un compte sans fiche de membre voit une page d'attente.
  */
@@ -26,7 +26,10 @@ final class AccueilController extends AbstractController
     public function index(): Response
     {
         $utilisateur = $this->getUser();
-        \assert($utilisateur instanceof Utilisateur);
+        // Une personne non connectée découvre Caisses (page publique, 29 septembre 2026).
+        if (!$utilisateur instanceof Utilisateur) {
+            return $this->render('accueil/presentation.html.twig');
+        }
 
         // Un super-admin, même s'il est aussi bureau central d'une association, commence par l'administration.
         if ($utilisateur->aLaPermissionSurLaPlateforme(Permission::PLATEFORME_ADMINISTRER)) {

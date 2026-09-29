@@ -62,6 +62,7 @@ security:
     # sont décidés par les Voters (App\Security\Voter), jamais par des règles d'URL.
     access_control:
         - { path: ^/(connexion|mot-de-passe-oublie|mot-de-passe/|invitation/|mentions-legales$|confidentialite$), roles: PUBLIC_ACCESS }
+        - { path: ^/$, roles: PUBLIC_ACCESS }
         - { path: ^/, roles: ROLE_USER }
 
 when@test:

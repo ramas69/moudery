@@ -2808,3 +2808,58 @@ legal:
     mentions: 'Mentions légales'
     confidentialite: 'Politique de confidentialité'
     mise_a_jour: 'Mise à jour le {date}.'
+presentation:
+    titre_page: 'Caisses · la caisse du village, tenue ensemble'
+    se_connecter: 'Se connecter'
+    contact_sujet: 'Notre association voudrait utiliser Caisses'
+    une:
+        titre: 'La caisse du village, tenue ensemble, ville par ville.'
+        chapo: 'Caisses aide les associations de la diaspora à suivre leurs membres, leurs cotisations, leurs appels à contribution et leurs dépenses, dans chaque ville où vit le village, avec des comptes que tout le monde peut comprendre.'
+        association: 'Votre association veut l’utiliser'
+        socle: 'Le bureau central relie toutes les caisses'
+    roles:
+        titre: 'Ce que chacun y trouve'
+        central:
+            nom: 'Le bureau central'
+            texte: 'Toutes les villes d’un coup d’œil : collecté, dépensé, reversements attendus, appels à contribution et rapport d’assemblée générale prêt à imprimer.'
+        ville:
+            nom: 'La trésorière et le président de ville'
+            texte: 'Les membres de la ville, les paiements reçus en réunion, les relances aux retardataires et les dépenses à valider, depuis le téléphone.'
+        membre:
+            nom: 'Chaque membre'
+            texte: 'Ses échéances, ses reçus et ce que devient l’argent de sa ville, sans jamais voir ce que versent les autres.'
+    regles:
+        titre: 'Des règles qui ne se contournent pas'
+        deux:
+            titre: 'Une dépense se valide à deux.'
+            texte: 'Personne ne valide une dépense qu’il a saisie lui-même ; dans une ville, c’est son président qui décide.'
+        noms:
+            titre: 'Transparence sans indiscrétion.'
+            texte: 'Les membres voient les totaux de leur ville, jamais les noms ni les montants des autres.'
+        etanche:
+            titre: 'Chaque association chez elle.'
+            texte: 'Une association ne voit jamais les données d’une autre, et une ville ne voit que les siennes.'
+        trace:
+            titre: 'Tout est tracé.'
+            texte: 'Paiements, dépenses, relances et changements de rôle restent dans un journal consultable.'
+    etapes:
+        titre: 'Comment on démarre'
+        villes:
+            titre: 'Le bureau central crée ses villes.'
+            texte: 'Une caisse par ville, avec sa trésorière et son président.'
+        classeurs:
+            titre: 'Les classeurs Excel entrent tels quels.'
+            texte: 'Un onglet par ville, les années passées et les mois déjà payés sont repris.'
+        invitations:
+            titre: 'Chacun reçoit son invitation.'
+            texte: 'Un lien par e-mail, valable sept jours, ouvre le compte de chaque responsable et de chaque membre.'
+        suivi:
+            titre: 'Cotisations, appels et dépenses se suivent au jour le jour.'
+            texte: 'Les paiements s’enregistrent en réunion, les relances partent toutes seules.'
+        ag:
+            titre: 'Le rapport d’assemblée générale est prêt.'
+            texte: 'Les chiffres de l’exercice, par ville, à imprimer ou à exporter pour Excel.'
+    membre:
+        titre: 'Vous êtes membre ?'
+        texte: 'Il n’y a pas d’inscription : c’est votre ville qui vous envoie un lien d’invitation par e-mail. Vous l’avez déjà utilisé ? Connectez-vous.'
+    pied: 'Caisses, né pour l’association de la diaspora de Moudéry.'

@@ -34,7 +34,8 @@ final class ConnexionControllerTest extends CasDeTestWeb
 
     public function testUnePageProtegeeRenvoieVersLaConnexion(): void
     {
-        $this->client->request('GET', '/');
+        // Depuis le 29 septembre 2026, la racine présente Caisses aux visiteurs ; les autres pages restent protégées.
+        $this->client->request('GET', '/parametres');
 
         self::assertResponseRedirects('http://localhost/connexion', 302);
     }
@@ -61,7 +62,7 @@ final class ConnexionControllerTest extends CasDeTestWeb
         $this->client->submit($this->client->getCrawler()->filter('form.deconnexion')->form());
         self::assertResponseRedirects('http://localhost/connexion', 302);
 
-        $this->client->request('GET', '/');
+        $this->client->request('GET', '/parametres');
         self::assertResponseRedirects('http://localhost/connexion', 302, 'Une fois déconnecté, les pages protégées ne sont plus accessibles.');
     }
 
@@ -109,7 +110,7 @@ final class ConnexionControllerTest extends CasDeTestWeb
         self::assertSelectorTextContains('.alerte--erreur', 'Identifiants invalides');
         self::assertSelectorExists('input[name="email"][value="central@moudery.fr"]', 'L’adresse saisie est conservée.');
 
-        $this->client->request('GET', '/');
+        $this->client->request('GET', '/parametres');
         self::assertResponseRedirects('http://localhost/connexion', 302);
     }
 

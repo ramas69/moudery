@@ -1,0 +1,92 @@
+{# Page d'accueil publique (29 septembre 2026) : ce qu'est Caisses, pour qui, les règles, comment démarrer. Le village
+   du logo porte une maison par ville sur un même socle : la structure du produit. Aucune inscription libre : on se
+   connecte, ou l'association nous écrit. #}
+{% extends 'base.html.twig' %}
+{% import 'composants/icones.html.twig' as icones %}
+
+{% block title %}{{ 'presentation.titre_page'|trans }}{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/presentation.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/legal.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="presentation">
+        <header class="presentation__entete">
+            {{ include('composants/logo.html.twig', {taille: 36}) }}
+            <a class="bouton bouton--secondaire" href="{{ path('connexion') }}">{{ 'presentation.se_connecter'|trans }}</a>
+        </header>
+
+        <main id="contenu">
+            <section class="presentation__une" aria-labelledby="presentation-titre">
+                <div class="presentation__texte">
+                    <h1 id="presentation-titre" class="presentation__titre">{{ 'presentation.une.titre'|trans }}</h1>
+                    <p class="presentation__chapo">{{ 'presentation.une.chapo'|trans }}</p>
+                    <div class="presentation__actions">
+                        <a class="bouton bouton--primaire presentation__bouton" href="{{ path('connexion') }}">{{ 'presentation.se_connecter'|trans }}</a>
+                        <a class="bouton bouton--secondaire presentation__bouton" href="mailto:{{ legal.contact }}?subject={{ 'presentation.contact_sujet'|trans|url_encode }}">{{ icones.icone('envoyer', 16) }}{{ 'presentation.une.association'|trans }}</a>
+                    </div>
+                </div>
+
+                {# Le village : une maison par caisse de ville, toutes sur le socle du bureau central. Décoratif. #}
+                <figure class="presentation__village" aria-hidden="true">
+                    <svg viewBox="0 0 560 260" focusable="false">
+                        <circle class="village__soleil" cx="486" cy="48" r="20"/>
+                        <g class="village__maisons">
+                            <g class="village__maison" style="--rang: 0"><path d="M24 200 V132 L56 104 L88 132 V200 Z"/><text x="56" y="222">Rouen</text></g>
+                            <g class="village__maison village__maison--claire" style="--rang: 1"><path d="M104 200 V150 L128 128 L152 150 V200 Z"/><text x="128" y="222">Évry</text></g>
+                            <g class="village__maison village__maison--forte" style="--rang: 2"><path d="M168 200 V96 L208 60 L248 96 V200 Z"/><rect class="village__porte" x="196" y="166" width="24" height="34" rx="2"/><text x="208" y="222">Paris</text></g>
+                            <g class="village__maison" style="--rang: 3"><path d="M264 200 V124 L296 96 L328 124 V200 Z"/><rect class="village__fenetre" x="284" y="140" width="24" height="16" rx="2"/><text x="296" y="222">Lyon</text></g>
+                            <g class="village__maison village__maison--claire" style="--rang: 4"><path d="M344 200 V156 L366 136 L388 156 V200 Z"/><text x="366" y="222">Le Mans</text></g>
+                            <g class="village__maison village__maison--forte" style="--rang: 5"><path d="M404 200 V112 L440 80 L476 112 V200 Z"/><rect class="village__porte" x="428" y="170" width="24" height="30" rx="2"/><text x="440" y="222">Marseille</text></g>
+                            <g class="village__maison" style="--rang: 6"><path d="M492 200 V146 L516 124 L540 146 V200 Z"/><text x="516" y="222">Creil</text></g>
+                        </g>
+                        <line class="village__socle" x1="12" y1="206" x2="548" y2="206"/>
+                        <text class="village__central" x="280" y="252">{{ 'presentation.une.socle'|trans }}</text>
+                    </svg>
+                </figure>
+            </section>
+
+            <section class="presentation__bloc" aria-labelledby="roles-titre">
+                <h2 id="roles-titre" class="presentation__sous-titre">{{ 'presentation.roles.titre'|trans }}</h2>
+                <dl class="presentation__roles">
+                    {% for role in ['central', 'ville', 'membre'] %}
+                        <div class="presentation__role">
+                            <dt>{{ ('presentation.roles.' ~ role ~ '.nom')|trans }}</dt>
+                            <dd>{{ ('presentation.roles.' ~ role ~ '.texte')|trans }}</dd>
+                        </div>
+                    {% endfor %}
+                </dl>
+            </section>
+
+            <section class="presentation__bloc presentation__bloc--regles" aria-labelledby="regles-titre">
+                <h2 id="regles-titre" class="presentation__sous-titre">{{ 'presentation.regles.titre'|trans }}</h2>
+                <ul class="presentation__regles">
+                    {% for regle, icone in {deux: 'coche', noms: 'oeil', etanche: 'cle', trace: 'activite'} %}
+                        <li><span class="presentation__icone" aria-hidden="true">{{ icones.icone(icone, 18) }}</span><span><strong>{{ ('presentation.regles.' ~ regle ~ '.titre')|trans }}</strong> {{ ('presentation.regles.' ~ regle ~ '.texte')|trans }}</span></li>
+                    {% endfor %}
+                </ul>
+            </section>
+
+            <section class="presentation__bloc" aria-labelledby="etapes-titre">
+                <h2 id="etapes-titre" class="presentation__sous-titre">{{ 'presentation.etapes.titre'|trans }}</h2>
+                <ol class="presentation__etapes">
+                    {% for etape in ['villes', 'classeurs', 'invitations', 'suivi', 'ag'] %}
+                        <li><strong>{{ ('presentation.etapes.' ~ etape ~ '.titre')|trans }}</strong><span>{{ ('presentation.etapes.' ~ etape ~ '.texte')|trans }}</span></li>
+                    {% endfor %}
+                </ol>
+            </section>
+
+            <section class="presentation__membre" aria-labelledby="membre-titre">
+                <h2 id="membre-titre">{{ 'presentation.membre.titre'|trans }}</h2>
+                <p>{{ 'presentation.membre.texte'|trans }}</p>
+            </section>
+        </main>
+
+        <footer class="presentation__pied">
+            <p>{{ 'presentation.pied'|trans }}</p>
+            {{ include('composants/pied_legal.html.twig') }}
+        </footer>
+    </div>
+{% endblock %}
