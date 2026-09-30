@@ -61,72 +61,67 @@
     color: var(--texte-3);
 }
 
-/* Pied commun en trois colonnes (30 septembre 2026, demande de Rama) : marque, liens, contact et crédits, puis le
-   copyright. Les colonnes s'empilent dès que chacune aurait moins de 12 rem. */
-.pied {
+/* Pied commun (30 septembre 2026) : une ligne, copyright et pages légales à gauche, crédits à droite ; deux lignes
+   centrées quand la place manque (téléphone, colonne de connexion). */
+.pied-legal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 2.5rem;
     width: 100%;
     margin: 0;
-    padding-top: 1.75rem;
+    padding-top: 1rem;
     border-top: 1px solid var(--bordure);
     font-size: var(--taille-petit);
     color: var(--texte-3);
-    text-align: left;
 }
 
-.pied__colonnes {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-    gap: 1.75rem 2.5rem;
-}
-
-.pied__colonne {
+.pied-legal p {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-}
-
-.pied__texte {
-    max-width: 18rem;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem 1rem;
     margin: 0;
-    line-height: 1.6;
-    text-wrap: pretty;
 }
 
-.pied__titre {
-    margin: 0;
-    font-size: var(--taille-petit);
-    font-weight: 700;
-    color: var(--texte);
-}
-
-.pied__liste {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    line-height: 1.5;
-}
-
-.pied a {
-    color: var(--texte-2);
+.pied-legal a {
+    color: var(--texte-3);
     text-decoration: none;
 }
 
-.pied a:hover {
-    color: var(--accent-texte);
+.pied-legal a:hover {
+    color: var(--texte);
     text-decoration: underline;
 }
 
-.pied strong {
-    font-weight: 600;
-    color: var(--texte-2);
+.pied-legal strong {
+    font-weight: 700;
+    color: var(--accent-texte);
 }
 
-.pied__copyright {
-    margin: 1.75rem 0 0;
-    padding-top: 1rem;
-    border-top: 1px solid var(--bordure);
+.pied-legal__credit {
+    gap: 0.25rem 0.5rem !important;
+}
+
+.pied-legal__mail {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background: var(--surface-2);
+}
+
+.pied-legal__mail:hover {
+    background: var(--accent-doux);
+    color: var(--accent-texte) !important;
+}
+
+@media (min-width: 64rem) {
+    .vitrine__pied .pied-legal {
+        justify-content: space-between;
+    }
 }

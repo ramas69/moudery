@@ -18,7 +18,7 @@ final class PresentationTest extends CasDeTestWeb
         self::assertSelectorTextContains('.vitrine__membre', 'pas d’inscription');
         self::assertSelectorExists('.demo .demo__piece');
         self::assertSelectorNotExists('a[href*="inscription"]');
-        self::assertSelectorExists('.pied a[href="/confidentialite"]');
+        self::assertSelectorExists('.pied-legal a[href="/confidentialite"]');
 
         $moudery = $this->creerAssociation('Association de Moudery', 'moudery');
         $this->connecter($this->creerUtilisateur($moudery, 'central@example.org', Role::BureauCentral));

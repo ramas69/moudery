@@ -17,12 +17,10 @@ final class LegalTest extends CasDeTestWeb
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'Politique de confidentialité');
         $this->client->request('GET', '/connexion');
-        self::assertSelectorExists('.pied a[href="/mentions-legales"]');
+        self::assertSelectorExists('.pied-legal a[href="/mentions-legales"]');
         self::assertSelectorNotExists('link[href*="fonts.googleapis.com"]', 'Plus aucun appel à Google Fonts.');
-        self::assertSelectorCount(3, '.pied .pied__colonne');
-        self::assertSelectorTextContains('.pied__copyright', '© '.date('Y').' Caisses', 'L’année du copyright suit l’année en cours.');
-        self::assertSelectorTextContains('.pied', 'Conçue par Rama SOUMARÉ, Yellingara');
-        self::assertSelectorTextContains('.pied', 'À la demande d’Ibrahima Ndiaye, Moudéry');
-        self::assertSelectorExists('.pied a[href="mailto:contact@pomelo-agence.com"]');
+        self::assertSelectorTextContains('.pied-legal__gauche', '© '.date('Y').' Caisses', 'L’année du copyright suit l’année en cours.');
+        self::assertSelectorTextContains('.pied-legal__credit', 'Conçue par Rama SOUMARÉ, Yellingara, pour Ibrahima NDIAYE, Moudéry');
+        self::assertSelectorExists('.pied-legal__credit a[href="mailto:contact@pomelo-agence.com"]');
     }
 }
