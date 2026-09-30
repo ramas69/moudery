@@ -2809,7 +2809,9 @@ legal:
     mentions: 'Mentions légales'
     confidentialite: 'Politique de confidentialité'
     mise_a_jour: 'Mise à jour le {date}.'
-    credit: '© {annee} Caisses. Conçue par Rama SOUMARÉ de Yellingara, à la demande d’Ibrahima Ndiaye de Moudéry.'
+    credit: 'Conçue par {auteur}, Yellingara, pour {commanditaire}, Moudéry'
+    confidentialite_court: Confidentialité
+    ecrire: 'Écrire à Rama SOUMARÉ : contact@pomelo-agence.com'
 vitrine:
     titre_page: 'Caisses · de la ville au village, chaque euro compte'
     se_connecter: 'Se connecter'

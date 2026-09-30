@@ -61,29 +61,67 @@
     color: var(--texte-3);
 }
 
+/* Pied commun (30 septembre 2026) : une ligne, copyright et pages légales à gauche, crédits à droite ; deux lignes
+   centrées quand la place manque (téléphone, colonne de connexion). */
 .pied-legal {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 0.25rem;
+    justify-content: center;
+    gap: 0.5rem 2.5rem;
+    width: 100%;
     margin: 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--bordure);
     font-size: var(--taille-petit);
     color: var(--texte-3);
-    text-align: center;
-    text-wrap: balance;
 }
 
 .pied-legal p {
-    margin: 0;
-}
-
-.pied-legal__liens {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
     gap: 0.25rem 1rem;
+    margin: 0;
 }
 
 .pied-legal a {
     color: var(--texte-3);
+    text-decoration: none;
+}
+
+.pied-legal a:hover {
+    color: var(--texte);
+    text-decoration: underline;
+}
+
+.pied-legal strong {
+    font-weight: 600;
+    color: var(--texte-2);
+}
+
+.pied-legal__credit {
+    gap: 0.25rem 0.5rem !important;
+}
+
+.pied-legal__mail {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background: var(--surface-2);
+}
+
+.pied-legal__mail:hover {
+    background: var(--accent-doux);
+    color: var(--accent-texte) !important;
+}
+
+@media (min-width: 64rem) {
+    .vitrine__pied .pied-legal {
+        justify-content: space-between;
+    }
 }

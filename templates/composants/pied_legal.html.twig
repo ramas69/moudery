@@ -1,5 +1,14 @@
-{# Pied des pages publiques et de l'espace membre : pages légales, puis le copyright (année courante) et les crédits. #}
+{# Pied des pages publiques et de l'espace membre : à gauche le copyright (année courante) et les pages légales, à droite
+   les crédits. Une ligne sur grand écran, deux lignes centrées dans une colonne étroite. #}
+{% import 'composants/icones.html.twig' as icones %}
 <div class="pied-legal">
-    <p class="pied-legal__liens"><a href="{{ path('mentions_legales') }}">{{ 'legal.mentions'|trans }}</a><a href="{{ path('confidentialite') }}">{{ 'legal.confidentialite'|trans }}</a></p>
-    <p class="pied-legal__credit">{{ 'legal.credit'|trans({annee: 'now'|date('Y')}) }} <a href="mailto:contact@pomelo-agence.com">contact@pomelo-agence.com</a></p>
+    <p class="pied-legal__gauche">
+        <span>© {{ 'now'|date('Y') }} {{ 'app.nom'|trans }}</span>
+        <a href="{{ path('mentions_legales') }}">{{ 'legal.mentions'|trans }}</a>
+        <a href="{{ path('confidentialite') }}">{{ 'legal.confidentialite_court'|trans }}</a>
+    </p>
+    <p class="pied-legal__credit">
+        <span>{{ 'legal.credit'|trans({auteur: '<strong>Rama SOUMARÉ</strong>', commanditaire: '<strong>Ibrahima Ndiaye</strong>'})|raw }}</span>
+        <a class="pied-legal__mail" href="mailto:contact@pomelo-agence.com" title="contact@pomelo-agence.com" aria-label="{{ 'legal.ecrire'|trans }}">{{ icones.icone('envoyer', 14) }}</a>
+    </p>
 </div>
