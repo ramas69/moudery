@@ -19,5 +19,9 @@ final class LegalTest extends CasDeTestWeb
         $this->client->request('GET', '/connexion');
         self::assertSelectorExists('.pied-legal a[href="/mentions-legales"]');
         self::assertSelectorNotExists('link[href*="fonts.googleapis.com"]', 'Plus aucun appel à Google Fonts.');
+        self::assertSelectorTextContains('.pied-legal__credit', '© '.date('Y').' Caisses', 'L’année du copyright suit l’année en cours.');
+        self::assertSelectorTextContains('.pied-legal__credit', 'Rama SOUMARÉ de Yellingara');
+        self::assertSelectorTextContains('.pied-legal__credit', 'Ibrahima Ndiaye de Moudéry');
+        self::assertSelectorExists('.pied-legal__credit a[href="mailto:contact@pomelo-agence.com"]');
     }
 }

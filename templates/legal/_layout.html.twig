@@ -17,6 +17,7 @@
         <main class="legal__corps" id="contenu">
             {% block contenu %}{% endblock %}
             <p class="legal__maj">{{ 'legal.mise_a_jour'|trans({date: '2026-09-29'|format_date('long')}) }}</p>
+            {{ include('composants/pied_legal.html.twig') }}
         </main>
     </div>
 {% endblock %}

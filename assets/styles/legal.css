@@ -63,11 +63,25 @@
 
 .pied-legal {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 0;
+    font-size: var(--taille-petit);
+    color: var(--texte-3);
+    text-align: center;
+    text-wrap: balance;
+}
+
+.pied-legal p {
+    margin: 0;
+}
+
+.pied-legal__liens {
+    display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.25rem 1rem;
-    margin: 0;
-    font-size: var(--taille-petit);
 }
 
 .pied-legal a {
