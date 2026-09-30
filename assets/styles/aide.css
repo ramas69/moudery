@@ -83,7 +83,6 @@
 
 .aide__guide-entete p,
 .aide__section p {
-    max-width: 62ch;
     margin: 0;
     color: var(--texte-2);
     text-wrap: pretty;
@@ -111,7 +110,6 @@
 
 .aide__etapes li {
     position: relative;
-    max-width: 62ch;
     padding-left: 2.5rem;
     counter-increment: etape;
     text-wrap: pretty;
@@ -217,7 +215,6 @@
 }
 
 .aide__glossaire dd {
-    max-width: 70ch;
     margin: 0;
     color: var(--texte-2);
     text-wrap: pretty;
