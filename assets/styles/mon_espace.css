@@ -75,7 +75,7 @@
     left: 0;
     z-index: 5;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     padding-bottom: env(safe-area-inset-bottom);
     border-top: 1px solid var(--bordure);
     background: var(--surface);
@@ -86,9 +86,10 @@
     align-items: center;
     justify-content: center;
     min-height: 3.5rem;
+    padding-inline: 0.125rem;
     border-top: 2px solid transparent;
     color: var(--texte-2);
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     font-weight: 600;
     text-align: center;
     text-decoration: none;
@@ -600,4 +601,97 @@
     .merci__actions .bouton {
         flex: 1 1 100%;
     }
+}
+
+/* Onglet Projets (30 septembre 2026) : un bloc par appel, total puis détail par ville, sans aucun nom. */
+.projet {
+    padding: 1rem;
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    background: var(--surface);
+}
+
+.projet__entete {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.projet__entete h2 {
+    text-wrap: balance;
+}
+
+.projet__detail,
+.projet__moi {
+    margin: 0;
+    font-size: var(--taille-petit);
+    color: var(--texte-2);
+    text-wrap: pretty;
+}
+
+.projet__moi {
+    padding: 0.625rem 0.75rem;
+    border-radius: var(--rayon-petit);
+    background: var(--surface-2);
+    color: var(--texte);
+}
+
+.projet__progression {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: center;
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.projet__villes {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--taille-petit);
+    font-variant-numeric: tabular-nums;
+}
+
+.projet__villes caption {
+    padding-bottom: 0.375rem;
+    font-weight: 700;
+    text-align: left;
+}
+
+.projet__villes th,
+.projet__villes td {
+    padding: 0.5rem 0.25rem;
+    border-bottom: 1px solid var(--bordure);
+    text-align: left;
+}
+
+.projet__villes .numerique {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.projet__villes thead th {
+    font-weight: 600;
+    color: var(--texte-3);
+}
+
+.projet__villes tfoot th,
+.projet__villes tfoot td {
+    border-bottom: 0;
+    font-weight: 700;
+}
+
+.projet__ma-ville th {
+    font-weight: 700;
+}
+
+.projet__vous {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent-texte);
+}
+
+.projet__progression .espace-membre__piste {
+    grid-column: auto;
 }

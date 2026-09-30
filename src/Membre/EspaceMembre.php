@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Membre;
 
+use App\Appel\Appels;
 use App\Association\Reversements;
 use App\Association\TableauDeBordAssociation;
+use App\Entity\AppelContribution;
+use App\Entity\AppelStatut;
 use App\Entity\Depense;
 use App\Entity\DepenseStatut;
 use App\Entity\Echeance;
@@ -14,6 +17,7 @@ use App\Entity\Membre;
 use App\Entity\MembreStatut;
 use App\Entity\Paiement;
 use App\Entity\Utilisateur;
+use App\Repository\AppelContributionRepository;
 use App\Repository\DepenseRepository;
 use App\Repository\EcheanceRepository;
 use App\Repository\MembreRepository;
@@ -36,7 +40,40 @@ final class EspaceMembre
         private readonly DepenseRepository $depenses,
         private readonly TableauDeBordAssociation $tableau,
         private readonly Reversements $reversements,
+        private readonly AppelContributionRepository $appels,
     ) {
+    }
+
+    /**
+     * Les projets et appels à contribution (30 septembre 2026, demande de Rama) : ceux lancés pour toute l'association et
+     * ceux de la ville du membre, les plus récents d'abord. Pour chacun, le suivi du bureau central (collecté, objectif,
+     * reste, détail par ville et total : des montants et des comptes, jamais un nom) et la situation du membre (versé, dû).
+     *
+     * @return list<array{appel: AppelContribution, suivi: array<string, mixed>, moi: array{verse: int, du: int, libre: bool}}>
+     */
+    public function projets(Membre $membre, \DateTimeImmutable $aujourdhui): array
+    {
+        $lignes = [];
+        foreach ($this->appels->findBy(['association' => $membre->getAssociation()], ['ouvertLe' => 'DESC', 'id' => 'DESC']) as $appel) {
+            if (AppelStatut::Brouillon === $appel->getStatut() || (null !== $appel->getVille() && $appel->getVille() !== $membre->getVille())) {
+                continue;
+            }
+            $moi = ['verse' => 0, 'du' => 0, 'libre' => false];
+            foreach ($appel->getEcheances() as $echeance) {
+                \assert($echeance instanceof Echeance);
+                if ($echeance->getMembre() !== $membre) {
+                    continue;
+                }
+                if ($echeance->estPayee()) {
+                    $moi['verse'] += $echeance->getMontant() ?? 0;
+                } elseif ($echeance->estDue()) {
+                    null === $echeance->getMontant() ? $moi['libre'] = true : $moi['du'] += $echeance->getMontant();
+                }
+            }
+            $lignes[] = ['appel' => $appel, 'suivi' => Appels::suivi($appel, $aujourdhui), 'moi' => $moi];
+        }
+
+        return $lignes;
     }
 
     /** La fiche du membre connecté, ou null : il n'a pas d'espace membre (pas de fiche dans une ville active). */

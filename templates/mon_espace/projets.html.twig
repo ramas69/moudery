@@ -1,0 +1,64 @@
+{# Projets et appels à contribution vus par un membre (30 septembre 2026) : pour chaque appel de l'association ou de
+   sa ville, le collecté, l'objectif et le reste au total puis ville par ville (jamais un nom), et sa propre situation.
+   Variables : membre, onglet, projets (EspaceMembre::projets()). #}
+{% extends 'mon_espace/_layout.html.twig' %}
+{% macro euros(centimes) %}{{ (centimes / 100)|format_currency('EUR', {fraction_digit: 0}) }}{% endmacro %}
+{% import _self as r %}
+
+{% block title %}{{ 'mon_espace.projets.titre'|trans }} · {{ membre.association.nom }}{% endblock %}
+
+{% block contenu %}
+    <p class="espace-membre__surtitre">{{ membre.association.nom }}</p>
+    <h1 class="espace-membre__titre">{{ 'mon_espace.projets.titre'|trans }}</h1>
+    <p class="espace-membre__intro">{{ 'mon_espace.projets.intro'|trans }}</p>
+
+    {% for p in projets %}
+        {% set a = p.appel %}
+        {% set s = p.suivi %}
+        <section class="espace-membre__bloc projet" aria-labelledby="projet-{{ a.id }}">
+            <div class="projet__entete">
+                <h2 id="projet-{{ a.id }}">{{ a.objet }}</h2>
+                <span class="pastille {{ a.statut.value == 'ouvert' ? 'pastille--info' : 'pastille--archivee' }}">{{ ('mon_espace.projets.statut.' ~ a.statut.value)|trans }}</span>
+            </div>
+            <p class="projet__detail">{{ a.type.nom }} · {{ (a.ville ? 'mon_espace.projets.pour_ville' : 'mon_espace.projets.pour_tous')|trans({ville: a.ville ? a.ville.nom : ''}) }} · {{ 'mon_espace.projets.avant'|trans({date: a.dateLimite|format_date('long')}) }}</p>
+
+            <dl class="espace-membre__bilan">
+                <div><dt>{{ 'mon_espace.projets.collecte'|trans }}</dt><dd>{{ r.euros(s.collecte) }}</dd></div>
+                {% if s.objectif is not null %}
+                    <div><dt>{{ 'mon_espace.projets.objectif'|trans }}</dt><dd>{{ r.euros(s.objectif) }}</dd></div>
+                    <div class="espace-membre__bilan-total"><dt>{{ 'mon_espace.projets.reste'|trans }}</dt><dd>{{ r.euros(s.reste) }}</dd></div>
+                {% else %}
+                    <div class="espace-membre__bilan-total"><dt>{{ 'mon_espace.projets.contributeurs'|trans }}</dt><dd>{{ s.contributeurs }}</dd></div>
+                {% endif %}
+            </dl>
+            {% if s.progression is not null %}
+                <p class="projet__progression"><span class="espace-membre__piste"><span style="width: {{ s.progression }}%"></span></span><strong>{{ s.progression }} %</strong></p>
+            {% endif %}
+
+            <p class="projet__moi">
+                {% if p.moi.du > 0 %}{{ 'mon_espace.projets.moi_du'|trans({verse: r.euros(p.moi.verse)|trim, du: r.euros(p.moi.du)|trim}) }}
+                {% elseif p.moi.libre %}{{ 'mon_espace.projets.moi_libre'|trans({verse: r.euros(p.moi.verse)|trim}) }}
+                {% elseif p.moi.verse > 0 %}{{ 'mon_espace.projets.moi_ok'|trans({verse: r.euros(p.moi.verse)|trim}) }}
+                {% else %}{{ 'mon_espace.projets.moi_rien'|trans }}{% endif %}
+            </p>
+
+            <table class="projet__villes">
+                <caption>{{ 'mon_espace.projets.par_ville'|trans }}</caption>
+                <thead><tr><th scope="col">{{ 'mon_espace.projets.ville'|trans }}</th><th scope="col" class="numerique">{{ 'mon_espace.projets.contributions'|trans }}</th><th scope="col" class="numerique">{{ 'mon_espace.projets.collecte'|trans }}</th>{% if a.montant %}<th scope="col" class="numerique">{{ 'mon_espace.projets.reste'|trans }}</th>{% endif %}</tr></thead>
+                <tbody>
+                    {% for v in s.parVille %}
+                        <tr{% if v.ville == membre.ville.nom %} class="projet__ma-ville"{% endif %}>
+                            <th scope="row">{{ v.ville }}{% if v.ville == membre.ville.nom %} <span class="projet__vous">{{ 'mon_espace.projets.ma_ville'|trans }}</span>{% endif %}</th>
+                            <td class="numerique">{{ v.contributeurs }} / {{ v.echeances }}</td>
+                            <td class="numerique">{{ r.euros(v.collecte) }}</td>
+                            {% if a.montant %}<td class="numerique">{{ r.euros(max(0, a.montant * v.echeances - v.collecte)) }}</td>{% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot><tr><th scope="row">{{ 'mon_espace.projets.total'|trans }}</th><td class="numerique">{{ s.contributeurs }} / {{ s.echeances }}</td><td class="numerique">{{ r.euros(s.collecte) }}</td>{% if a.montant %}<td class="numerique">{{ r.euros(s.reste ?? 0) }}</td>{% endif %}</tr></tfoot>
+            </table>
+        </section>
+    {% else %}
+        <p class="espace-membre__vide">{{ 'mon_espace.projets.aucun'|trans }}</p>
+    {% endfor %}
+{% endblock %}

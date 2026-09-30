@@ -83,6 +83,22 @@ final class MonEspaceController extends AbstractController
         ]);
     }
 
+    /** Projets et appels à contribution : collecté, reste, par ville et au total, et ma propre situation. */
+    #[Route('/projets', name: 'mon_espace_projets', methods: ['GET'])]
+    public function projets(): Response
+    {
+        $membre = $this->membre();
+        if (null === $membre) {
+            return $this->redirectToRoute('accueil');
+        }
+
+        return $this->render('mon_espace/projets.html.twig', [
+            'membre' => $membre,
+            'onglet' => 'projets',
+            'projets' => $this->espace->projets($membre, new \DateTimeImmutable()),
+        ]);
+    }
+
     #[Route('/ma-ville/depenses', name: 'mon_espace_ville_depenses', methods: ['GET'])]
     public function depensesDeMaVille(): Response
     {

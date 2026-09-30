@@ -2592,6 +2592,7 @@ mon_espace:
     onglets:
         echeances: Échéances
         historique: Historique
+        projets: Projets
         ville: 'Ma ville'
         profil: Profil
     echeances:
@@ -2627,6 +2628,29 @@ mon_espace:
         central: 'Reversé au bureau central'
         voir_recu: 'Voir le reçu'
         retour: 'Retour à mes échéances'
+    projets:
+        titre: 'Projets et appels'
+        intro: 'Ce que chaque appel a collecté, ville par ville et au total. Les contributions restent anonymes.'
+        statut:
+            ouvert: 'En cours'
+            cloture: Clôturé
+        pour_tous: 'toutes les villes'
+        pour_ville: 'ville de {ville}'
+        avant: 'avant le {date}'
+        collecte: Collecté
+        objectif: Objectif
+        reste: 'Reste à collecter'
+        contributeurs: Contributions
+        contributions: Contributions
+        par_ville: 'Par ville'
+        ville: Ville
+        ma_ville: 'ma ville'
+        total: Total
+        moi_ok: 'Vous avez versé {verse}. Merci !'
+        moi_du: 'Vous avez versé {verse} ; il vous reste {du} à régler.'
+        moi_libre: 'Vous avez versé {verse} ; votre contribution, libre, reste à faire.'
+        moi_rien: 'Cet appel ne vous concerne pas directement.'
+        aucun: 'Aucun projet ni appel à contribution pour l’instant.'
     historique:
         titre: Historique
         vide: 'Aucun paiement enregistré pour l’instant.'

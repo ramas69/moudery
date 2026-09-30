@@ -1,5 +1,5 @@
 {# Coquille de l'espace membre (F-26), mobile d'abord comme la maquette « Espace membre » : en-tête (logo, prénom,
-   menu du compte), contenu, onglets Échéances · Historique · Ma ville · Profil en bas sur téléphone, en haut sur un
+   menu du compte), contenu, onglets Échéances · Historique · Projets · Ma ville · Profil en bas sur téléphone, en haut sur un
    grand écran. Variables : membre, onglet. #}
 {% extends 'base.html.twig' %}
 {% import 'composants/icones.html.twig' as icones %}
@@ -25,7 +25,7 @@
         </header>
 
         <nav class="espace-membre__onglets" aria-label="{{ 'mon_espace.navigation'|trans }}">
-            {% for cle, route in {echeances: 'mon_espace', historique: 'mon_espace_historique', ville: 'mon_espace_ville', profil: 'mon_espace_profil'} %}
+            {% for cle, route in {echeances: 'mon_espace', historique: 'mon_espace_historique', projets: 'mon_espace_projets', ville: 'mon_espace_ville', profil: 'mon_espace_profil'} %}
                 <a class="espace-membre__onglet" href="{{ path(route) }}"{% if onglet == cle %} aria-current="page"{% endif %}>{{ ('mon_espace.onglets.' ~ cle)|trans }}</a>
             {% endfor %}
         </nav>
