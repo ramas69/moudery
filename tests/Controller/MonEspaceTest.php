@@ -49,7 +49,7 @@ final class MonEspaceTest extends CasDeTestWeb
         self::assertSelectorTextContains('h1', 'Mes échéances');
         self::assertSelectorTextContains('.espace-membre__surtitre', 'Bonjour Hawa · Lyon');
         self::assertSelectorTextContains('.espace-membre__vide', 'Vous êtes à jour');
-        self::assertSelectorCount(4, '.espace-membre__onglet');
+        self::assertSelectorCount(5, '.espace-membre__onglet');
 
         $fiche = $this->em()->getRepository(Membre::class)->findOneBy(['email' => 'hawa@example.org']);
         self::assertSame($this->compteHawa, $fiche?->getCompte()?->getId(), 'La fiche est rattachée au compte.');
