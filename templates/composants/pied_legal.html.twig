@@ -1,14 +1,29 @@
-{# Pied des pages publiques et de l'espace membre : à gauche le copyright (année courante) et les pages légales, à droite
-   les crédits. Une ligne sur grand écran, deux lignes centrées dans une colonne étroite. #}
-{% import 'composants/icones.html.twig' as icones %}
-<div class="pied-legal">
-    <p class="pied-legal__gauche">
-        <span>© {{ 'now'|date('Y') }} {{ 'app.nom'|trans }}</span>
-        <a href="{{ path('mentions_legales') }}">{{ 'legal.mentions'|trans }}</a>
-        <a href="{{ path('confidentialite') }}">{{ 'legal.confidentialite_court'|trans }}</a>
-    </p>
-    <p class="pied-legal__credit">
-        <span>{{ 'legal.credit'|trans({auteur: '<strong>Rama SOUMARÉ</strong>', commanditaire: '<strong>Ibrahima Ndiaye</strong>'})|raw }}</span>
-        <a class="pied-legal__mail" href="mailto:contact@pomelo-agence.com" title="contact@pomelo-agence.com" aria-label="{{ 'legal.ecrire'|trans }}">{{ icones.icone('envoyer', 14) }}</a>
-    </p>
-</div>
+{# Pied des pages publiques et de l'espace membre, en trois colonnes (demande de Rama du 30 septembre 2026) : la marque,
+   les liens utiles, le contact et les crédits ; puis le copyright à l'année courante. Les colonnes s'empilent quand la
+   place manque (téléphone, colonne de connexion étroite). #}
+<footer class="pied">
+    <div class="pied__colonnes">
+        <div class="pied__colonne">
+            {{ include('composants/logo.html.twig', {taille: 32, lien: path('accueil')}) }}
+            <p class="pied__texte">{{ 'legal.pied.promesse'|trans }}</p>
+        </div>
+        <nav class="pied__colonne" aria-label="{{ 'legal.aria'|trans }}">
+            <h2 class="pied__titre">{{ 'legal.pied.liens'|trans }}</h2>
+            <ul class="pied__liste">
+                <li><a href="{{ path('connexion') }}">{{ 'connexion.titre'|trans }}</a></li>
+                <li><a href="{{ path('aide') }}">{{ 'legal.pied.aide'|trans }}</a></li>
+                <li><a href="{{ path('mentions_legales') }}">{{ 'legal.mentions'|trans }}</a></li>
+                <li><a href="{{ path('confidentialite') }}">{{ 'legal.confidentialite'|trans }}</a></li>
+            </ul>
+        </nav>
+        <div class="pied__colonne">
+            <h2 class="pied__titre">{{ 'legal.pied.contact'|trans }}</h2>
+            <ul class="pied__liste">
+                <li>{{ 'legal.pied.concue'|trans({auteur: '<strong>Rama SOUMARÉ</strong>'})|raw }}</li>
+                <li><a href="mailto:contact@pomelo-agence.com">contact@pomelo-agence.com</a></li>
+                <li>{{ 'legal.pied.demande'|trans({commanditaire: '<strong>Ibrahima Ndiaye</strong>'})|raw }}</li>
+            </ul>
+        </div>
+    </div>
+    <p class="pied__copyright">{{ 'legal.pied.copyright'|trans({annee: 'now'|date('Y')}) }}</p>
+</footer>

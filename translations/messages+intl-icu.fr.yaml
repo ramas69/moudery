@@ -2809,9 +2809,14 @@ legal:
     mentions: 'Mentions légales'
     confidentialite: 'Politique de confidentialité'
     mise_a_jour: 'Mise à jour le {date}.'
-    credit: 'Conçue par {auteur}, Yellingara, pour {commanditaire}, Moudéry'
-    confidentialite_court: Confidentialité
-    ecrire: 'Écrire à Rama SOUMARÉ : contact@pomelo-agence.com'
+    pied:
+        promesse: 'La caisse du village, tenue ensemble, ville par ville.'
+        liens: Liens
+        aide: 'Aide et tutoriel'
+        contact: Contact
+        concue: 'Conçue par {auteur}, Yellingara'
+        demande: 'À la demande d’{commanditaire}, Moudéry'
+        copyright: '© {annee} Caisses. Tous droits réservés.'
 vitrine:
     titre_page: 'Caisses · de la ville au village, chaque euro compte'
     se_connecter: 'Se connecter'
