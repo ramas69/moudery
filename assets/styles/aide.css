@@ -55,6 +55,19 @@
     text-decoration: underline;
 }
 
+/* La section en cours de lecture (contrôleur Stimulus « sommaire ») : trait accent à gauche, texte accent. */
+.aide__sommaire a {
+    margin-left: -1rem;
+    padding-left: calc(1rem - 2px);
+    border-left: 2px solid transparent;
+}
+
+.aide__sommaire a[aria-current="true"] {
+    border-left-color: var(--accent);
+    color: var(--accent-texte);
+    font-weight: 600;
+}
+
 .aide__guides {
     display: grid;
     gap: 3.5rem;

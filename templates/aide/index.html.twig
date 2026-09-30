@@ -52,8 +52,8 @@
 } %}
 
 {% block contenu %}
-<div class="aide">
-    <nav class="aide__sommaire" aria-label="{{ 'aide.sommaire'|trans }}">
+<div class="aide" data-controller="sommaire">
+    <nav class="aide__sommaire" aria-label="{{ 'aide.sommaire'|trans }}" data-sommaire-target="nav">
         <h2>{{ 'aide.sommaire'|trans }}</h2>
         <ul>
             <li class="aide__sommaire-guide"><a href="#vue-ensemble">{{ 'aide.vue_ensemble'|trans }}</a></li>
